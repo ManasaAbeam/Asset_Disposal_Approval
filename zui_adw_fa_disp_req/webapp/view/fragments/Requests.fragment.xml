@@ -1,0 +1,161 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:f="sap.f">
+    <f:DynamicPage id="dynamicPageRequests" fitContent="true" class="sapUiNoContentPadding">
+        <f:header>
+            <f:DynamicPageHeader>
+                <f:content>
+                    <fb:FilterBar id="filterbarRequests" useToolbar="false" search=".onSearchRequest">
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem id="fgiBtpRequestId" name="Request ID" label="{i18n>lblBtpRequestId}" groupName="Group1" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inpRequestId" showValueHelp="true" required="true" suggest="onSuggestRequestId" showSuggestion="true" valueHelpRequest=".onRequestIdValueHelp">
+                                    </Input>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+
+
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table id="idTRequests" sticky="HeaderToolbar,ColumnHeaders" mode="None" items="{RequestItemsModel>/RequestItemsData}" growing="true" growingScrollToLoad="true">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer />
+                         <Button id="idEdit" text= "{i18n>btnEdit}" type="Emphasized" press="onEditAssetRequests" />
+                        <!-- <Button id="idEdit" text="{= ${RequestItemsModel>/RequestItemsData/0/Zstat} === 'Rejected' || ${RequestItemsModel>/RequestItemsData/0/Zstat} === 'Save As Draft' ? ${i18n>btnEdit} : ${i18n>btnDisplay} }" type="Emphasized" press="onEditAssetRequests" /> -->
+                    </OverflowToolbar>
+                </headerToolbar>
+                <columns>
+                    <Column visible="false">
+                        <Text text="{i18n>colHeaderRequestId}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colHCompanyCode}" />
+                    </Column>
+
+
+                    <Column>
+                        <Text text="{i18n>colStatus}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colListRequestId}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colItemNumber}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colRequestDate}" />
+                    </Column>
+                    <Column >
+                        <Text text="{i18n>lblCompanyCode}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colAsset}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colAssetSub}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colAssetClass}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colDescription}" />
+                    </Column >
+                    <Column visible="false">
+                        <Text text="{i18n>colQuantity}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colBaseUnit}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colGroup2EvalKey}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetLocation}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colCostCenter}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colWBSElement}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colProfitCenter}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colGrantID}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colValidityEndDate}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblAssetPhysicalDisposalRequired}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblDisposalReason}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblDisposalQty}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblDisposalValue}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblDisposalPercentage}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetCapitalizationDate}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>lblCurrency}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colGroup1EvalKey}" />
+                    </Column>
+
+                </columns>
+                <items>
+                    <ColumnListItem >
+                        <cells>
+                            <Text text="{RequestItemsModel>/RequestId}"/>
+                            <Text text="{RequestItemsModel>Bukrs}"/>
+
+                            <Text text="{RequestItemsModel>Zstat}"/>
+                            <Text text="{RequestItemsModel>Btprn}"/>
+                            <Text text="{RequestItemsModel>Itemno}"/>
+                            <Text text="{RequestItemsModel>Cpudt}"/>
+                            <Text text="{RequestItemsModel>Bukrs}"/>
+                            <Text text="{RequestItemsModel>Anln1}"/>
+                            <Text text="{RequestItemsModel>Anln2}"/>
+                            <Text text="{RequestItemsModel>Anlkl}"/>
+                            <Text text="{RequestItemsModel>Txa50Nlt}"/>
+                            <Text text="{RequestItemsModel>AmMenge}"/>
+                            <Text text="{RequestItemsModel>Meins}" />
+                            <Text text="{RequestItemsModel>Ord42}" />
+                            <Text text="{RequestItemsModel>Stort}" />
+                            <Text text="{RequestItemsModel>Kostl}" />
+                            <Text text="{RequestItemsModel>PsPspPnr2}"/>
+                            <Text text="{RequestItemsModel>Prctr}"/>
+                            <Text text="{RequestItemsModel>GmGrantNbr}"/>
+                            <Text text="{RequestItemsModel>GmToDate}"/>
+                            <Text text="{RequestItemsModel>Zphya}"/>
+                            <Text text="{RequestItemsModel>Rstgr}"/>
+                            <Text text="{RequestItemsModel>Menge}"/>
+                            <Text text="{RequestItemsModel>Anbtr}" />
+                            <Text text="{RequestItemsModel>Prozs}" />
+                            <Text text="{RequestItemsModel>Aktivd}" />
+                            <Text text="{RequestItemsModel>Currency}"/>
+                            <Text text="{RequestItemsModel>Answl}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+
+</core:FragmentDefinition>

@@ -1,0 +1,170 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar">
+    <f:DynamicPage id="dynamicPageAssetDisposal" fitContent="true" class="sapUiNoContentPadding">
+
+        <f:header>
+            <f:DynamicPageHeader >
+                <f:content>
+                    <fb:FilterBar id="filterbarAssetDisposal"  useToolbar="false" search=".onSearchAssetDisposal" >
+                        <fb:filterGroupItems>
+                            <fb:FilterGroupItem id="fgiAssetCostCenter" name="CostCenter" label="{i18n>lblCostCenter}" groupName="Group1" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inpAssetCostCenter" showValueHelp="true" required="true" showSuggestion="true" valueHelpRequest=".onCostCenterValueHelp" suggestionItems="{/CostCenter_VH}">
+                                        <suggestionItems>
+                                            <core:ListItem id="ltAssetCostCenter" key="{CostCenter}" text="{CostCenter}" />
+                                        </suggestionItems>
+                                    </Input>
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                            <fb:FilterGroupItem id="fgiMasterFixedAsset" name="Asset" label="{i18n>lblAssetNumber}" groupName="Group1" visibleInFilterBar="true">
+                                <fb:control>
+                                    <Input id="inpMasterFixedAsset" showValueHelp="true"  showSuggestion="true" valueHelpRequest=".onAssetNumValueHelp" suggestionItems="{/Asset_VH}">
+                                        <suggestionItems>
+                                            <core:ListItem id="liMasterFixedAsset" key="{MasterFixedAsset}" text="{MasterFixedAsset}" />
+                                        </suggestionItems>
+                                    </Input>
+
+                                    
+                                    
+                                </fb:control>
+                            </fb:FilterGroupItem>
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <Table id="idTAssetDisposal"  sticky="HeaderToolbar,ColumnHeaders" mode="MultiSelect" items="{/AssetWorklist}" growing="true" growingScrollToLoad="true">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer />
+                        <Button text="{i18n>btnCreate}" type="Emphasized" press="onNewAssetRequests" />
+                    </OverflowToolbar>
+
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="{i18n>colCostCenter}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colAsset}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colCompanyCode}" />
+                    </Column>
+                    <Column  visible="false">
+                        <Text text="{i18n>colDescription}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colCurrency}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetSub}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetClass}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colQuantity}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colBaseUnit}" />
+                    </Column>
+                 
+                    <Column visible="false">
+                        <Text text="{i18n>colGroup1EvalKey}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colGroup2EvalKey}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetLocation}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colCostCenter}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colWBSElement}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colProfitCenter}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colGrantID}" />
+                    </Column>
+                    <Column>
+                        <Text text="{i18n>colValidityEndDate}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colAPCValue}" />
+                    </Column>
+                    
+                    <Column visible="false">
+                        <Text text="{i18n>colAssetCapitalizationDate}" />
+                    </Column>
+
+                    <Column visible="false">
+                        <Text text="{i18n>colDepArea}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colPhYear}" />
+                    </Column>
+                    <Column visible="false">
+                        <Text text="{i18n>colDepreTillDate}" />
+                    </Column>
+
+                    <!-- New Column for AssetPhysicalDisposalRequired -->
+<!-- <Column width="18rem">
+    <Text text="{i18n>lblAssetPhysicalDisposalRequired}" />
+</Column> -->
+
+
+
+                </columns>
+                <items>
+                    <ColumnListItem id="clAssetDisposal" type="Navigation" visible="{visibilityModel>/columlist}">
+                        <cells>
+                            <ObjectIdentifier title="{CostCenter}" />
+                            <Text text="{Asset}" />
+                            <Text text="{CompanyCode}" />
+                            <Text text="{Description}" />
+                            <Text text="{Currency}" />
+
+
+                            <Text text="{AssetSub}" />
+                            <Text text="{AssetClass}" />
+                            <Text text="{Quantity}" />
+                            <Text text="{BaseUnit}" />
+                           
+                            <Text text="{Group1AssetEvaluationKey}" />
+                            <Text text="{Group2AssetEvaluationKey}" />
+                            <Text text="{AssetLocation}" />
+                            <Text text="{CostCenter}" />
+                            <Text text="{WBSElementInternalID}" />
+                            <Text text="{ProfitCenter}" />
+                            <Text text="{GrantID}" />
+                            <Text text="{ValidityEndDate}" />
+                            <Text text="{APC_Value}" />
+                            
+                            <Text text="{AssetCapitalizationDate}" />
+
+                            <Text text="{DepArea}" />
+                            <Text text="{PhYear}" />
+                            <Text text="{DepreTillDate}" />
+                            <!-- <ComboBox 
+    selectedKey="{AssetPhysicalDisposalRequired}" 
+    items="{disposalRequiredModel>/DisposalRequiredOptions}" 
+    change=".onDisposalRequiredChange">
+    <core:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
+</ComboBox> -->
+
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</core:FragmentDefinition>

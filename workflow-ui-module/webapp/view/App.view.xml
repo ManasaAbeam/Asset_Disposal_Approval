@@ -1,0 +1,211 @@
+<mvc:View 
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    displayBlock="true"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:uxap="sap.uxap"
+    xmlns:c="sap.ui.core"
+    xmlns="sap.ui.table"
+    xmlns:layout="sap.ui.layout"
+    xmlns:m="sap.m" 
+    controllerName="fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.App">
+
+    <uxap:ObjectPageLayout id="ObjectPageLayout" showFooter="true">
+
+        <uxap:sections>
+            <uxap:ObjectPageSection showTitle="false">
+                <uxap:subSections>
+                    <uxap:ObjectPageSubSection>
+                        <uxap:blocks>
+                            <layout:VerticalLayout width="100%">
+                                <!-- Asset Table -->
+                                <Table id="idtEditAssetRequest" rows="{listOfSelectedAssetsModel>/value}" selectionMode="None" fixedColumnCount="2" >
+                                    <extension>
+                                        <m:OverflowToolbar style="Clear">
+                                            <m:Title id="idtitle" text="{i18n>titleSelectedAssets}"/>
+                                        </m:OverflowToolbar>
+                                    </extension>
+                            
+                                    <columns>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblCompanyCode}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Bukrs}" wrapping="false" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblAsset}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Anln1}"/>
+                                            </template>
+                                        </Column>
+                                        <Column width="6rem" hAlign="End">
+                                            <m:Label text="{i18n>lblAssetSub}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Anln2}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="9rem">
+                                            <m:Label text="{i18n>lblAssetClass}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Anlkl}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="9rem">
+                                            <m:Label text="{i18n>lblDescription}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Txa50Nlt}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="12rem">
+                                            <m:Label text="{i18n>lblQuantity}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>AmMenge}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="9rem">
+                                            <m:Label text="{i18n>lblBaseUnit}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Meins}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="9rem">
+                                            <m:Label text="{i18n>lblAssetCapitalizationDate}" />
+                                            <template>
+                                                <!-- <m:Label text="{listOfSelectedAssetsModel>Aktivd}" /> -->
+                                                <m:Label text="{
+            path: 'listOfSelectedAssetsModel>Aktivd',
+            formatter: '.formatCapitalizationDate'
+        }" />    
+                                            </template>
+                                        </Column>
+                                        <Column width="7rem">
+                                            <m:Label text="{i18n>lblGroup1AssetEvalKey}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Ord41}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="12rem">
+                                            <m:Label text="{i18n>lblGroup2AssetEvalKey}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Ord42}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="12rem">
+                                            <m:Label text="{i18n>lblAssetLocation}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Stort}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="6rem">
+                                            <m:Label text="{i18n>lblCostCenter}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Kostl}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblWBSElement}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>WBSElement}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblProfitCenter}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Prctr}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblGrantID}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>GmGrantNbr}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblValidityEndDate}" />
+                                            <template>
+                                                <!-- <m:Label text="{listOfSelectedAssetsModel>GmToDate}" /> -->
+                                                  <m:Label text="{
+            path: 'listOfSelectedAssetsModel>GmToDate',
+            formatter: '.formatCapitalizationDate'
+        }" />  
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblAPCValue}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Answl}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblCurrency}" />
+                                            <template>
+                                                <m:Label text="{listOfSelectedAssetsModel>Currency}" />
+                                            </template>
+                                        </Column>
+                                         <Column width="18rem">
+                                            <m:Label text="{i18n>lblDepreTillDate}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Nafag}"></m:Text>
+                                            </template>
+                                        </Column>
+                                        <Column width="18rem">
+                                            <m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Zphya}"></m:Text>
+                                            </template>
+                                        </Column>
+                                        <Column width="12rem">
+                                            <m:Label text="{i18n>lblDisposalReason}" required="true"/>
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>txt40}"></m:Text>
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblDisposalQty}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Menge}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblDisposalValue}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Anbtr}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="11rem">
+                                            <m:Label text="{i18n>lblDisposalPercentage}" />
+                                            <template>
+                                                <m:Text text="{listOfSelectedAssetsModel>Prozs}" />
+                                            </template>
+                                        </Column>
+                                        <Column width="18rem">
+                                            <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
+                                            <template>
+                                                <m:HBox justifyContent="Center">
+                                                    <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                                                </m:HBox>
+                                            </template>
+                                        </Column>
+                                    </columns>
+                                </Table>
+
+                                <!-- Approver Comments Section Below Table -->
+                                <m:VBox class="sapUiSmallMarginTop" width="100%">
+                                    <m:Label text="{i18n>lblApproverComments}" design="Bold" />
+                                                            <m:TextArea id="idApproverComments" placeholder="{i18n>phEnterComments}" rows="2" width="100%" />
+                                    <!-- <m:TextArea 
+                                        id="idApproverComments" 
+                                        placeholder="{i18n>phEnterComments}" 
+                                        rows="3" 
+                                        width="100%" 
+                                        value="{listOfSelectedAssetsModel>/Header/ApproverComments}" 
+                                        enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" /> -->
+                                </m:VBox>
+                            </layout:VerticalLayout>
+                        </uxap:blocks>
+                    </uxap:ObjectPageSubSection>
+                </uxap:subSections>
+            </uxap:ObjectPageSection>
+        </uxap:sections>
+    </uxap:ObjectPageLayout>
+</mvc:View>

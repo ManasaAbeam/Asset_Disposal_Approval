@@ -1,0 +1,107 @@
+_schema-version: "3.2"
+ID: zui_adw_manage
+version: 0.0.1
+modules:
+- name: zui_adw_manage-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: zui_adw_manage-destination-service
+    parameters:
+      content-target: true
+  - name: zui_adw_manage_html_repo_host
+    parameters:
+      service-key:
+        name: zui_adw_manage_html_repo_host-key
+  - name: uaa_zui_adw_manage
+    parameters:
+      service-key:
+        name: uaa_zui_adw_manage-key
+  parameters:
+    content:
+      subaccount:
+        destinations:
+        - Name: zui_adw_zui_adw_manage_html_repo_host
+          ServiceInstanceName: zui_adw_manage-html5-app-host-service
+          ServiceKeyName: zui_adw_manage_html_repo_host-key
+          sap.cloud.service: zui_adw
+        - Authentication: OAuth2UserTokenExchange
+          Name: zui_adw_uaa_zui_adw_manage
+          ServiceInstanceName: zui_adw_manage-xsuaa-service
+          ServiceKeyName: uaa_zui_adw_manage-key
+          sap.cloud.service: zui_adw
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: zui_adw_manage-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: zui_adw_manage_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - zuiadwfixedassetsdisposalapprovalzuiadwfadispreq.zip
+      name: zuiadwfixedassetsdisposalapprovalzuiadwfadispreq
+      target-path: resources/
+    - artifacts:
+      - fixedassetsdisposalapprovaladwwfworkflowuimodule.zip
+      name: fixedassetsdisposalapprovaladwwfworkflowuimodule
+      target-path: resources/
+- name: zuiadwfixedassetsdisposalapprovalzuiadwfadispreq
+  type: html5
+  path: zui_adw_fa_disp_req
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: fixedassetsdisposalapprovaladwwfworkflowuimodule
+  type: html5
+  path: workflow-ui-module
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: zui_adw_manage-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        subaccount:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: zui_adw_manage-destination-service
+    service-plan: lite
+- name: zui_adw_manage_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: zui_adw_manage-html5-app-host-service
+    service-plan: app-host
+- name: uaa_zui_adw_manage
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: zui_adw_manage-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo
+  enable-parallel-deployments: true

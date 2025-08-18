@@ -1,0 +1,9 @@
+<mvc:View controllerName="fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.AssetDisposal"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+    <Page showHeader="false" id="assetdisposal" showFooter="false">
+        <content>
+            <Text text="Asset disposal app texe"></Text>
+        </content>
+    </Page>
+</mvc:View>

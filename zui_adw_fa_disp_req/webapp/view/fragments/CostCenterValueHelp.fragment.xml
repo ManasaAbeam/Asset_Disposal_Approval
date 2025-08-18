@@ -1,0 +1,15 @@
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <SelectDialog id="selectDialog" title="{i18n>dlgTitleSelectCostCenter}" items="{
+            path: '/CostCenter_VH',
+            sorter: {
+                path: 'CostCenterName',
+                descending: false
+            }
+        }"  search="onGenericValueHelpSearch" confirm=".onGenericValueHelpClose" cancel=".onGenericValueHelpClose">
+        <customData>
+            <core:CustomData key="filterFields" value="CostCenter,CostCenterName" />
+        </customData>
+        <StandardListItem title="{CostCenter}" description="{CostCenterName}" />
+    </SelectDialog>
+</core:FragmentDefinition>

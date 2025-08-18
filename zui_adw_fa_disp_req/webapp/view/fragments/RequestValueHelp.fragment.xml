@@ -1,0 +1,9 @@
+
+<core:FragmentDefinition xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <SelectDialog id="idRselectDialog" title="{i18n>lblBtpRequestId}" search=".onRequestIdValueHelpSearch($event,'Btprn')" confirm=".onGenericValueHelpClose" cancel=".onGenericValueHelpClose" items="{
+            path: 'ZUI_ADW_ASSET_REQUEST_SRV>/AssetDispSet'
+        }">
+        <StandardListItem title="{ZUI_ADW_ASSET_REQUEST_SRV>Btprn}" description="{ZUI_ADW_ASSET_REQUEST_SRV>ReqStatus}" />
+    </SelectDialog>
+</core:FragmentDefinition>

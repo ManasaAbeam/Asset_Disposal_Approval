@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZUI_SMU_ATTACHMENTS_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="Attachments" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Fileid"/>
+                </Key>
+                <Property Name="Fileid" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Phys. Document" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Reqno" Type="Edm.String" Nullable="false" MaxLength="25" sap:unicode="false" sap:label="Document" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Reqitem" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Item Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Reqtype" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Request Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Filename" Type="Edm.String" Nullable="false" MaxLength="255" sap:unicode="false" sap:label="Original" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mimetype" Type="Edm.String" Nullable="false" MaxLength="128" sap:unicode="false" sap:label="MIME type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Filesize" Type="Edm.String" Nullable="false" MaxLength="12" sap:unicode="false" sap:label="FileLgt." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="CrBtpuser" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Created By BTP" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12" sap:unicode="false" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Erdat" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created On" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Erzet" Type="Edm.Time" Nullable="false" Precision="0" sap:unicode="false" sap:label="Time" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="File" m:HasStream="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Fileid"/>
+                </Key>
+                <Property Name="Fileid" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MimeType" Type="Edm.String" Nullable="false" MaxLength="128" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="LinkFiles" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Comments"/>
+                </Key>
+                <Property Name="Comments" Type="Edm.String" Nullable="false" MaxLength="200" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <NavigationProperty Name="Attachments" Relationship="ZUI_SMU_ATTACHMENTS_SRV.LinkFiles_Att" FromRole="FromRole_LinkFiles_Att" ToRole="ToRole_LinkFiles_Att"/>
+            </EntityType>
+            <Association Name="LinkFiles_Att" sap:content-version="1">
+                <End Type="ZUI_SMU_ATTACHMENTS_SRV.LinkFiles" Multiplicity="*" Role="FromRole_LinkFiles_Att"/>
+                <End Type="ZUI_SMU_ATTACHMENTS_SRV.Attachments" Multiplicity="*" Role="ToRole_LinkFiles_Att"/>
+            </Association>
+            <EntityContainer Name="ZUI_SMU_ATTACHMENTS_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="AttachmentsList" EntityType="ZUI_SMU_ATTACHMENTS_SRV.Attachments" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="FileSet" EntityType="ZUI_SMU_ATTACHMENTS_SRV.File" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="LinkFiles" EntityType="ZUI_SMU_ATTACHMENTS_SRV.LinkFiles" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <AssociationSet Name="LinkFiles_Att_AssocSet" Association="ZUI_SMU_ATTACHMENTS_SRV.LinkFiles_Att" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="LinkFiles" Role="FromRole_LinkFiles_Att"/>
+                    <End EntitySet="AttachmentsList" Role="ToRole_LinkFiles_Att"/>
+                </AssociationSet>
+            </EntityContainer>
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <atom:link rel="self" href="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

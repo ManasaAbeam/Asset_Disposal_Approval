@@ -1,0 +1,239 @@
+<mvc:View controllerName="zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.DisposalRequest"
+	xmlns="sap.ui.table"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:c="sap.ui.core"
+	xmlns:m="sap.m"
+	xmlns:rowmodes="sap.ui.table.rowmodes">
+	<m:Page showHeader="false" enableScrolling="false" class="sapUiContentPadding">
+		<m:content>
+			<Table id="idtDisposalRequest" rows="{listOfSelectedAssetsModel>/assets}" selectionMode="None" fixedColumnCount="2">
+				<extension>
+					<m:OverflowToolbar style="Clear">
+						<m:Title id="title" text="{i18n>titleSelectedAssets}"/>
+					</m:OverflowToolbar>
+				</extension>
+
+				<rowMode>
+					<rowmodes:Auto maxRowCount="{listOfSelectedAssetsModel>/length}" />
+				</rowMode>
+				<columns>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblCompanyCode}" />
+						<template>
+							<m:Text text="{listOfSelectedAssetsModel>CompanyCode}" wrapping="false" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblAsset}" />
+						<template>
+							<m:Text text="{listOfSelectedAssetsModel>Asset}"/>
+						</template>
+					</Column>
+					<Column width="6rem" hAlign="End">
+						<m:Label text="{i18n>lblAssetSub}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>AssetSub}" />
+						</template>
+					</Column>
+					<Column width="9rem">
+						<m:Label text="{i18n>lblAssetClass}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>AssetClass}" />
+						</template>
+					</Column>
+					<Column width="9rem">
+						<m:Label text="{i18n>lblDescription}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>Description}" />
+						</template>
+					</Column>
+					<Column width="12rem">
+						<m:Label text="{i18n>lblQuantity}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>Quantity}" />
+						</template>
+					</Column>
+					<Column width="9rem">
+						<m:Label text="{i18n>lblBaseUnit}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>BaseUnit}" />
+						</template>
+					</Column>
+					<Column width="9rem">
+						<m:Label text="{i18n>lblAssetCapitalizationDate}" />
+						<template>
+							<!-- <m:Label text="{listOfSelectedAssetsModel>AssetCapitalizationDate}" /> -->
+							<m:Label text="{
+            path: 'listOfSelectedAssetsModel>AssetCapitalizationDate',
+            formatter: '.formatCapitalizationDate'
+        }" />
+						</template>
+					</Column>
+					<Column width="7rem">
+						<m:Label text="{i18n>lblGroup1AssetEvalKey}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>Group1AssetEvaluationKey}" />
+						</template>
+					</Column>
+					<Column width="12rem">
+						<m:Label text="{i18n>lblGroup2AssetEvalKey}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>Group2AssetEvaluationKey}" />
+						</template>
+					</Column>
+					<Column width="12rem">
+						<m:Label text="{i18n>lblAssetLocation}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>AssetLocation}" />
+						</template>
+					</Column>
+					<Column width="6rem">
+						<m:Label text="{i18n>lblCostCenter}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>CostCenter}" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblWBSElement}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>WBSElementInternalID}" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblProfitCenter}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>ProfitCenter}" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblGrantID}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>GrantID}" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblValidityEndDate}" />
+						<template>
+							<!-- <m:Label text="{listOfSelectedAssetsModel>ValidityEndDate}" /> -->
+							<m:Label text="{
+            path: 'listOfSelectedAssetsModel>ValidityEndDate',
+            formatter: '.formatCapitalizationDate'
+        }" />
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblAPCValue}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>APC_Value}" />
+						</template>
+					</Column>
+
+					<Column width="11rem">
+						<m:Label text="{i18n>lblCurrency}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>Currency}" />
+						</template>
+					</Column>
+
+					<Column width="11rem">
+						<m:Label text="{i18n>lblDepreTillDate}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>DepreTillDate}" />
+						</template>
+					</Column>
+
+					<Column width="18rem">
+						<m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
+						<template>
+							<m:ComboBox selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" change=".onDisposalRequiredChange">
+								<c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
+							</m:ComboBox>
+						</template>
+					</Column>
+
+					<Column width="12rem">
+						<m:Label text="{i18n>lblDisposalReason}" required="true"/>
+						<template>
+							<m:ComboBox selectedKey="{listOfSelectedAssetsModel>DisposalReason}" selectedItem="{listOfSelectedAssetsModel>DisposalReasonDescription}" items="{path: '/ReasonCodes',  sorter: {
+                            path: 'Txt40',
+                            descending: false
+},
+		                   filters: [{path: 'Btpdevid', operator: 'EQ', value1: 'FA-BTP-001'}]}">
+								<c:Item key="{Rstgr}" text="{Txt40}" />
+							</m:ComboBox>
+						</template>
+					</Column>
+					<Column width="11rem">
+						<m:Label text="{i18n>lblDisposalQty}" />
+						<template>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalQuantity}" type="Number"/>
+						</template>
+					</Column>
+
+					<Column width="11rem">
+						<m:Label text="{i18n>lblDisposalValue}" />
+						<template>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalValue}" type="Number"/>
+						</template>
+					</Column>
+
+					<Column width="11rem">
+						<m:Label text="{i18n>lblDisposalPercentage}" />
+						<template>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalPercentage}" type="Number"/>
+						</template>
+					</Column>
+
+					<Column width="18rem">
+						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
+						<template>
+							<m:HBox justifyContent="Center">
+								<m:Button  icon="sap-icon://upload" type="Transparent" press=".onAttachmentPressa" tooltip="{i18n>tooltipUploadAttachment}" />
+							</m:HBox>
+						</template>
+					</Column>
+
+					
+
+
+					<!-- <Column width="15rem">
+    <m:Label text="{i18n>lblAttachments}" />
+    <template>
+        <m:VBox>
+            <m:List items="{listOfSelectedAssetsModel>Attachments}">
+                <m:CustomListItem>
+                    <m:HBox justifyContent="SpaceBetween" alignItems="Center">
+                        <m:Link text="{listOfSelectedAssetsModel>Filename}" press=".onDownloadItem" />
+                        <m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
+                    </m:HBox>
+                </m:CustomListItem>
+            </m:List>
+        </m:VBox>
+    </template>
+</Column> -->
+
+
+
+
+
+
+				</columns>
+			</Table>
+		</m:content>
+		<m:footer>
+			<m:Bar>
+				<m:contentRight>
+					<m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onSaveDraftPress" />
+					<m:Button text="{i18n>btnSubmit}" type="Accept" press=".onSubmitPress" />
+					<m:Button text="{i18n>btnCancel}" type="Reject" press=".onCancelPress" />
+					<!-- <m:Button text="Trigger Workflow" icon="sap-icon://workflow-tasks" press=".onTestEF" /> -->
+					<!-- <m:Button text="Save attachment" icon="sap-icon://workflow-tasks" press=".onSaveAttachments" /> -->
+				</m:contentRight>
+			</m:Bar>
+		</m:footer>
+	</m:Page>
+
+
+
+</mvc:View>
+

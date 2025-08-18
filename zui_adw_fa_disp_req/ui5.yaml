@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "3.1"
+metadata:
+  name: zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq
+type: application
+server:
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertError: false
+        ui5:
+          path:
+            - /resources
+            - /test-resources
+          url: https://ui5.sap.com
+        backend:
+          - path: /sap
+            url: http://ds4.sap.smu.edu.sg:44300
+            destination: DS4_110_BAS
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV/
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata4/sap/zui_adw_asset_details_o4/srvd/sap/zi_adw_asset_details/0001/
+          - path: /workflow/rest/v1/workflow-instances
+            destination: spa_process_automation_workflow
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        flp:
+          theme: sap_horizon

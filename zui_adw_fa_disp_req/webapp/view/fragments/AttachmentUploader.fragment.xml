@@ -1,0 +1,32 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog id="attachmentDialog" title="Upload Attachment" stretch="false">
+        <VBox class="sapUiSmallMargin">
+            <items>
+                <UploadCollection 
+                    id="UploadCollection"
+                    items="{AttachmentsModel>/Attachments}"
+                    multiple="true"
+                    instantUpload="true"
+                    beforeUploadStarts=".onBeforeUploadStarts"
+                    uploadComplete=".onUploadComplete"
+                    fileDeleted=".onFileDeleted"
+                    uploadEnabled="{= ${JournalHeaderModel>/Status} === 'Draft' }">
+                    
+                    <items>
+                        <UploadCollectionItem 
+                            documentId="{AttachmentsModel>Fileid}"
+                            fileName="{AttachmentsModel>Filename}"
+                            mimeType="{AttachmentsModel>MimeType}"
+                            url="{AttachmentsModel>Url}"
+                            enableDelete="{= ${JournalHeaderModel>/Status} === 'Draft' }"
+                            press="onDownloadItem"/>
+                    </items>
+                </UploadCollection>
+            </items>
+        </VBox>
+
+        <endButton>
+            <Button text="Close" press=".onCloseAttachmentDialog"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

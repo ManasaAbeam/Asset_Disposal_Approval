@@ -1,0 +1,219 @@
+{
+  "_version": "1.60.0",
+  "sap.app": {
+    "id": "zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:basic",
+      "version": "1.18.0",
+      "toolsId": "78bf46a9-b494-4520-a5d7-0d7aeeabc97e"
+    },
+    "dataSources": {
+      "ZUI_ADW_ASSET_REQUEST_SRV": {
+        "uri": "/sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZUI_ADW_ASSET_REQUEST_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "zi_adw_asset_details": {
+        "uri": "/sap/opu/odata4/sap/zui_adw_asset_details_o4/srvd/sap/zi_adw_asset_details/0001/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/zi_adw_asset_details/metadata.xml",
+          "odataVersion": "4.0"
+        }
+      },
+      "ZUI_SMU_ATTACHMENTS_SRV": {
+        "uri": "/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZUI_SMU_ATTACHMENTS_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "Display-Action": {
+          "semanticObject": "Display",
+          "action": "Action",
+          "title": "{{Display-Action.flpTitle}}",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.i18n.i18n"
+        }
+      },
+      "ZUI_ADW_ASSET_REQUEST_SRV": {
+        "dataSource": "ZUI_ADW_ASSET_REQUEST_SRV",
+        "preload": true,
+        "settings": {}
+      },
+      "": {
+        "dataSource": "zi_adw_asset_details",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "listOfSelectedAssetsModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "visibilityModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "RequestItemsModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "disposalRequiredModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "uri": "../model/disposalRequiredModel.json"
+      },
+      "currentUser": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+      "ZUI_SMU_ATTACHMENTS_SRV": {
+        "dataSource": "ZUI_SMU_ATTACHMENTS_SRV",
+        "preload": true,
+        "settings": {}
+      },
+       "AttachmentsModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      },
+       "viewModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {},
+        "preload": false
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.view",
+        "async": true,
+        "viewPath": "zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.view"
+      },
+      "routes": [
+        {
+          "name": "RouteWorkList",
+          "pattern": ":?query:",
+          "target": [
+            "TargetWorkList"
+          ]
+        },
+        {
+          "name": "RouteDisposalRequest",
+          "pattern": "DisposalRequest",
+          "target": [
+            "TargetDisposalRequest"
+          ]
+        },
+        {
+          "name": "RouteEditAssetRequest",
+          "pattern": "EditAssetRequest",
+          "target": [
+            "TargetEditAssetRequest"
+          ]
+        }
+      ],
+      "targets": {
+        "TargetWorkList": {
+          "id": "WorkList",
+          "name": "WorkList"
+        },
+        "TargetDisposalRequest": {
+          "id": "DisposalRequest",
+          "name": "DisposalRequest"
+        },
+        "TargetEditAssetRequest": {
+          "id": "EditAssetRequest",
+          "name": "EditAssetRequest"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  },
+  "sap.cloud": {
+    "public": true,
+    "service": "zui_adw"
+  }
+}

@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="SAP__common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="SAP__measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CORE',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Core.V1" Alias="SAP__core"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="SAP__capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="SAP__aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="SAP__validation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="SAP__UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HTML5',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.HTML5.v1" Alias="SAP__HTML5"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PDF',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.PDF.v1" Alias="SAP__PDF"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_SESSION',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Session.v1" Alias="SAP__session"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_HIERARCHY',Version='0001',SAP__Origin='LOCAL')/$value">
+        <edmx:Include Namespace="com.sap.vocabularies.Hierarchy.v1" Alias="SAP__hierarchy"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="com.sap.gateway.srvd.zi_adw_asset_details.v0001" Alias="SAP__self">
+            <Annotation Term="SAP__core.SchemaVersion" String="1.0.0"/>
+            <EntityType Name="AssetDetailsType">
+                <Key>
+                    <PropertyRef Name="Btprn"/>
+                </Key>
+                <Property Name="Btprn" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Bukrs" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Reason" Type="Edm.String" Nullable="false" MaxLength="100"/>
+                <Property Name="Timestamp" Type="Edm.DateTimeOffset"/>
+                <Property Name="Ernam" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="Erdat" Type="Edm.Date"/>
+                <Property Name="Erzet" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="Aenam" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="Aedat" Type="Edm.Date"/>
+                <Property Name="Aezet" Type="Edm.TimeOfDay" Nullable="false"/>
+                <Property Name="Itemno" Type="Edm.String" Nullable="false" MaxLength="6"/>
+                <Property Name="Cpudt" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Anln1" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="Anln2" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Anlkl" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="Txa50Nlt" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="AmMenge" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3"/>
+                <Property Name="Meins" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="Aktivd" Type="Edm.Date"/>
+                <Property Name="Ord41" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Ord42" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Stort" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Kostl" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Prctr" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="GmGrantNbr" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="GmToDate" Type="Edm.Date"/>
+                <Property Name="Answl" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="variable"/>
+                <Property Name="Nafag" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="variable"/>
+                <Property Name="Zphya" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="Rstgr" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="Menge" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3"/>
+                <Property Name="Anbtr" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="variable"/>
+                <Property Name="Prozs" Type="Edm.Decimal" Nullable="false" Precision="5" Scale="2"/>
+                <Property Name="Zprofd" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Zstat" Type="Edm.String" Nullable="false" MaxLength="2"/>
+                <Property Name="Zstatdat" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Belnr" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Gjahr" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Currency" Type="Edm.String" Nullable="false" MaxLength="5"/>
+            </EntityType>
+            <EntityType Name="CostCenter_VHType">
+                <Key>
+                    <PropertyRef Name="CostCenter"/>
+                    <PropertyRef Name="ControllingArea"/>
+                    <PropertyRef Name="ValidityEndDate"/>
+                </Key>
+                <Property Name="CostCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ControllingArea" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="ControllingArea_Text" Type="Edm.String" Nullable="false" MaxLength="25"/>
+                <Property Name="ValidityEndDate" Type="Edm.Date" Nullable="false"/>
+                <Property Name="CostCenterName" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="CompanyCode" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="CostCenterCategory" Type="Edm.String" Nullable="false" MaxLength="1"/>
+                <Property Name="CostCtrResponsiblePersonName" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="CostCtrResponsibleUser" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="ValidityStartDate" Type="Edm.Date"/>
+                <Property Name="ProfitCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="CostCenterResponsibilityArea" Type="Edm.String" Nullable="false" MaxLength="16"/>
+            </EntityType>
+            <EntityType Name="AssetAssignmentType">
+                <Key>
+                    <PropertyRef Name="CompanyCode"/>
+                    <PropertyRef Name="MasterFixedAsset"/>
+                    <PropertyRef Name="FixedAsset"/>
+                </Key>
+                <Property Name="CompanyCode" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="MasterFixedAsset" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="FixedAsset" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="AssetClass" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="FixedAssetDescription" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="Quantity" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3"/>
+                <Property Name="BaseUnit" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="AssetCapitalizationDate" Type="Edm.Date"/>
+                <Property Name="Group1AssetEvaluationKey" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Group2AssetEvaluationKey" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="AssetLocation" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="CostCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ProfitCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="GrantID" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="ValidityEndDate" Type="Edm.Date"/>
+            </EntityType>
+            <EntityType Name="AssetWorklistType">
+                <Key>
+                    <PropertyRef Name="CompanyCode"/>
+                    <PropertyRef Name="MasterFixedAsset"/>
+                    <PropertyRef Name="FixedAsset"/>
+                </Key>
+                <Property Name="CompanyCode" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="MasterFixedAsset" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="FixedAsset" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="AssetClass" Type="Edm.String" Nullable="false" MaxLength="8"/>
+                <Property Name="FixedAssetDescription" Type="Edm.String" Nullable="false" MaxLength="50"/>
+                <Property Name="Quantity" Type="Edm.Decimal" Nullable="false" Precision="23" Scale="3"/>
+                <Property Name="BaseUnit" Type="Edm.String" Nullable="false" MaxLength="3"/>
+                <Property Name="AssetValueDate" Type="Edm.Date"/>
+                <Property Name="Group1AssetEvaluationKey" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="Group2AssetEvaluationKey" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="AssetLocation" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="CostCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="WBSElementExternalID" Type="Edm.String" Nullable="false" MaxLength="24"/>
+                <Property Name="ProfitCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="GrantID" Type="Edm.String" Nullable="false" MaxLength="20"/>
+                <Property Name="AssetCostCenter" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="ValidityEndDate" Type="Edm.Date"/>
+                <Property Name="APC_value" Type="Edm.Decimal" Nullable="false" Precision="23" Scale="variable"/>
+                <Property Name="Depreciation" Type="Edm.Decimal" Nullable="false" Precision="23" Scale="variable"/>
+                <Property Name="DisplayCurrency" Type="Edm.String" Nullable="false" MaxLength="5"/>
+            </EntityType>
+            <EntityType Name="AssetApproversType">
+                <Key>
+                    <PropertyRef Name="Aprgrp"/>
+                    <PropertyRef Name="Btpuser"/>
+                </Key>
+                <Property Name="Aprgrp" Type="Edm.String" Nullable="false" MaxLength="10"/>
+                <Property Name="Btpuser" Type="Edm.String" Nullable="false" MaxLength="50"/>
+            </EntityType>
+            <EntityType Name="Asset_VHType">
+                <Key>
+                    <PropertyRef Name="CompanyCode"/>
+                    <PropertyRef Name="MasterFixedAsset"/>
+                </Key>
+                <Property Name="CompanyCode" Type="Edm.String" Nullable="false" MaxLength="4"/>
+                <Property Name="MasterFixedAsset" Type="Edm.String" Nullable="false" MaxLength="12"/>
+                <Property Name="MasterFixedAssetDescription" Type="Edm.String" Nullable="false" MaxLength="50"/>
+            </EntityType>
+            <EntityContainer Name="Container">
+                <EntitySet Name="AssetApprovers" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.AssetApproversType"/>
+                <EntitySet Name="AssetAssignment" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.AssetAssignmentType"/>
+                <EntitySet Name="AssetDetails" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.AssetDetailsType"/>
+                <EntitySet Name="AssetWorklist" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.AssetWorklistType"/>
+                <EntitySet Name="Asset_VH" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.Asset_VHType"/>
+                <EntitySet Name="CostCenter_VH" EntityType="com.sap.gateway.srvd.zi_adw_asset_details.v0001.CostCenter_VHType"/>
+            </EntityContainer>
+            <Annotations Target="SAP__self.AssetDetailsType/Btprn">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="BTP Request Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Bukrs">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Company Code"/>
+                <Annotation Term="SAP__common.Heading" String="CoCd"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Status">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="BTP Status"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Reason">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Reason"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Ernam">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Created By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Name of Person Responsible for Creating the Object"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Aenam">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Changed By"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Name of Person Who Changed Object"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Itemno">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="BTP Item Number"/>
+                <Annotation Term="SAP__common.QuickInfo" String="BTP item number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Cpudt">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Anln1">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Main Asset Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Anln2">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Sub-number"/>
+                <Annotation Term="SAP__common.Heading" String="SNo."/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Subnumber"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Anlkl">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset Class"/>
+                <Annotation Term="SAP__common.Heading" String="Class"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Meins">
+                <Annotation Term="SAP__common.IsUnit"/>
+                <Annotation Term="SAP__common.Label" String="Base Unit of Measure"/>
+                <Annotation Term="SAP__common.Heading" String="BUn"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Ord41">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Research LVA Cat"/>
+                <Annotation Term="SAP__common.Heading" String="RLC"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Research LVA Category"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Ord42">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Evaluation Group 2"/>
+                <Annotation Term="SAP__common.Heading" String="Ev.2"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Stort">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Location"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Kostl">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Cost Center"/>
+                <Annotation Term="SAP__common.Heading" String="Cost Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Prctr">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Profit Center"/>
+                <Annotation Term="SAP__common.Heading" String="Profit Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/GmGrantNbr">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Grant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Answl">
+                <Annotation Term="SAP__measures.ISOCurrency" Path="Currency"/>
+                <Annotation Term="SAP__common.Label" String="Asset Value"/>
+                <Annotation Term="SAP__common.Heading" String="Ast.Val.Trans."/>
+                <Annotation Term="SAP__common.QuickInfo" String="Transactions for the Year Affecting Asset Values"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Nafag">
+                <Annotation Term="SAP__measures.ISOCurrency" Path="Currency"/>
+                <Annotation Term="SAP__common.Label" String="Ordinary Dep.Posted"/>
+                <Annotation Term="SAP__common.Heading" String="Ord.Dep.Posted"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Ordinary Depreciation Posted in the Current Year"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Zphya">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Physically Available"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Rstgr">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Reason Code"/>
+                <Annotation Term="SAP__common.Heading" String="RCd"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Reason Code for Payments"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Anbtr">
+                <Annotation Term="SAP__measures.ISOCurrency" Path="Currency"/>
+                <Annotation Term="SAP__common.Label" String="Amount Posted"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Zprofd">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Prof of disposal"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Zstat">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="BTP Status"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Zstatdat">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Status Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Belnr">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Document Number"/>
+                <Annotation Term="SAP__common.Heading" String="DocumentNo"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Document Number of an Accounting Document"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Gjahr">
+                <Annotation Term="SAP__common.IsDigitSequence"/>
+                <Annotation Term="SAP__common.Label" String="Fiscal Year"/>
+                <Annotation Term="SAP__common.Heading" String="Year"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Currency">
+                <Annotation Term="SAP__common.IsCurrency"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Document Currency"/>
+                <Annotation Term="SAP__common.Heading" String="Crcy"/>
+                <Annotation Term="SAP__common.QuickInfo" String="SD Document Currency"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType">
+                <Annotation Term="SAP__common.Label" String="Asset Details"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/AssetDetails">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Container">
+                <Annotation Term="SAP__CodeList.CurrencyCodes">
+                    <Record>
+                        <PropertyValue Property="Url" String="../../../../default/iwbep/common/0001/$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="Currencies"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__CodeList.UnitsOfMeasure">
+                    <Record>
+                        <PropertyValue Property="Url" String="../../../../default/iwbep/common/0001/$metadata"/>
+                        <PropertyValue Property="CollectionPath" String="UnitsOfMeasure"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="SAP__aggregation.RollupType/None"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+                <Annotation Term="SAP__capabilities.FilterFunctions">
+                    <Collection>
+                        <String>eq</String>
+                        <String>ne</String>
+                        <String>gt</String>
+                        <String>ge</String>
+                        <String>lt</String>
+                        <String>le</String>
+                        <String>and</String>
+                        <String>or</String>
+                        <String>contains</String>
+                        <String>startswith</String>
+                        <String>endswith</String>
+                        <String>any</String>
+                        <String>all</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.SupportedFormats">
+                    <Collection>
+                        <String>application/json</String>
+                        <String>application/pdf</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__PDF.Features">
+                    <Record>
+                        <PropertyValue Property="DocumentDescriptionReference" String="../../../../default/iwbep/common/0001/$metadata"/>
+                        <PropertyValue Property="DocumentDescriptionCollection" String="MyDocumentDescriptions"/>
+                        <PropertyValue Property="ArchiveFormat" Bool="true"/>
+                        <PropertyValue Property="Border" Bool="true"/>
+                        <PropertyValue Property="CoverPage" Bool="true"/>
+                        <PropertyValue Property="FitToPage" Bool="true"/>
+                        <PropertyValue Property="FontName" Bool="true"/>
+                        <PropertyValue Property="FontSize" Bool="true"/>
+                        <PropertyValue Property="Margin" Bool="true"/>
+                        <PropertyValue Property="Padding" Bool="true"/>
+                        <PropertyValue Property="Signature" Bool="true"/>
+                        <PropertyValue Property="HeaderFooter" Bool="true"/>
+                        <PropertyValue Property="ResultSizeDefault" Int="20000"/>
+                        <PropertyValue Property="ResultSizeMaximum" Int="20000"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.KeyAsSegmentSupported"/>
+                <Annotation Term="SAP__capabilities.AsynchronousRequestsSupported"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCenter">
+                <Annotation Term="SAP__common.Text" Path="CostCenterName"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Cost Center"/>
+                <Annotation Term="SAP__common.Heading" String="Cost Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/ControllingArea">
+                <Annotation Term="SAP__common.Text" Path="ControllingArea_Text"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/i_controllingareastdvh/0001;ps='srvd-zi_adw_asset_details-0001';va='com.sap.gateway.srvd.zi_adw_asset_details.v0001.et-i_costcentervh.controllingarea'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__UI.Hidden"/>
+                <Annotation Term="SAP__common.Label" String="Controlling Area"/>
+                <Annotation Term="SAP__common.Heading" String="COAr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/ControllingArea_Text">
+                <Annotation Term="SAP__core.Computed"/>
+                <Annotation Term="SAP__common.Label" String="Controlling Area Name"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CompanyCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/i_companycodestdvh/0001;ps='srvd-zi_adw_asset_details-0001';va='com.sap.gateway.srvd.zi_adw_asset_details.v0001.et-i_costcentervh.companycode'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.Label" String="Company Code"/>
+                <Annotation Term="SAP__common.Heading" String="CoCd"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCenterCategory">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Cost Center Category"/>
+                <Annotation Term="SAP__common.Heading" String="CCtC"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCtrResponsibleUser">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="User Responsible"/>
+                <Annotation Term="SAP__common.Heading" String="User Resp."/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/ProfitCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Profit Center"/>
+                <Annotation Term="SAP__common.Heading" String="Profit Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType">
+                <Annotation Term="SAP__common.Label" String="Cost Center"/>
+                <Annotation Term="SAP__common.SemanticKey">
+                    <Collection>
+                        <PropertyPath>ValidityEndDate</PropertyPath>
+                        <PropertyPath>CostCenter</PropertyPath>
+                        <PropertyPath>ControllingArea</PropertyPath>
+                    </Collection>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/CostCenter_VH">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="true"/>
+                        <PropertyValue Property="UnsupportedExpressions" EnumMember="SAP__capabilities.SearchExpressions/AND SAP__capabilities.SearchExpressions/OR SAP__capabilities.SearchExpressions/NOT SAP__capabilities.SearchExpressions/group SAP__capabilities.SearchExpressions/phrase"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="Filterable" Bool="true"/>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="ValidityEndDate"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleValue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="ValidityStartDate"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleValue"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/CompanyCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Company Code"/>
+                <Annotation Term="SAP__common.Heading" String="CoCd"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/MasterFixedAsset">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Main Asset Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/FixedAsset">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Sub-number"/>
+                <Annotation Term="SAP__common.Heading" String="SNo."/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Subnumber"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/AssetClass">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset Class"/>
+                <Annotation Term="SAP__common.Heading" String="Class"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/Quantity">
+                <Annotation Term="SAP__measures.Unit" Path="BaseUnit"/>
+                <Annotation Term="SAP__common.Label" String="Quantity"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/BaseUnit">
+                <Annotation Term="SAP__common.IsUnit"/>
+                <Annotation Term="SAP__common.Label" String="Base Unit of Measure"/>
+                <Annotation Term="SAP__common.Heading" String="BUn"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/Group1AssetEvaluationKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Research LVA Cat"/>
+                <Annotation Term="SAP__common.Heading" String="RLC"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Research LVA Category"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/Group2AssetEvaluationKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Evaluation Group 2"/>
+                <Annotation Term="SAP__common.Heading" String="Ev.2"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/AssetLocation">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Location"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/CostCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Cost Center"/>
+                <Annotation Term="SAP__common.Heading" String="Cost Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/ProfitCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Profit Center"/>
+                <Annotation Term="SAP__common.Heading" String="Profit Ctr"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/GrantID">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Grant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType">
+                <Annotation Term="SAP__common.Label" String="Asset Assignment"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/AssetAssignment">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Quantity"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/CompanyCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Company Code"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/MasterFixedAsset">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Fixed Asset"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/FixedAsset">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset Subnumber"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/AssetClass">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset Class"/>
+                <Annotation Term="SAP__common.Heading" String="Class"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/Quantity">
+                <Annotation Term="SAP__measures.Unit" Path="BaseUnit"/>
+                <Annotation Term="SAP__common.Label" String="Quantity"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/BaseUnit">
+                <Annotation Term="SAP__common.IsUnit"/>
+                <Annotation Term="SAP__common.Label" String="Base Unit of Measure"/>
+                <Annotation Term="SAP__common.Heading" String="BUn"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/Group1AssetEvaluationKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Research LVA Cat"/>
+                <Annotation Term="SAP__common.Heading" String="RLC"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Research LVA Category"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/Group2AssetEvaluationKey">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Evaluation Group 2"/>
+                <Annotation Term="SAP__common.Heading" String="Ev.2"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/AssetLocation">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Location"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset location"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/CostCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Cost Center"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/WBSElementExternalID">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="WBS Element"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Work Breakdown Structure Element (WBS Element) Edited"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/ProfitCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Profit Center"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/GrantID">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Grant"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/AssetCostCenter">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset Cost Center"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/APC_value">
+                <Annotation Term="SAP__measures.ISOCurrency" Path="DisplayCurrency"/>
+                <Annotation Term="SAP__common.Label" String="Amount in Displ.Crcy"/>
+                <Annotation Term="SAP__common.Heading" String="Amount in Display Currency"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Amount in Display Currency"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/Depreciation">
+                <Annotation Term="SAP__measures.ISOCurrency" Path="DisplayCurrency"/>
+                <Annotation Term="SAP__common.Label" String="Amount in Displ.Crcy"/>
+                <Annotation Term="SAP__common.Heading" String="Amount in Display Currency"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Amount in Display Currency"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/DisplayCurrency">
+                <Annotation Term="SAP__common.IsCurrency"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Display Currency"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType">
+                <Annotation Term="SAP__common.Label" String="Asset worklist"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/AssetWorklist">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Quantity"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="APC_value"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="Depreciation"/>
+                                    <PropertyValue Property="AllowedExpressions" String="MultiValue"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetApproversType/Aprgrp">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Approver Group Cost"/>
+                <Annotation Term="SAP__common.Heading" String="Approver Group Cost Center Master"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Approver Group Cost Center Master"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetApproversType/Btpuser">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="BTP User ID"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetApproversType">
+                <Annotation Term="SAP__common.Label" String="Asset Disposal Approvers"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/AssetApprovers">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.Asset_VHType/CompanyCode">
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.ValueListReferences">
+                    <Collection>
+                        <String>../../../../srvd_f4/sap/i_companycodestdvh/0001;ps='srvd-zi_adw_asset_details-0001';va='com.sap.gateway.srvd.zi_adw_asset_details.v0001.et-i_masterfixedasset.companycode'/$metadata</String>
+                    </Collection>
+                </Annotation>
+                <Annotation Term="SAP__common.Label" String="Company Code"/>
+                <Annotation Term="SAP__common.Heading" String="CoCd"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Asset_VHType/MasterFixedAsset">
+                <Annotation Term="SAP__common.Text" Path="MasterFixedAssetDescription"/>
+                <Annotation Term="SAP__common.IsUpperCase"/>
+                <Annotation Term="SAP__common.Label" String="Asset"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Main Asset Number"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Asset_VHType">
+                <Annotation Term="SAP__common.Label" String="Master Fixed Asset"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Container/Asset_VH">
+                <Annotation Term="SAP__capabilities.SearchRestrictions">
+                    <Record>
+                        <PropertyValue Property="Searchable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.InsertRestrictions">
+                    <Record>
+                        <PropertyValue Property="Insertable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.DeleteRestrictions">
+                    <Record>
+                        <PropertyValue Property="Deletable" Bool="false"/>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__capabilities.UpdateRestrictions">
+                    <Record>
+                        <PropertyValue Property="Updatable" Bool="false"/>
+                        <PropertyValue Property="QueryOptions">
+                            <Record>
+                                <PropertyValue Property="SelectSupported" Bool="true"/>
+                            </Record>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="SAP__core.OptimisticConcurrency">
+                    <Collection/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCenterResponsibilityArea">
+                <Annotation Term="SAP__UI.Hidden"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Timestamp">
+                <Annotation Term="SAP__common.Label" String="Time Stamp"/>
+                <Annotation Term="SAP__common.QuickInfo" String="UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Erdat">
+                <Annotation Term="SAP__common.Label" String="Created On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Record Creation Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Erzet">
+                <Annotation Term="SAP__common.Label" String="Time"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Entry time"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Aedat">
+                <Annotation Term="SAP__common.Label" String="Changed On"/>
+                <Annotation Term="SAP__common.Heading" String="Chngd On"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Last Changed On"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Aezet">
+                <Annotation Term="SAP__common.Label" String="Changed at"/>
+                <Annotation Term="SAP__common.Heading" String="TimeOfChng"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Time last change was made"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Txa50Nlt">
+                <Annotation Term="SAP__common.Label" String="Description"/>
+                <Annotation Term="SAP__common.Heading" String="Asset Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Description"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/AmMenge">
+                <Annotation Term="SAP__common.Label" String="Quantity"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Aktivd">
+                <Annotation Term="SAP__common.Label" String="Capitalized On"/>
+                <Annotation Term="SAP__common.Heading" String="Cap.Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Capitalization Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/GmToDate">
+                <Annotation Term="SAP__common.Label" String="Valid to Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Valid-to Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Menge">
+                <Annotation Term="SAP__common.Label" String="Quantity"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetDetailsType/Prozs">
+                <Annotation Term="SAP__common.Label" String="Percentage Rate"/>
+                <Annotation Term="SAP__common.Heading" String="% Rate"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Retirement: Percentage Rate"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/ValidityEndDate">
+                <Annotation Term="SAP__common.Label" String="Valid To"/>
+                <Annotation Term="SAP__common.Heading" String="to"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Valid To Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCenterName">
+                <Annotation Term="SAP__common.Label" String="Cost Center Name"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/CostCtrResponsiblePersonName">
+                <Annotation Term="SAP__common.Label" String="Person Responsible"/>
+            </Annotations>
+            <Annotations Target="SAP__self.CostCenter_VHType/ValidityStartDate">
+                <Annotation Term="SAP__common.Label" String="Valid From"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Valid-From Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/FixedAssetDescription">
+                <Annotation Term="SAP__common.Label" String="Description"/>
+                <Annotation Term="SAP__common.Heading" String="Asset Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Description"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/AssetCapitalizationDate">
+                <Annotation Term="SAP__common.Label" String="Capitalized On"/>
+                <Annotation Term="SAP__common.Heading" String="Cap.Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Capitalization Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetAssignmentType/ValidityEndDate">
+                <Annotation Term="SAP__common.Label" String="Valid to Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Valid-to Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/FixedAssetDescription">
+                <Annotation Term="SAP__common.Label" String="Description"/>
+                <Annotation Term="SAP__common.Heading" String="Asset Description"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Description"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/AssetValueDate">
+                <Annotation Term="SAP__common.Label" String="Asset Value Date"/>
+                <Annotation Term="SAP__common.Heading" String="AssetValDate"/>
+            </Annotations>
+            <Annotations Target="SAP__self.AssetWorklistType/ValidityEndDate">
+                <Annotation Term="SAP__common.Label" String="Valid to Date"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Valid-to Date"/>
+            </Annotations>
+            <Annotations Target="SAP__self.Asset_VHType/MasterFixedAssetDescription">
+                <Annotation Term="SAP__common.Label" String="Asset Main No. Text"/>
+                <Annotation Term="SAP__common.QuickInfo" String="Asset Main Number Text"/>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

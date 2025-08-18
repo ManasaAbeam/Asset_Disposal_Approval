@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "2.5"
+metadata:
+  name: fixedassetsdisposalapproval.adw.wf.workflowuimodule
+type: application
+framework:
+  name: SAPUI5
+  version: 1.82.2
+  libraries:
+    - name: sap.m
+    - name: sap.ui.core
+    - name: sap.f
+    - name: sap.suite.ui.generic.template
+    - name: sap.ui.comp
+    - name: sap.ui.generic.app
+    - name: sap.ui.table
+    - name: sap.ushell
+    - name: themelib_sap_fiori_3
+server:
+  customMiddleware:
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertError: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        backend:
+          - path: /sap
+            url: http://ds4.sap.smu.edu.sg:44300
+            destination: DS4_110_BAS
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata4/sap/zui_adw_asset_details_o4/srvd/sap/zi_adw_asset_details/0001/
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV/
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        component: fixedassetsdisposalapproval.adw.wf.workflowuimodule
+        ui5Theme: sap_fiori_3
+    - name: sap-fe-mockserver
+      beforeMiddleware: csp
+      configuration:
+        mountPath: /
+        services:
+          - urlPath: /sap/opu/odata
+            metadataPath: ./webapp/localService/mainService/metadata.xml
+            mockdataPath: ./webapp/localService/mainService/data
+            generateMockData: true
+          - urlPath: /sap/opu/odata4/sap/zui_adw_asset_details_o4/srvd/sap/zi_adw_asset_details/0001
+            metadataPath: ./webapp/localService/zi_adw_asset_details/metadata.xml
+            mockdataPath: ./webapp/localService/zi_adw_asset_details/data
+            generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV
+            metadataPath: ./webapp/localService/ZUI_ADW_ASSET_REQUEST_SRV/metadata.xml
+            mockdataPath: ./webapp/localService/ZUI_ADW_ASSET_REQUEST_SRV/data
+            generateMockData: true
+        annotations: []
