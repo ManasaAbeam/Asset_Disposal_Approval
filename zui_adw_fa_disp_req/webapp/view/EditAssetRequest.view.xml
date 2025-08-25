@@ -169,7 +169,7 @@
                                     <Column width="18rem">
                                         <m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
                                         <template>
-                                            <m:ComboBox editable="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" selectedKey="{listOfSelectedAssetsModel>Zphya}" change=".onEditDisposalRequiredChange" items="{disposalRequiredModel>/DisposalRequiredOptions}">
+                                            <m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>Zphya}" change=".onEditDisposalRequiredChange" items="{disposalRequiredModel>/DisposalRequiredOptions}">
                                                 <c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
                                             </m:ComboBox>
                                         </template>
@@ -188,26 +188,34 @@
                                     <Column width="11rem">
                                         <m:Label text="{i18n>lblDisposalQty}" />
                                         <template>
-                                            <m:Input value="{listOfSelectedAssetsModel>Menge}" type="Number" editable="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                                            <m:Input value="{listOfSelectedAssetsModel>Menge}" type="Number" editable="{= ${listOfSelectedAssetsModel>AmMenge}>0? true:false}" />
                                         </template>
                                     </Column>
                                     <Column width="11rem">
                                         <m:Label text="{i18n>lblDisposalValue}" />
                                         <template>
-                                            <m:Input value="{listOfSelectedAssetsModel>Anbtr}" type="Number" editable="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                                            <m:Input value="{listOfSelectedAssetsModel>Anbtr}" change=".onDisposaValueChange" type="Number" editable="{= ${listOfSelectedAssetsModel>AmMenge}>0? false : true}" />
                                         </template>
                                     </Column>
                                     <Column width="11rem">
                                         <m:Label text="{i18n>lblDisposalPercentage}" />
                                         <template>
-                                            <m:Input value="{listOfSelectedAssetsModel>Prozs}" type="Number" editable="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                                            <m:Input value="{listOfSelectedAssetsModel>Prozs}" change=".onDisposalPercentageChange" type="Number" editable="{= ${listOfSelectedAssetsModel>AmMenge}>0? false:true}" />
                                         </template>
                                     </Column>
                                     <Column width="18rem">
                                         <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
                                         <template>
-                                            <m:HBox justifyContent="Center">
-                                                <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                                            <m:HBox justifyContent="SpaceBetween" alignItems="Center">
+                                                <m:List items="{listOfSelectedAssetsModel>Attachments}">
+                                                    <m:CustomListItem>
+                                                        <m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
+                                                            <m:Link text="{= ${listOfSelectedAssetsModel>Filename}.length > 10 ? ${listOfSelectedAssetsModel>Filename}.substring(0, 10) + '...' : ${listOfSelectedAssetsModel>Filename}}" wrapping="true" press=".onDownloadItem" />
+                                                            <m:Button class="sapUiMediumMarginBegin" icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
+                                                        </m:HBox>
+                                                    </m:CustomListItem>
+                                                </m:List>
+                                                <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
                                             </m:HBox>
                                         </template>
                                     </Column>

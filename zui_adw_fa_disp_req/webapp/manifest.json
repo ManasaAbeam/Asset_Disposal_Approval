@@ -137,11 +137,6 @@
         "preload": true,
         "settings": {}
       },
-       "AttachmentsModel": {
-        "type": "sap.ui.model.json.JSONModel",
-        "settings": {},
-        "preload": false
-      },
        "viewModel": {
         "type": "sap.ui.model.json.JSONModel",
         "settings": {},

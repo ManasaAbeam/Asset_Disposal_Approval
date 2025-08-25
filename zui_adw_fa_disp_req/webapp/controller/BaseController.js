@@ -15,54 +15,11 @@ sap.ui.define([
             return this.getOwnerComponent().getRouter();
         },
 
-        //      onRequestIdValueHelpSearch: function (oEvent, searchColumn) {
-        //     const sSearchValue = oEvent.getParameter("value");
-        //     const oUserModel = this.getModel("currentUser");
-        //     const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
-
-        //     // Create search filters - focus on Request ID field primarily
-        //     const aSearchFilters = [];
-
-        //     if (sSearchValue) {
-        //         // Search in the primary field (Btprn - Request ID)
-        //         aSearchFilters.push(new Filter("Btprn", FilterOperator.Contains, sSearchValue));
-
-        //         // Optional: Also search in ReqStatus field if needed
-        //         // Uncomment the line below if you want to search in status field too
-        //         //aSearchFilters.push(new Filter("ReqStatus", FilterOperator.Contains, sSearchValue));
-        //     }
-
-        //     // Combine search filters with OR logic
-        //     let oCombinedSearchFilter = null;
-        //     if (aSearchFilters.length > 0) {
-        //         oCombinedSearchFilter = new Filter(aSearchFilters, false); // false = OR logic
-        //     }
-
-        //     // User filter (always required)
-        //     const oUserFilter = new Filter("CrBtpuser", FilterOperator.EQ, sUserEmail);
-
-        //     // Combine all filters
-        //     const aFinalFilters = [oUserFilter];
-        //     if (oCombinedSearchFilter) {
-        //         aFinalFilters.push(oCombinedSearchFilter);
-        //     }
-
-        //     // Use AND logic between user filter and search filter
-        //     const oFinalFilter = new Filter(aFinalFilters, true); // true = AND logic
-
-        //     const oBinding = oEvent.getSource().getBinding("items");
-        //     if (oBinding) {
-        //         oBinding.filter(oFinalFilter);
-        //     }
-        // },
-
-
         onRequestIdValueHelpSearch: function (oEvent, searchColumn) {
             const sSearchValue = oEvent.getParameter("value");
             const oUserModel = this.getModel("currentUser");
             const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
 
-            // --- Search filter ---
             const aSearchFilters = [];
             if (sSearchValue) {
                 aSearchFilters.push(new Filter("Btprn", FilterOperator.Contains, sSearchValue));
@@ -137,28 +94,6 @@ sap.ui.define([
             this._pValueHelpDialogs[sFragmentName].then(function (oDialog) {
                 oDialog.data("filterField", sFilterField);
 
-                // ✅ Apply user-specific filter only for RequestValueHelp fragment
-                // if (sFragmentName.includes("RequestValueHelp")) {
-                //     const oUserModel = that.getModel("currentUser");
-                //     const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
-                //     let oItemsBinding = oDialog.getBinding("items");
-                //     if (oItemsBinding) {
-                //         const oUserFilter = new Filter("CrBtpuser", FilterOperator.EQ, sUserEmail);
-                //         oItemsBinding.filter([oUserFilter]);
-                //         console.log("Applied CrBtpuser filter:", sUserEmail);
-                //     } else {
-                //         // Apply filter after dialog opens if binding is not yet available
-                //         oDialog.attachEventOnce("afterOpen", function () {
-                //             let oLateBinding = oDialog.getBinding("items");
-                //             if (oLateBinding) {
-                //                 const oUserFilter = new Filter("CrBtpuser", FilterOperator.EQ, sUserEmail);
-                //                 oLateBinding.filter([oUserFilter]);
-                //                 console.log("Applied CrBtpuser filter after open:", sUserEmail);
-                //             }
-                //         });
-                //     }
-                // }
-
                 if (sFragmentName.includes("RequestValueHelp")) {
                     const oUserModel = that.getModel("currentUser");
                     const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
@@ -190,33 +125,46 @@ sap.ui.define([
             });
         },
 
-
-
-        // onGenericValueHelp: function (oEvent, sFragmentName, sFilterField) {
-        //     let that = this;
-        //     this._sInputId = oEvent.getSource().getId();
-        //     let oView = this.getView();
-        //     if (!this._pValueHelpDialogs) {
-        //         this._pValueHelpDialogs = {};
+        //this logic is working when  we using cost center and asset number both single select
+        // onGenericValueHelpSearch: function (oEvent) {
+        //     let sValue = oEvent.getParameter("value");
+        //     let oControl = oEvent.getSource();
+        //     while (oControl && !(oControl instanceof sap.m.SelectDialog)) {
+        //         oControl = oControl.getParent();
         //     }
-        //     if (!this._pValueHelpDialogs[sFragmentName]) {
-        //         this._pValueHelpDialogs[sFragmentName] = Fragment.load({
-        //             id: oView.getId(),
-        //             name: sFragmentName,
-        //             controller: this
-        //         }).then(function (oDialog) {
-        //             oView.addDependent(oDialog);
-        //             return oDialog;
-        //         });
-        //     }
-        //     this._pValueHelpDialogs[sFragmentName].then(function (oDialog) {
-        //         oDialog.data("filterField", sFilterField);
-        //         // Check if this is the RequestValueHelp dialog and apply user filter
-        //         if (sFragmentName.includes("RequestValueHelp")) {
-        //             that.applyUserFilter(oDialog);;
-        //         }
-        //         oDialog.open();
+        //     let oDialog = oControl;
+
+        //     // Get the custom data value
+        //     let sFilterFields = oDialog.data("filterFields"); // works with core:CustomData
+        //     let aFilterFields = sFilterFields ? sFilterFields.split(",") : [];
+
+        //     // Build filters dynamically
+        //     let aFilters = aFilterFields.map(function (field) {
+        //         return new sap.ui.model.Filter(
+        //             field.trim(),
+        //             sap.ui.model.FilterOperator.Contains,
+        //             sValue
+        //         );
         //     });
+
+        //     // Combine with OR
+        //     let oCombinedFilter = new sap.ui.model.Filter({
+        //         filters: aFilters,
+        //         and: false
+        //     });
+
+        //     // Apply
+        //     oEvent.getSource().getBinding("items").filter([oCombinedFilter]);
+        // },
+
+
+        // onGenericValueHelpClose: function (oEvent) {
+        //     let oSelectedItem = oEvent.getParameter("selectedItem");
+        //     if (oSelectedItem) {
+        //         let oInput = sap.ui.getCore().byId(this._sInputId);
+        //         oInput.setValue(oSelectedItem.getTitle());
+        //     }
+        //     oEvent.getSource().getBinding("items").filter([]);
         // },
 
 
@@ -227,12 +175,8 @@ sap.ui.define([
                 oControl = oControl.getParent();
             }
             let oDialog = oControl;
-
-            // Get the custom data value
-            let sFilterFields = oDialog.data("filterFields"); // works with core:CustomData
+            let sFilterFields = oDialog.data("filterFields");
             let aFilterFields = sFilterFields ? sFilterFields.split(",") : [];
-
-            // Build filters dynamically
             let aFilters = aFilterFields.map(function (field) {
                 return new sap.ui.model.Filter(
                     field.trim(),
@@ -240,54 +184,47 @@ sap.ui.define([
                     sValue
                 );
             });
-
-            // Combine with OR
             let oCombinedFilter = new sap.ui.model.Filter({
                 filters: aFilters,
                 and: false
             });
-
-            // Apply
             oEvent.getSource().getBinding("items").filter([oCombinedFilter]);
         },
 
-        // onGenericValueHelpClose: function (oEvent) {
-        //     let aSelectedItems = oEvent.getParameter("selectedItems"); // <-- multiple items
-        //     let oInput = sap.ui.getCore().byId(this._sInputId);
-
-        //     if (aSelectedItems && aSelectedItems.length > 0) {
-        //         let aValues = aSelectedItems.map(function (oItem) {
-        //             return oItem.getTitle();
-        //         });
-        //         oInput.setValue(aValues.join(", ")); // Comma-separated values
-        //     } else {
-        //         oInput.setValue(""); // Clear if nothing selected
-        //     }
-
-        //     // Clear filters
-        //     oEvent.getSource().getBinding("items").filter([]);
-        // },
 
         onGenericValueHelpClose: function (oEvent) {
-            let oSelectedItem = oEvent.getParameter("selectedItem");
-            if (oSelectedItem) {
-                let oInput = sap.ui.getCore().byId(this._sInputId);
-                oInput.setValue(oSelectedItem.getTitle());
+            let oDialog = oEvent.getSource();
+            let bMultiSelect = oDialog.getMultiSelect();
+            let oInput = sap.ui.getCore().byId(this._sInputId);
+
+            if (bMultiSelect) {
+                let aSelectedItems = oEvent.getParameter("selectedItems");
+                let sSearchValue = oDialog._oSearchField ? oDialog._oSearchField.getValue() : "";
+
+                if (aSelectedItems && aSelectedItems.length > 0) {
+                    oInput.removeAllTokens();
+                    aSelectedItems.forEach(function (oItem) {
+                        oInput.addToken(new sap.m.Token({
+                            key: oItem.getTitle(),
+                            text: oItem.getTitle()
+                        }));
+                    });
+                }
+                if ((!aSelectedItems || aSelectedItems.length === 0) && sSearchValue) {
+                    oInput.addToken(new sap.m.Token({
+                        key: sSearchValue,
+                        text: sSearchValue
+                    }));
+                }
+            } else {
+                let oSelectedItem = oEvent.getParameter("selectedItem");
+                if (oSelectedItem) {
+                    oInput.setValue(oSelectedItem.getTitle());
+                }
             }
+
             oEvent.getSource().getBinding("items").filter([]);
         },
-
-        // onGenericValueHelpSearch: function (oEvent) {
-        //     let sValue = oEvent.getParameter("value");
-        //     let oControl = oEvent.getSource();
-        //     while (oControl && !(oControl instanceof sap.m.SelectDialog)) {
-        //         oControl = oControl.getParent();
-        //     }
-        //     let oDialog = oControl;
-        //     let sFilterField = oDialog.data("filterField");
-        //     let oFilter = new Filter(sFilterField, FilterOperator.Contains, sValue);
-        //     oEvent.getSource().getBinding("items").filter([oFilter]);
-        // },
 
         //which is used to check the filters are empty are not
         checkIfFiltersAreEmpty: function (aInputIds, sModelName, sPropertyPath) {
@@ -342,32 +279,60 @@ sap.ui.define([
             else {
                 let aTableFilters = [];
                 let aFilterGroupItems = oFilterBar.getFilterGroupItems();
+
                 for (let i = 0; i < aFilterGroupItems.length; i++) {
                     let oFilterGroupItem = aFilterGroupItems[i];
                     let oControl = oFilterGroupItem.getControl();
                     let sFieldName = oFilterGroupItem.getName();
-                    let sValue = oControl.getValue();
-                    if (sValue && sValue.trim() !== "") {
-                        let oFilter = new Filter(sFieldName, FilterOperator.Contains, sValue.trim());
-                        aTableFilters.push(oFilter);
+
+                    // 🔹 Check if control is MultiInput (asset number)
+                    if (oControl instanceof sap.m.MultiInput) {
+                        let aTokens = oControl.getTokens();
+                        if (aTokens.length > 0) {
+                            let aTokenFilters = aTokens.map(function (oToken) {
+                                return new sap.ui.model.Filter(
+                                    sFieldName,
+                                    sap.ui.model.FilterOperator.Contains,
+                                    oToken.getText()
+                                );
+                            });
+                            // combine multiple asset numbers with OR
+                            aTableFilters.push(new sap.ui.model.Filter({
+                                filters: aTokenFilters,
+                                and: false
+                            }));
+                        }
+                    } else {
+                        // 🔹 Normal Input (cost center, etc.)
+                        let sValue = oControl.getValue();
+                        if (sValue && sValue.trim() !== "") {
+                            let oFilter = new sap.ui.model.Filter(
+                                sFieldName,
+                                sap.ui.model.FilterOperator.Contains,
+                                sValue.trim()
+                            );
+                            aTableFilters.push(oFilter);
+                        }
                     }
                 }
+
+                // 🔹 Add validity date filter
                 let today = new Date();
                 today.setHours(0, 0, 0, 0);
                 let formattedDate = this.formatDateToYMD(today);
-                console.log("todays date", formattedDate)
 
-                let oDateFilter = new Filter({
+                let oDateFilter = new sap.ui.model.Filter({
                     filters: [
-                        new Filter("ValidityEndDate", FilterOperator.LE, formattedDate),
-                        new Filter("ValidityEndDate", FilterOperator.EQ, null)
+                        new sap.ui.model.Filter("ValidityEndDate", sap.ui.model.FilterOperator.LE, formattedDate),
+                        new sap.ui.model.Filter("ValidityEndDate", sap.ui.model.FilterOperator.EQ, null)
                     ],
                     and: false
                 });
 
                 aTableFilters.push(oDateFilter);
+
+                // 🔹 Apply filter to table
                 let oBinding = oTable.getBinding("items");
-                oBinding.filter(aTableFilters);
                 if (oBinding) {
                     if (aTableFilters.length > 0) {
                         oBinding.filter(aTableFilters);
@@ -380,6 +345,48 @@ sap.ui.define([
                     }
                 }
             }
+
+            // else {
+            //     let aTableFilters = [];
+            //     let aFilterGroupItems = oFilterBar.getFilterGroupItems();
+            //     for (let i = 0; i < aFilterGroupItems.length; i++) {
+            //         let oFilterGroupItem = aFilterGroupItems[i];
+            //         let oControl = oFilterGroupItem.getControl();
+            //         let sFieldName = oFilterGroupItem.getName();
+            //         let sValue = oControl.getValue();
+            //         if (sValue && sValue.trim() !== "") {
+            //             let oFilter = new Filter(sFieldName, FilterOperator.Contains, sValue.trim());
+            //             aTableFilters.push(oFilter);
+            //         }
+            //     }
+            //     let today = new Date();
+            //     today.setHours(0, 0, 0, 0);
+            //     let formattedDate = this.formatDateToYMD(today);
+            //     console.log("todays date", formattedDate)
+
+            //     let oDateFilter = new Filter({
+            //         filters: [
+            //             new Filter("ValidityEndDate", FilterOperator.LE, formattedDate),
+            //             new Filter("ValidityEndDate", FilterOperator.EQ, null)
+            //         ],
+            //         and: false
+            //     });
+
+            //     aTableFilters.push(oDateFilter);
+            //     let oBinding = oTable.getBinding("items");
+            //     oBinding.filter(aTableFilters);
+            //     if (oBinding) {
+            //         if (aTableFilters.length > 0) {
+            //             oBinding.filter(aTableFilters);
+            //             MessageBox.information(oResourceBundle.getText("msgFiltersApplied"));
+            //             this.getModel("visibilityModel").setProperty("/columlist", true);
+            //         } else {
+            //             oBinding.filter([]);
+            //             MessageBox.information(oResourceBundle.getText("msgNoFiltersApplied"));
+            //             this.getModel("visibilityModel").setProperty("/columlist", false);
+            //         }
+            //     }
+            // }
         },
 
         // Format date as YYYY-MM-DD
@@ -450,10 +457,53 @@ sap.ui.define([
             });
         },
 
+        // validateAssetData: function (aTableData) {
+        //     let bValidationError = false;
+        //     let aErrorMessages = [];
+        //     let oBundle = this.getResourceBundle();
+        //     if (!aTableData || aTableData.length === 0) {
+        //         bValidationError = true;
+        //         aErrorMessages.push(oBundle.getText("errorNoDataToValidate") || "No data to validate");
+        //         return {
+        //             hasError: bValidationError,
+        //             errorMessages: aErrorMessages
+        //         };
+        //     }
+        //     aTableData.forEach(function (oRowData) {
+        //         if (!oRowData.AssetPhysicalDisposalRequired && !oRowData.Zphya) {
+        //             bValidationError = true;
+        //             if (!aErrorMessages.includes(oBundle.getText("errorAssetPhysicalDisposalRequired"))) {
+        //                 aErrorMessages.push(oBundle.getText("errorAssetPhysicalDisposalRequired"));
+        //             }
+        //         }
+        //         if (!oRowData.DisposalReason && !oRowData.Rstgr) {
+        //             bValidationError = true;
+        //             if (!aErrorMessages.includes(oBundle.getText("errorDisposalReason"))) {
+        //                 aErrorMessages.push(oBundle.getText("errorDisposalReason"));
+        //             }
+        //         }
+        //         let disposalPercentage = oRowData.DisposalPercentage || oRowData.Prozs;
+        //         if (disposalPercentage &&
+        //             (isNaN(parseFloat(disposalPercentage)) ||
+        //                 parseFloat(disposalPercentage) < 0 ||
+        //                 parseFloat(disposalPercentage) > 100)) {
+        //             bValidationError = true;
+        //             if (!aErrorMessages.includes(oBundle.getText("errorDisposalPercentageRange"))) {
+        //                 aErrorMessages.push(oBundle.getText("errorDisposalPercentageRange"));
+        //             }
+        //         }
+        //     }.bind(this));
+        //     return {
+        //         hasError: bValidationError,
+        //         errorMessages: aErrorMessages
+        //     };
+        // },
+
         validateAssetData: function (aTableData) {
             let bValidationError = false;
             let aErrorMessages = [];
             let oBundle = this.getResourceBundle();
+
             if (!aTableData || aTableData.length === 0) {
                 bValidationError = true;
                 aErrorMessages.push(oBundle.getText("errorNoDataToValidate") || "No data to validate");
@@ -462,19 +512,23 @@ sap.ui.define([
                     errorMessages: aErrorMessages
                 };
             }
+
             aTableData.forEach(function (oRowData) {
+                // Existing validations
                 if (!oRowData.AssetPhysicalDisposalRequired && !oRowData.Zphya) {
                     bValidationError = true;
                     if (!aErrorMessages.includes(oBundle.getText("errorAssetPhysicalDisposalRequired"))) {
                         aErrorMessages.push(oBundle.getText("errorAssetPhysicalDisposalRequired"));
                     }
                 }
+
                 if (!oRowData.DisposalReason && !oRowData.Rstgr) {
                     bValidationError = true;
                     if (!aErrorMessages.includes(oBundle.getText("errorDisposalReason"))) {
                         aErrorMessages.push(oBundle.getText("errorDisposalReason"));
                     }
                 }
+
                 let disposalPercentage = oRowData.DisposalPercentage || oRowData.Prozs;
                 if (disposalPercentage &&
                     (isNaN(parseFloat(disposalPercentage)) ||
@@ -485,7 +539,45 @@ sap.ui.define([
                         aErrorMessages.push(oBundle.getText("errorDisposalPercentageRange"));
                     }
                 }
+
+                // NEW VALIDATION: Check if DisposalQuantity exceeds Quantity
+                let quantity = parseFloat(oRowData.BalQty || oRowData.AmMenge);
+                let disposalQuantity = parseFloat(oRowData.DisposalQuantity || oRowData.Menge);
+
+                // Only validate if both values exist and are valid numbers
+                if (disposalQuantity && quantity && !isNaN(disposalQuantity) && !isNaN(quantity)) {
+                    if (disposalQuantity > quantity) {
+                        bValidationError = true;
+                        let errorMessage = oBundle.getText("errorDisposalQuantityExceedsQuantity") ||
+                            "Enter Disposal Quantity less than Quantity";
+                        if (!aErrorMessages.includes(errorMessage)) {
+                            aErrorMessages.push(errorMessage);
+                        }
+                    }
+                }
+
+
+                // NEW VALIDATION: Check if DisposalValue exceeds BalValue
+                let balValue = parseFloat(oRowData.BalValue || oRowData.Answl);
+                let disposalValue = parseFloat(oRowData.DisposalValue || oRowData.Anbtr);
+
+                // Only validate if both values exist and are valid numbers
+                if (disposalValue && balValue && !isNaN(disposalValue) && !isNaN(balValue)) {
+                    if (disposalValue > balValue) {
+                        bValidationError = true;
+                        let errorMessage = oBundle.getText("errorDisposalValueExceedsBalValue") ||
+                            "Enter Disposal Value less than Balance Value";
+                        if (!aErrorMessages.includes(errorMessage)) {
+                            aErrorMessages.push(errorMessage);
+                        }
+                    }
+                }
+
+
+
+
             }.bind(this));
+
             return {
                 hasError: bValidationError,
                 errorMessages: aErrorMessages
@@ -573,18 +665,18 @@ sap.ui.define([
                     //     (oRow.ValidityEndDate ? formatSAPDateTime(new Date(oRow.ValidityEndDate)) : formatSAPDateTime(now)),
                     "Zphya": oRow.Zphya || oRow.AssetPhysicalDisposalRequired,
                     "Rstgr": oRow.Rstgr || oRow.DisposalReason,
-                    "Menge": oRow.Menge || oRow.DisposalQuantity || "0",
+                    "Menge": oRow.Menge || oRow.DisposalQuantity,
                     "Anbtr": oRow.Anbtr || oRow.DisposalValue,
                     "Prozs": oRow.Prozs || oRow.DisposalPercentage,
                     "Currency": oRow.Currency || oRow.Currency,
                     "Aktivd": oRow.Aktivd ?
                         (typeof oRow.Aktivd === 'string' ? oRow.Aktivd : formatSAPDateTime(new Date(oRow.Aktivd))) :
                         (oRow.AssetCapitalizationDate ? formatSAPDateTime(new Date(oRow.AssetCapitalizationDate)) : formatSAPDateTime(now)),
-                    "Answl": oRow.Answl || oRow.APC_Value || "0.00",
+                    "Answl": oRow.Answl || oRow.APC_Value,
                     "Zstat": sZstat,
-                    "Ord41": oRow.Ord41 || oRow.Order1 || "",
+                    "Ord41": oRow.Ord41 || oRow.Order1,
                     "Nafag": oRow.Nafag || oRow.DepreTillDate,
-                    "Zprofd": oRow.Zprofd || oRow.ProfOfDisposalAttachments || "",
+                    "Zprofd": oRow.Zprofd || oRow.ProfOfDisposalAttachments,
                     "Zstatdat": "",
                     "Belnr": "",
                     "Gjahr": ""
@@ -639,30 +731,195 @@ sap.ui.define([
             BusyIndicator.show(0);
 
             oBackendModel.create("/AssetDispSet", oPayload, {
+                // success: function (oData) {
+                //     try {
+                //         if (sAction === "submit" && !bSilent) {
+                //             that.triggerWorkflowAfterSave(oData, sAction, oBundle, aTableData);
+                //         } else {
+                //             if (!bSilent) {
+                //                 that._handleSaveSuccess(oData, sAction, oBundle);
+                //             } else {
+                //                 // Silent mode - just hide busy indicator
+                //                 BusyIndicator.hide();
+                //                 console.log("Silent save completed successfully");
+                //             }
+                //         }
+                //     } catch (error) {
+                //         console.error("Error in success handler:", error);
+                //         BusyIndicator.hide();
+                //         that._handleSaveError(error, sAction, oBundle);
+                //     }
+                // },
+
                 success: function (oData) {
                     try {
+                        // First trigger workflow or success handler
                         if (sAction === "submit" && !bSilent) {
                             that.triggerWorkflowAfterSave(oData, sAction, oBundle, aTableData);
                         } else {
                             if (!bSilent) {
                                 that._handleSaveSuccess(oData, sAction, oBundle);
                             } else {
-                                // Silent mode - just hide busy indicator
                                 BusyIndicator.hide();
                                 console.log("Silent save completed successfully");
                             }
                         }
+
+                        // 🔗 Now link attachments after request created
+                        if (oData && oData.Btprn) {
+                            that._saveRowAttachments(aTableData, oData.Btprn);
+                            // aTableData.forEach((oRow, iIndex) => {
+                            //     if (oRow.Attachments && oRow.Attachments.length > 0) {
+                            //         that._saveRowAttachments(oRow.Attachments, oData.Btprn, iIndex + 1);
+                            //     }
+                            // });
+                        }
+
+
                     } catch (error) {
                         console.error("Error in success handler:", error);
                         BusyIndicator.hide();
                         that._handleSaveError(error, sAction, oBundle);
                     }
                 },
+
                 error: function (oError) {
                     that._handleSaveError(oError, sAction, oBundle);
                 }
             });
         },
+        // Function to process all table data
+        _saveRowAttachments: function (aTableData, sBtprn) {
+            const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+            console.log("🔗 [Attachment Save] Start for all rows with Request ID:", sBtprn);
+
+            // Iterate over each row to collect all new attachments
+            let aAllAttachmentsPayload = [];
+
+            aTableData.forEach((oRow, iIndex) => {
+                if (oRow.Attachments && oRow.Attachments.length > 0) {
+                    const aNewFiles = oRow.Attachments.filter(att => !att.Linked);
+                    if (aNewFiles.length) {
+                        const aRowAttachments = aNewFiles.map(att => ({
+                            Fileid: att.Fileid,
+                            Reqno: sBtprn,
+                            Reqtype: "ADApproval", // adapt if required
+                            Reqitem: String(iIndex + 1).padStart(3, "0")
+                        }));
+                        aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
+                    }
+                }
+            });
+
+            if (aAllAttachmentsPayload.length) {
+                const oPayload = {
+                    Comments: "",
+                    Attachments: aAllAttachmentsPayload
+                };
+
+                console.log("📤 [Attachment Save] Payload for all rows:", oPayload);
+
+                // Single POST call for all attachments
+                oSrvModel.create("/LinkFiles", oPayload, {
+                    success: (oData, response) => {
+                        console.log("✅ [Attachment Save] All files linked successfully");
+                        console.log("🔎 [Attachment Save] OData response:", oData);
+                    },
+                    error: (oError) => {
+                        console.error("❌ [Attachment Save] Error linking files");
+                        console.error("⚠️ [Attachment Save] Error details:", oError);
+                    }
+                });
+            } else {
+                console.log("ℹ️ [Attachment Save] No new files to link for any row");
+            }
+        },
+
+        //         _saveRowAttachments: async function (aAttachments, sBtprn, sReqItem) {
+        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+
+        //     console.log("🔗 [Attachment Save] Start for row:", sReqItem, "with Request ID:", sBtprn);
+        //     console.log("📂 [Attachment Save] Attachments received:", aAttachments);
+
+        //     const aNewFiles = aAttachments.filter(att => !att.Linked);
+        //     console.log("🆕 [Attachment Save] New files to be linked:", aNewFiles);
+
+        //     for (let idx = 0; idx < aNewFiles.length; idx++) {
+        //         const att = aNewFiles[idx];
+        //         const oPayload = {
+        //             Comments: "",
+        //             Attachments: [{
+        //                 Fileid: att.Fileid,
+        //                 Reqno: sBtprn,
+        //                 Reqtype: "JVP",
+        //                 Reqitem: String(sReqItem).padStart(3, "0")
+        //             }]
+        //         };
+
+        //         console.log(`📤 [Attachment Save] Payload for file ${idx + 1}:`, oPayload);
+
+        //         await new Promise((resolve, reject) => {
+        //             oSrvModel.create("/LinkFiles", oPayload, {
+        //                 success: (oData) => {
+        //                     console.log(`✅ [Attachment Save] File ${att.Filename || att.Fileid} linked for row ${sReqItem}`);
+        //                     resolve();
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error(`❌ [Attachment Save] Error linking file ${att.Filename || att.Fileid} for row ${sReqItem}`);
+        //                     console.error("⚠️ [Attachment Save] Error details:", oError);
+        //                     reject(oError);
+        //                 }
+        //             });
+        //         });
+        //     }
+
+        //     if (aNewFiles.length === 0) {
+        //         console.log(`ℹ️ [Attachment Save] No new files to link for row ${sReqItem}`);
+        //     }
+        // },
+
+        // _saveRowAttachments: function (aAttachments, sBtprn, sReqItem) {
+        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+        //     console.log("🔗 [Attachment Save] Start for row:", sReqItem, "with Request ID:", sBtprn);
+        //     console.log("📂 [Attachment Save] Attachments received:", aAttachments);
+
+        //     const aNewFiles = aAttachments.filter(att => !att.Linked);
+        //     console.log("🆕 [Attachment Save] New files to be linked:", aNewFiles);
+
+        //     if (aNewFiles.length) {
+        //         aNewFiles.forEach((att, idx) => {
+        //             const oPayload = {
+        //                 Comments: "",
+        //                 Attachments: [{
+        //                     Fileid: att.Fileid,
+        //                     Reqno: sBtprn,
+        //                     Reqtype: "JVP",        // adapt if required
+        //                     Reqitem: String(sReqItem).padStart(3, "0")
+        //                 }]
+        //             };
+
+        //             console.log(`📤 [Attachment Save] Payload for file ${idx + 1}:`, oPayload);
+
+        //             oSrvModel.create("/LinkFiles", oPayload, {
+        //                 success: (oData, response) => {
+        //                     console.log(`✅ [Attachment Save] File ${att.Filename || att.Fileid} linked for row ${sReqItem}`);
+        //                     console.log("🔎 [Attachment Save] OData response:", oData);
+        //                 },
+        //                 error: (oError) => {
+        //                     console.error(`❌ [Attachment Save] Error linking file ${att.Filename || att.Fileid} for row ${sReqItem}`);
+        //                     console.error("⚠️ [Attachment Save] Error details:", oError);
+        //                 }
+        //             });
+        //         });
+        //     } else {
+        //         console.log(`ℹ️ [Attachment Save] No new files to link for row ${sReqItem}`);
+        //     }
+        // },
+
+
         // triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
         //     let that = this;
 

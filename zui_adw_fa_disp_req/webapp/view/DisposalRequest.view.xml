@@ -1,4 +1,4 @@
-<mvc:View controllerName="zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.DisposalRequest"
+<mvc:View xmlns:unified="sap.ui.unified" controllerName="zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.DisposalRequest"
 	xmlns="sap.ui.table"
 	xmlns:mvc="sap.ui.core.mvc"
 	xmlns:c="sap.ui.core"
@@ -50,7 +50,8 @@
 					<Column width="12rem">
 						<m:Label text="{i18n>lblQuantity}" />
 						<template>
-							<m:Label text="{listOfSelectedAssetsModel>Quantity}" />
+							<!-- <m:Label text="{listOfSelectedAssetsModel>Quantity}" /> -->
+								<m:Label text="{listOfSelectedAssetsModel>BalQty}" />
 						</template>
 					</Column>
 					<Column width="9rem">
@@ -124,7 +125,7 @@
 					<Column width="11rem">
 						<m:Label text="{i18n>lblAPCValue}" />
 						<template>
-							<m:Label text="{listOfSelectedAssetsModel>APC_Value}" />
+							<m:Label text="{listOfSelectedAssetsModel>BalValue}" />
 						</template>
 					</Column>
 
@@ -142,10 +143,26 @@
 						</template>
 					</Column>
 
+					<!-- <Column width="11rem">
+						<m:Label text="{i18n>lblBalQty}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>BalQty}" />
+						</template>
+					</Column>
+
+					<Column width="11rem">
+						<m:Label text="{i18n>lblBalValue}" />
+						<template>
+							<m:Label text="{listOfSelectedAssetsModel>BalValue}" />
+						</template>
+					</Column> -->
+
+					
+
 					<Column width="18rem">
 						<m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
 						<template>
-							<m:ComboBox selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" change=".onDisposalRequiredChange">
+							<m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" change=".onDisposalRequiredChange">
 								<c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
 							</m:ComboBox>
 						</template>
@@ -166,55 +183,40 @@
 					<Column width="11rem">
 						<m:Label text="{i18n>lblDisposalQty}" />
 						<template>
-							<m:Input value="{listOfSelectedAssetsModel>DisposalQuantity}" type="Number"/>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalQuantity}" editable="{= ${listOfSelectedAssetsModel>BalQty}>0? true:false}" type="Number"/>
 						</template>
 					</Column>
 
 					<Column width="11rem">
 						<m:Label text="{i18n>lblDisposalValue}" />
 						<template>
-							<m:Input value="{listOfSelectedAssetsModel>DisposalValue}" type="Number"/>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalValue}" change=".onDisposaValueChange" editable="{= ${listOfSelectedAssetsModel>BalQty}>0? false:true}" type="Number"/>
 						</template>
 					</Column>
 
 					<Column width="11rem">
 						<m:Label text="{i18n>lblDisposalPercentage}" />
 						<template>
-							<m:Input value="{listOfSelectedAssetsModel>DisposalPercentage}" type="Number"/>
+							<m:Input value="{listOfSelectedAssetsModel>DisposalPercentage}" change=".onDisposalPercentageChange" editable="{= ${listOfSelectedAssetsModel>BalQty}>0? false:true}" type="Number"/>
 						</template>
 					</Column>
 
 					<Column width="18rem">
 						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
 						<template>
-							<m:HBox justifyContent="Center">
-								<m:Button  icon="sap-icon://upload" type="Transparent" press=".onAttachmentPressa" tooltip="{i18n>tooltipUploadAttachment}" />
+							<m:HBox justifyContent="SpaceBetween" alignItems="Center">
+								<m:List items="{listOfSelectedAssetsModel>Attachments}">
+									<m:CustomListItem>
+										<m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
+											<m:Link text="{= ${listOfSelectedAssetsModel>Filename}.length > 20 ? ${listOfSelectedAssetsModel>Filename}.substring(0, 20) + '...' : ${listOfSelectedAssetsModel>Filename}}" wrapping="true" press=".onDownloadItem" />
+											<m:Button class="sapUiMediumMarginBegin" icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
+										</m:HBox>
+									</m:CustomListItem>
+								</m:List>
+								<m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
 							</m:HBox>
 						</template>
 					</Column>
-
-					
-
-
-					<!-- <Column width="15rem">
-    <m:Label text="{i18n>lblAttachments}" />
-    <template>
-        <m:VBox>
-            <m:List items="{listOfSelectedAssetsModel>Attachments}">
-                <m:CustomListItem>
-                    <m:HBox justifyContent="SpaceBetween" alignItems="Center">
-                        <m:Link text="{listOfSelectedAssetsModel>Filename}" press=".onDownloadItem" />
-                        <m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
-                    </m:HBox>
-                </m:CustomListItem>
-            </m:List>
-        </m:VBox>
-    </template>
-</Column> -->
-
-
-
-
 
 
 				</columns>
@@ -232,8 +234,5 @@
 			</m:Bar>
 		</m:footer>
 	</m:Page>
-
-
-
 </mvc:View>
 

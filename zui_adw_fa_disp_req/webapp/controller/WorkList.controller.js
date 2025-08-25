@@ -24,6 +24,10 @@ sap.ui.define([
             this.clearTableSelection();
             this.getUserInfo();
             this.clearRequestIdInput();
+            this.byId("idTAssetDisposal").getBinding("items").filter([]);
+            this.getModel("visibilityModel").setProperty("/columlist", false);
+            this.byId("inpAssetCostCenter").setValue("");
+            // this.onSearchAssetDisposal()
         },
 
         clearTableSelection: function () {
@@ -68,7 +72,7 @@ sap.ui.define([
             );
         },
 
-        
+
 
 
 
@@ -106,29 +110,153 @@ sap.ui.define([
         },
 
 
+        // onNewAssetRequests: function () {
+        //     let oTable = this.byId("idTAssetDisposal");
+        //     const oVisibilityModel = this.getModel("visibilityModel");
+        //     const oResourceBundle = this.getResourceBundle();
+        //     const bIsTableVisible = oVisibilityModel.getProperty("/columlist");
+        //     if (!bIsTableVisible) {
+        //         MessageBox.warning(oResourceBundle.getText("msgApplyFiltersFirst"));
+        //         return null;
+        //     }
+        //     let aSelectedItems = oTable.getSelectedItems();
+        //     if (aSelectedItems.length === 0) {
+        //         MessageBox.warning(oResourceBundle.getText("msgSelectItem"));
+        //         return null;
+        //     }
+        //     let aSelectedData = [];
+        //     aSelectedItems.forEach(function (oSelectedItem) {
+        //         let oBindingContext = oSelectedItem.getBindingContext();
+        //         if (oBindingContext) {
+        //             let oCompleteData = oBindingContext.getObject();
+        //             aSelectedData.push(oCompleteData);
+        //         }
+        //     });
+
+        //     let hasGrantId = false;
+        //     let hasNoGrantId = false;
+
+        //     aSelectedData.forEach(function (item) {
+        //         const grantId = item.GrantID;
+
+        //         if (grantId && grantId !== "NOT_RELEVANT_FOR_GM") {
+        //             hasGrantId = true;
+        //         }
+
+        //         if (!grantId || grantId === "NOT_RELEVANT_FOR_GM") {
+        //             hasNoGrantId = true;
+        //         }
+        //     });
+
+        //     if (hasGrantId && hasNoGrantId) {
+        //         MessageBox.error(oResourceBundle.getText("msgMixedGrantIdSelection"));
+        //         return null;
+        //     }
+
+
+        //     console.log("Selected Items Data:", aSelectedData);
+        //     let oModel = this.getModel("listOfSelectedAssetsModel");
+        //     // oModel.setData({
+        //     //     assets: aSelectedData,
+        //     //     length: aSelectedData.length
+        //     // });
+
+        //     // ✅ Initialize each row with an empty Attachments array
+        //     oModel.setData({
+        //         assets: aSelectedData.map(item => {
+        //             return {
+        //                 ...item,
+        //                 Attachments: []   // new property
+        //             };
+        //         }),
+        //         length: aSelectedData.length
+        //     });
+
+
+        //     console.log(`Data set to model listOfSelectedAssetsModel:`, oModel.getData());
+        //     BusyIndicator.show(0);
+        //     this.getRouter().navTo("RouteDisposalRequest");
+        // },
+
+
         onNewAssetRequests: function () {
             let oTable = this.byId("idTAssetDisposal");
             const oVisibilityModel = this.getModel("visibilityModel");
             const oResourceBundle = this.getResourceBundle();
             const bIsTableVisible = oVisibilityModel.getProperty("/columlist");
+
             if (!bIsTableVisible) {
                 MessageBox.warning(oResourceBundle.getText("msgApplyFiltersFirst"));
                 return null;
             }
+
             let aSelectedItems = oTable.getSelectedItems();
             if (aSelectedItems.length === 0) {
                 MessageBox.warning(oResourceBundle.getText("msgSelectItem"));
                 return null;
             }
+
             let aSelectedData = [];
             aSelectedItems.forEach(function (oSelectedItem) {
                 let oBindingContext = oSelectedItem.getBindingContext();
                 if (oBindingContext) {
                     let oCompleteData = oBindingContext.getObject();
+
+                    // Get the ComboBox value from the UI control
+                    let aCells = oSelectedItem.getCells();
+                    let oComboBox = null;
+
+                    // Find the ComboBox control in the cells
+                    for (let i = 0; i < aCells.length; i++) {
+                        if (aCells[i].getMetadata().getName() === "sap.m.ComboBox") {
+                            oComboBox = aCells[i];
+                            break;
+                        }
+                    }
+
+                    let sPhysicalDisposalValue = "";
+                    if (oComboBox) {
+                        sPhysicalDisposalValue = oComboBox.getSelectedKey();
+                    }
+
+                    // Add the UI value to the data object
+                    oCompleteData.AssetPhysicalDisposalRequired = sPhysicalDisposalValue;
+
                     aSelectedData.push(oCompleteData);
                 }
             });
 
+            // Validation 1: Check if AssetPhysicalDisposalRequired is filled for all selected assets
+            let hasEmptyPhysicalDisposal = false;
+            aSelectedData.forEach(function (item) {
+                if (!item.AssetPhysicalDisposalRequired || item.AssetPhysicalDisposalRequired === "") {
+                    hasEmptyPhysicalDisposal = true;
+                }
+            });
+
+            if (hasEmptyPhysicalDisposal) {
+                MessageBox.error(oResourceBundle.getText("msgPhysicalDisposalRequired") ||
+                    "Please fill Asset Physical Disposal Required field for all selected assets");
+                return null;
+            }
+
+            // Validation 2: Check if all selected assets have the same AssetPhysicalDisposalRequired value
+            let firstPhysicalDisposalValue = aSelectedData[0].AssetPhysicalDisposalRequired;
+            let hasMixedPhysicalDisposal = false;
+
+            aSelectedData.forEach(function (item) {
+                if (item.AssetPhysicalDisposalRequired !== firstPhysicalDisposalValue) {
+                    hasMixedPhysicalDisposal = true;
+                }
+            });
+
+            if (hasMixedPhysicalDisposal) {
+                MessageBox.error(oResourceBundle.getText("msgMixedPhysicalDisposalSelection") ||
+                    "Mixed selection not allowed. Please select assets with either 'Yes' or 'No' for Physical Disposal. Create separate requests for different disposal types.");
+                return null;
+            }
+
+            // Existing Grant ID validation
             let hasGrantId = false;
             let hasNoGrantId = false;
 
@@ -149,33 +277,19 @@ sap.ui.define([
                 return null;
             }
 
-
-                // --- New Validation for AssetPhysicalDisposalRequired ---
-    // let uniqueDisposalValues = [...new Set(aSelectedData.map(item => item.AssetPhysicalDisposalRequired))];
-
-    // if (uniqueDisposalValues.length > 1) {
-    //     MessageBox.error(oResourceBundle.getText("msgMixedDisposalSelection")); 
-    //     return null;
-    // }
-
             console.log("Selected Items Data:", aSelectedData);
             let oModel = this.getModel("listOfSelectedAssetsModel");
-            // oModel.setData({
-            //     assets: aSelectedData,
-            //     length: aSelectedData.length
-            // });
 
-             // ✅ Initialize each row with an empty Attachments array
-    oModel.setData({
-        assets: aSelectedData.map(item => {
-            return {
-                ...item,
-                Attachments: []   // new property
-            };
-        }),
-        length: aSelectedData.length
-    });
-
+            // ✅ Initialize each row with an empty Attachments array
+            oModel.setData({
+                assets: aSelectedData.map(item => {
+                    return {
+                        ...item,
+                        Attachments: []   // new property
+                    };
+                }),
+                length: aSelectedData.length
+            });
 
             console.log(`Data set to model listOfSelectedAssetsModel:`, oModel.getData());
             BusyIndicator.show(0);
@@ -223,7 +337,7 @@ sap.ui.define([
         },
 
 
-       
+
 
 
     });

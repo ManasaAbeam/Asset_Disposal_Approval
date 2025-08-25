@@ -1,6 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m"
     xmlns:core="sap.ui.core">
     <SelectDialog id="selectDialogg"
+      multiSelect="true"
        title="{i18n>dlgTitleSelectAssetNumber}"  items="{
             path: '/Asset_VH',
             sorter: {
