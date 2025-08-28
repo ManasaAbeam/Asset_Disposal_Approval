@@ -169,7 +169,7 @@
                                     <Column width="18rem">
                                         <m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
                                         <template>
-                                            <m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>Zphya}" change=".onEditDisposalRequiredChange" items="{disposalRequiredModel>/DisposalRequiredOptions}">
+                                            <m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>Zphya}" items="{disposalRequiredModel>/DisposalRequiredOptions}">
                                                 <c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
                                             </m:ComboBox>
                                         </template>
@@ -210,7 +210,7 @@
                                                 <m:List items="{listOfSelectedAssetsModel>Attachments}">
                                                     <m:CustomListItem>
                                                         <m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
-                                                            <m:Link text="{= ${listOfSelectedAssetsModel>Filename}.length > 10 ? ${listOfSelectedAssetsModel>Filename}.substring(0, 10) + '...' : ${listOfSelectedAssetsModel>Filename}}" wrapping="true" press=".onDownloadItem" />
+                                                            <m:Link text="{= ${listOfSelectedAssetsModel>Filename}.length > 20 ? ${listOfSelectedAssetsModel>Filename}.substring(0, 20) + '...' : ${listOfSelectedAssetsModel>Filename}}" wrapping="true" press=".onDownloadItem" />
                                                             <m:Button class="sapUiMediumMarginBegin" icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
                                                         </m:HBox>
                                                     </m:CustomListItem>

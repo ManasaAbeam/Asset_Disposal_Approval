@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageBox",
-    "sap/ui/core/format/DateFormat"
-], function (Controller, BusyIndicator, Fragment, Filter, FilterOperator, MessageBox, DateFormat) {
+    "sap/ui/core/format/DateFormat",
+    "sap/m/MessageToast"
+], function (Controller, BusyIndicator, Fragment, Filter, FilterOperator, MessageBox, DateFormat, MessageToast) {
     "use strict";
 
     return Controller.extend("zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.BaseController", {
@@ -124,50 +125,6 @@ sap.ui.define([
                 oDialog.open();
             });
         },
-
-        //this logic is working when  we using cost center and asset number both single select
-        // onGenericValueHelpSearch: function (oEvent) {
-        //     let sValue = oEvent.getParameter("value");
-        //     let oControl = oEvent.getSource();
-        //     while (oControl && !(oControl instanceof sap.m.SelectDialog)) {
-        //         oControl = oControl.getParent();
-        //     }
-        //     let oDialog = oControl;
-
-        //     // Get the custom data value
-        //     let sFilterFields = oDialog.data("filterFields"); // works with core:CustomData
-        //     let aFilterFields = sFilterFields ? sFilterFields.split(",") : [];
-
-        //     // Build filters dynamically
-        //     let aFilters = aFilterFields.map(function (field) {
-        //         return new sap.ui.model.Filter(
-        //             field.trim(),
-        //             sap.ui.model.FilterOperator.Contains,
-        //             sValue
-        //         );
-        //     });
-
-        //     // Combine with OR
-        //     let oCombinedFilter = new sap.ui.model.Filter({
-        //         filters: aFilters,
-        //         and: false
-        //     });
-
-        //     // Apply
-        //     oEvent.getSource().getBinding("items").filter([oCombinedFilter]);
-        // },
-
-
-        // onGenericValueHelpClose: function (oEvent) {
-        //     let oSelectedItem = oEvent.getParameter("selectedItem");
-        //     if (oSelectedItem) {
-        //         let oInput = sap.ui.getCore().byId(this._sInputId);
-        //         oInput.setValue(oSelectedItem.getTitle());
-        //     }
-        //     oEvent.getSource().getBinding("items").filter([]);
-        // },
-
-
         onGenericValueHelpSearch: function (oEvent) {
             let sValue = oEvent.getParameter("value");
             let oControl = oEvent.getSource();
@@ -239,18 +196,6 @@ sap.ui.define([
             });
             oModel.setProperty(sPropertyPath, !bAllEmpty);
         },
-
-        updateTableColumnAcrossRows: function (oEvent, sModelName, sPath, sPropertyToUpdate) {
-            const sSelectedKey = oEvent.getSource().getSelectedKey();
-            const oModel = this.getView().getModel(sModelName);
-            const aItems = oModel.getProperty(sPath);
-            aItems.forEach(item => {
-                item[sPropertyToUpdate] = sSelectedKey;
-            });
-
-            oModel.setProperty(sPath, aItems);
-        },
-
         onSearch: function (oFilterBar, oTable) {
             const oResourceBundle = this.getResourceBundle();
             let that = this;
@@ -331,6 +276,17 @@ sap.ui.define([
 
                 aTableFilters.push(oDateFilter);
 
+                // 🔹 BalValue >= 0 AND Currency = 'SGD'
+                let oBalValueFilter = new sap.ui.model.Filter({
+                    filters: [
+                        new sap.ui.model.Filter("BalValue", sap.ui.model.FilterOperator.GT, 0),
+                        new sap.ui.model.Filter("Currency", sap.ui.model.FilterOperator.EQ, "SGD")
+                    ],
+                    and: true
+                });
+                aTableFilters.push(oBalValueFilter);
+
+
                 // 🔹 Apply filter to table
                 let oBinding = oTable.getBinding("items");
                 if (oBinding) {
@@ -345,48 +301,6 @@ sap.ui.define([
                     }
                 }
             }
-
-            // else {
-            //     let aTableFilters = [];
-            //     let aFilterGroupItems = oFilterBar.getFilterGroupItems();
-            //     for (let i = 0; i < aFilterGroupItems.length; i++) {
-            //         let oFilterGroupItem = aFilterGroupItems[i];
-            //         let oControl = oFilterGroupItem.getControl();
-            //         let sFieldName = oFilterGroupItem.getName();
-            //         let sValue = oControl.getValue();
-            //         if (sValue && sValue.trim() !== "") {
-            //             let oFilter = new Filter(sFieldName, FilterOperator.Contains, sValue.trim());
-            //             aTableFilters.push(oFilter);
-            //         }
-            //     }
-            //     let today = new Date();
-            //     today.setHours(0, 0, 0, 0);
-            //     let formattedDate = this.formatDateToYMD(today);
-            //     console.log("todays date", formattedDate)
-
-            //     let oDateFilter = new Filter({
-            //         filters: [
-            //             new Filter("ValidityEndDate", FilterOperator.LE, formattedDate),
-            //             new Filter("ValidityEndDate", FilterOperator.EQ, null)
-            //         ],
-            //         and: false
-            //     });
-
-            //     aTableFilters.push(oDateFilter);
-            //     let oBinding = oTable.getBinding("items");
-            //     oBinding.filter(aTableFilters);
-            //     if (oBinding) {
-            //         if (aTableFilters.length > 0) {
-            //             oBinding.filter(aTableFilters);
-            //             MessageBox.information(oResourceBundle.getText("msgFiltersApplied"));
-            //             this.getModel("visibilityModel").setProperty("/columlist", true);
-            //         } else {
-            //             oBinding.filter([]);
-            //             MessageBox.information(oResourceBundle.getText("msgNoFiltersApplied"));
-            //             this.getModel("visibilityModel").setProperty("/columlist", false);
-            //         }
-            //     }
-            // }
         },
 
         // Format date as YYYY-MM-DD
@@ -456,48 +370,6 @@ sap.ui.define([
                 }
             });
         },
-
-        // validateAssetData: function (aTableData) {
-        //     let bValidationError = false;
-        //     let aErrorMessages = [];
-        //     let oBundle = this.getResourceBundle();
-        //     if (!aTableData || aTableData.length === 0) {
-        //         bValidationError = true;
-        //         aErrorMessages.push(oBundle.getText("errorNoDataToValidate") || "No data to validate");
-        //         return {
-        //             hasError: bValidationError,
-        //             errorMessages: aErrorMessages
-        //         };
-        //     }
-        //     aTableData.forEach(function (oRowData) {
-        //         if (!oRowData.AssetPhysicalDisposalRequired && !oRowData.Zphya) {
-        //             bValidationError = true;
-        //             if (!aErrorMessages.includes(oBundle.getText("errorAssetPhysicalDisposalRequired"))) {
-        //                 aErrorMessages.push(oBundle.getText("errorAssetPhysicalDisposalRequired"));
-        //             }
-        //         }
-        //         if (!oRowData.DisposalReason && !oRowData.Rstgr) {
-        //             bValidationError = true;
-        //             if (!aErrorMessages.includes(oBundle.getText("errorDisposalReason"))) {
-        //                 aErrorMessages.push(oBundle.getText("errorDisposalReason"));
-        //             }
-        //         }
-        //         let disposalPercentage = oRowData.DisposalPercentage || oRowData.Prozs;
-        //         if (disposalPercentage &&
-        //             (isNaN(parseFloat(disposalPercentage)) ||
-        //                 parseFloat(disposalPercentage) < 0 ||
-        //                 parseFloat(disposalPercentage) > 100)) {
-        //             bValidationError = true;
-        //             if (!aErrorMessages.includes(oBundle.getText("errorDisposalPercentageRange"))) {
-        //                 aErrorMessages.push(oBundle.getText("errorDisposalPercentageRange"));
-        //             }
-        //         }
-        //     }.bind(this));
-        //     return {
-        //         hasError: bValidationError,
-        //         errorMessages: aErrorMessages
-        //     };
-        // },
 
         validateAssetData: function (aTableData) {
             let bValidationError = false;
@@ -572,9 +444,6 @@ sap.ui.define([
                         }
                     }
                 }
-
-
-
 
             }.bind(this));
 
@@ -658,11 +527,6 @@ sap.ui.define([
                     "PsPspPnr2": oRow.PsPspPnr2 || oRow.WBSElementInternalID || "",
                     "Prctr": oRow.Prctr || oRow.ProfitCenter || "",
                     "GmGrantNbr": oRow.GmGrantNbr || oRow.GrantID || "",
-                    // "GmToDate": oRow.GmToDate ? (typeof oRow.GmToDate === "string" ? oRow.GmToDate : formatSAPDateTime(new Date(oRow.GmToDate))) : (oRow.ValidityEndDate ? formatSAPDateTime(new Date(oRow.ValidityEndDate)) : null),
-                    // "GmToDate": formatSAPDateTime(new Date(oRow.GmToDate)) || formatSAPDateTime(new Date(oRow.ValidityEndDate)),
-                    // "GmToDate": oRow.GmToDate ?
-                    //     (typeof oRow.GmToDate === 'string' ? oRow.GmToDate : formatSAPDateTime(new Date(oRow.GmToDate))) :
-                    //     (oRow.ValidityEndDate ? formatSAPDateTime(new Date(oRow.ValidityEndDate)) : formatSAPDateTime(now)),
                     "Zphya": oRow.Zphya || oRow.AssetPhysicalDisposalRequired,
                     "Rstgr": oRow.Rstgr || oRow.DisposalReason,
                     "Menge": oRow.Menge || oRow.DisposalQuantity,
@@ -713,13 +577,6 @@ sap.ui.define([
                 "Items": aItemsPayload,
                 "Aprgrp": "SOCI"
             };
-
-            // if (bIsEditMode) {
-            //     let oModel = this.getModel("listOfSelectedAssetsModel");
-            //     let oHeader = oModel.getProperty("/Header");
-            //     oPayload.Btprn = oHeader.RequestId;
-            // }
-
             if (bIsEditMode) {
                 let oModel = this.getModel("listOfSelectedAssetsModel");
                 let oHeader = oModel.getProperty("/Header");
@@ -731,29 +588,8 @@ sap.ui.define([
             BusyIndicator.show(0);
 
             oBackendModel.create("/AssetDispSet", oPayload, {
-                // success: function (oData) {
-                //     try {
-                //         if (sAction === "submit" && !bSilent) {
-                //             that.triggerWorkflowAfterSave(oData, sAction, oBundle, aTableData);
-                //         } else {
-                //             if (!bSilent) {
-                //                 that._handleSaveSuccess(oData, sAction, oBundle);
-                //             } else {
-                //                 // Silent mode - just hide busy indicator
-                //                 BusyIndicator.hide();
-                //                 console.log("Silent save completed successfully");
-                //             }
-                //         }
-                //     } catch (error) {
-                //         console.error("Error in success handler:", error);
-                //         BusyIndicator.hide();
-                //         that._handleSaveError(error, sAction, oBundle);
-                //     }
-                // },
-
                 success: function (oData) {
                     try {
-                        // First trigger workflow or success handler
                         if (sAction === "submit" && !bSilent) {
                             that.triggerWorkflowAfterSave(oData, sAction, oBundle, aTableData);
                         } else {
@@ -768,11 +604,6 @@ sap.ui.define([
                         // 🔗 Now link attachments after request created
                         if (oData && oData.Btprn) {
                             that._saveRowAttachments(aTableData, oData.Btprn);
-                            // aTableData.forEach((oRow, iIndex) => {
-                            //     if (oRow.Attachments && oRow.Attachments.length > 0) {
-                            //         that._saveRowAttachments(oRow.Attachments, oData.Btprn, iIndex + 1);
-                            //     }
-                            // });
                         }
 
 
@@ -788,257 +619,194 @@ sap.ui.define([
                 }
             });
         },
-        // Function to process all table data
-        _saveRowAttachments: function (aTableData, sBtprn) {
-            const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-            console.log("🔗 [Attachment Save] Start for all rows with Request ID:", sBtprn);
-
-            // Iterate over each row to collect all new attachments
-            let aAllAttachmentsPayload = [];
-
-            aTableData.forEach((oRow, iIndex) => {
-                if (oRow.Attachments && oRow.Attachments.length > 0) {
-                    const aNewFiles = oRow.Attachments.filter(att => !att.Linked);
-                    if (aNewFiles.length) {
-                        const aRowAttachments = aNewFiles.map(att => ({
-                            Fileid: att.Fileid,
-                            Reqno: sBtprn,
-                            Reqtype: "ADApproval", // adapt if required
-                            Reqitem: String(iIndex + 1).padStart(3, "0")
-                        }));
-                        aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-                    }
-                }
-            });
-
-            if (aAllAttachmentsPayload.length) {
-                const oPayload = {
-                    Comments: "",
-                    Attachments: aAllAttachmentsPayload
-                };
-
-                console.log("📤 [Attachment Save] Payload for all rows:", oPayload);
-
-                // Single POST call for all attachments
-                oSrvModel.create("/LinkFiles", oPayload, {
-                    success: (oData, response) => {
-                        console.log("✅ [Attachment Save] All files linked successfully");
-                        console.log("🔎 [Attachment Save] OData response:", oData);
-                    },
-                    error: (oError) => {
-                        console.error("❌ [Attachment Save] Error linking files");
-                        console.error("⚠️ [Attachment Save] Error details:", oError);
-                    }
-                });
-            } else {
-                console.log("ℹ️ [Attachment Save] No new files to link for any row");
-            }
-        },
-
-        //         _saveRowAttachments: async function (aAttachments, sBtprn, sReqItem) {
+        // Function to process all table data without delete
+        // _saveRowAttachments: function (aTableData, sBtprn) {
         //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
 
+        //     console.log("🔗 [Attachment Save] Start for all rows with Request ID:", sBtprn);
 
-        //     console.log("🔗 [Attachment Save] Start for row:", sReqItem, "with Request ID:", sBtprn);
-        //     console.log("📂 [Attachment Save] Attachments received:", aAttachments);
+        //     // Iterate over each row to collect all new attachments
+        //     let aAllAttachmentsPayload = [];
 
-        //     const aNewFiles = aAttachments.filter(att => !att.Linked);
-        //     console.log("🆕 [Attachment Save] New files to be linked:", aNewFiles);
-
-        //     for (let idx = 0; idx < aNewFiles.length; idx++) {
-        //         const att = aNewFiles[idx];
-        //         const oPayload = {
-        //             Comments: "",
-        //             Attachments: [{
-        //                 Fileid: att.Fileid,
-        //                 Reqno: sBtprn,
-        //                 Reqtype: "JVP",
-        //                 Reqitem: String(sReqItem).padStart(3, "0")
-        //             }]
-        //         };
-
-        //         console.log(`📤 [Attachment Save] Payload for file ${idx + 1}:`, oPayload);
-
-        //         await new Promise((resolve, reject) => {
-        //             oSrvModel.create("/LinkFiles", oPayload, {
-        //                 success: (oData) => {
-        //                     console.log(`✅ [Attachment Save] File ${att.Filename || att.Fileid} linked for row ${sReqItem}`);
-        //                     resolve();
-        //                 },
-        //                 error: (oError) => {
-        //                     console.error(`❌ [Attachment Save] Error linking file ${att.Filename || att.Fileid} for row ${sReqItem}`);
-        //                     console.error("⚠️ [Attachment Save] Error details:", oError);
-        //                     reject(oError);
-        //                 }
-        //             });
-        //         });
-        //     }
-
-        //     if (aNewFiles.length === 0) {
-        //         console.log(`ℹ️ [Attachment Save] No new files to link for row ${sReqItem}`);
-        //     }
-        // },
-
-        // _saveRowAttachments: function (aAttachments, sBtprn, sReqItem) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     console.log("🔗 [Attachment Save] Start for row:", sReqItem, "with Request ID:", sBtprn);
-        //     console.log("📂 [Attachment Save] Attachments received:", aAttachments);
-
-        //     const aNewFiles = aAttachments.filter(att => !att.Linked);
-        //     console.log("🆕 [Attachment Save] New files to be linked:", aNewFiles);
-
-        //     if (aNewFiles.length) {
-        //         aNewFiles.forEach((att, idx) => {
-        //             const oPayload = {
-        //                 Comments: "",
-        //                 Attachments: [{
+        //     aTableData.forEach((oRow, iIndex) => {
+        //         if (oRow.Attachments && oRow.Attachments.length > 0) {
+        //             const aNewFiles = oRow.Attachments.filter(att => !att.Linked);
+        //             if (aNewFiles.length) {
+        //                 const aRowAttachments = aNewFiles.map(att => ({
         //                     Fileid: att.Fileid,
         //                     Reqno: sBtprn,
-        //                     Reqtype: "JVP",        // adapt if required
-        //                     Reqitem: String(sReqItem).padStart(3, "0")
-        //                 }]
-        //             };
-
-        //             console.log(`📤 [Attachment Save] Payload for file ${idx + 1}:`, oPayload);
-
-        //             oSrvModel.create("/LinkFiles", oPayload, {
-        //                 success: (oData, response) => {
-        //                     console.log(`✅ [Attachment Save] File ${att.Filename || att.Fileid} linked for row ${sReqItem}`);
-        //                     console.log("🔎 [Attachment Save] OData response:", oData);
-        //                 },
-        //                 error: (oError) => {
-        //                     console.error(`❌ [Attachment Save] Error linking file ${att.Filename || att.Fileid} for row ${sReqItem}`);
-        //                     console.error("⚠️ [Attachment Save] Error details:", oError);
-        //                 }
-        //             });
-        //         });
-        //     } else {
-        //         console.log(`ℹ️ [Attachment Save] No new files to link for row ${sReqItem}`);
-        //     }
-        // },
-
-
-        // triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
-        //     let that = this;
-
-        //     try {
-
-        //         let bHasPhysicalDisposal = oSaveData.Items.results.some(item =>
-        //             item.Zphya && (item.Zphya.toLowerCase() === "yes" || item.Zphya.toLowerCase() === "y")
-        //         );
-
-        //         let bHasGrantId = oSaveData.Items.results.some(item =>
-        //             item.GmGrantNbr && item.GmGrantNbr.trim() !== "" && item.GmGrantNbr.trim() !== "NOT_RELEVANT_FOR_GM"
-        //         );
-
-        //         let sPhysicalDisposalFlag = bHasPhysicalDisposal ? "yes" : "no";
-        //         let sGrantIdFlag = bHasGrantId ? "yes" : "no";
-
-        //         const approverData = await this.getApproverDetails();
-
-        //         const workflowPayload = {
-        //             definitionId: "ap21.smu-dev.zuiadwfadispreq.zui_adw_process",
-        //             context: {
-        //                 input: {
-        //                     Btprn: oSaveData.Btprn,
-        //                     Bukrs: oSaveData.Bukrs,
-        //                     Status: oSaveData.Status,
-        //                     PhysicalDisposalFlag: sPhysicalDisposalFlag,
-        //                     GrantIdFlag: sGrantIdFlag,
-        //                     RequestorEmail: oSaveData.CrBtpuser,
-        //                     CFOApprovers: approverData.CFO,
-        //                     FUMANApprovers: approverData.FUMAN,
-        //                     HODApprovers: approverData.HOD,
-        //                     OFINApprovers: approverData.OFIN,
-        //                     SOCAApprovers: approverData.SOCA,
-        //                     // GrantApprovers:approverData.Grant,
-        //                     Items: oSaveData.Items.results.map(item => ({
-        //                         Btprn: item.Btprn,
-        //                         Itemno: item.Itemno,
-        //                         Anbtr: item.Anbtr,
-        //                         Zstat: item.Zstat,
-        //                         Rstgr: item.Txt40,
-        //                         Zphya: item.Zphya,
-        //                         GmGrantNbr: item.GmGrantNbr,
-        //                         Anln1: item.Anln1,
-        //                         Anln2: item.Anln2,
-        //                         Anlkl: item.Anlkl,
-        //                         Txa50Nlt: item.Txa50Nlt,
-        //                         Menge: item.Menge,
-        //                         Meins: item.Meins,
-        //                         Aktivd: item.Aktivd,
-        //                         Ord41: item.Ord41,
-        //                         Ord42: item.Ord42,
-        //                         Stort: item.Stort,
-        //                         Kostl: item.Kostl,
-        //                         PsPspPnr2: item.PsPspPnr2,
-        //                         Prctr: item.Prctr,
-        //                         GmToDate: item.GmToDate,
-        //                         Answl: item.Answl,
-        //                         DepreTillDate: item.Nafag,
-        //                         Currency: item.Currency,
-        //                         Prozs: item.Prozs,
-        //                         AmMenge: item.AmMenge
-        //                     }))
-        //                 }
+        //                     Reqtype: "ADApproval",
+        //                     Reqitem: String(iIndex + 1).padStart(3, "0")
+        //                 }));
+        //                 aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
         //             }
+        //         }
+        //     });
+
+        //     if (aAllAttachmentsPayload.length) {
+        //         const oPayload = {
+        //             Comments: "",
+        //             Attachments: aAllAttachmentsPayload
         //         };
 
-        //         let appId = that.getOwnerComponent().getManifestEntry('/sap.app/id');
-        //         let appPath = appId.replaceAll('.', '/');
-        //         that.appModPath = jQuery.sap.getModulePath(appPath);
-        //         that.sbpaWfUrl = "/workflow/rest/v1/workflow-instances";
+        //         console.log("📤 [Attachment Save] Payload for all rows:", oPayload);
 
-        //         console.log("Workflow Payload:", JSON.stringify(workflowPayload, null, 2));
-        //         console.log("Physical Disposal Flag:", sPhysicalDisposalFlag);
-        //         console.log("Grant ID Flag:", sGrantIdFlag);
-        //         console.log("Approver Data:", approverData);
-        //         const wfResp = await fetch(that.appModPath + that.sbpaWfUrl, {
-        //             method: "POST",
-        //             headers: {
-        //                 "Content-Type": "application/json"
+        //         // Single POST call for all attachments
+        //         oSrvModel.create("/LinkFiles", oPayload, {
+        //             success: (oData, response) => {
+        //                 console.log("✅ [Attachment Save] All files linked successfully");
+        //                 console.log("🔎 [Attachment Save] OData response:", oData);
         //             },
-        //             body: JSON.stringify(workflowPayload)
-        //         });
-
-        //         if (!wfResp.ok) {
-        //             const errText = await wfResp.text();
-        //             throw new Error("Workflow trigger failed: " + errText);
-        //         }
-        //         const result = await wfResp.json();
-        //         console.log("Workflow Result:", result);
-        //         that._handleSaveSuccess(oSaveData, sAction, oBundle);
-
-        //     } catch (err) {
-        //         console.error("Error triggering workflow:", err);
-        //         BusyIndicator.hide();
-        //         aTableData.forEach((oRowData, index) => {
-        //             oRowData.Zstat = "Save As Draft";
-        //             if (oSaveData.Items && oSaveData.Items.results && oSaveData.Items.results[index]) {
-        //                 oRowData.Btprn = oSaveData.Items.results[index].Btprn;
-        //                 oRowData.Itemno = oSaveData.Items.results[index].Itemno;
-        //             } else {
-        //                 oRowData.Btprn = oSaveData.Btprn
-        //                 oRowData.Itemno = oRowData.Itemno || String(index + 1).padStart(6, '0');
+        //             error: (oError) => {
+        //                 console.error("❌ [Attachment Save] Error linking files");
+        //                 console.error("⚠️ [Attachment Save] Error details:", oError);
         //             }
         //         });
-
-        //         that.saveRequestToBackend(aTableData, "Save As Draft", true);
-        //         let sPartialSuccessMsg = oBundle.getText("msgSubmitSuccessWF", [
-        //             oSaveData.Btprn,
-        //             err.message
-        //         ]);
-        //         MessageBox.warning(sPartialSuccessMsg, {
-        //             actions: [MessageBox.Action.OK],
-        //             onClose: function () {
-        //                 that.getRouter().navTo("RouteWorkList");
-        //             }
-        //         });
+        //     } else {
+        //         console.log("ℹ️ [Attachment Save] No new files to link for any row");
         //     }
         // },
 
+    
+        //working with delete for 2 functions
+        // _saveRowAttachments: function (aTableData, sBtprn) {
+        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+        //     let aAllAttachmentsPayload = [];
+        //     let aDeletePromises = [];
+
+        //     aTableData.forEach((oRow, iIndex) => {
+        //         const aCurrent = oRow.Attachments || [];
+        //         const aOriginal = oRow._OriginalAttachments || [];
+
+        //         // --- Deleted files ---
+        //         const aDeletedFiles = aOriginal.filter(orig =>
+        //             !aCurrent.find(att => att.Fileid === orig.Fileid)
+        //         );
+        //         aDeletedFiles.forEach(file => {
+        //             aDeletePromises.push(new Promise((resolve, reject) => {
+        //                 oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
+        //                     success: () => { console.log("✅ Deleted", file.Fileid); resolve(); },
+        //                     error: (err) => { console.error("❌ Delete failed", err); reject(err) }
+        //                 });
+        //             }));
+        //         });
+
+        //         // --- New files ---
+        //         const aNewFiles = aCurrent.filter(att => !att.Linked);
+        //         if (aNewFiles.length) {
+        //             const aRowAttachments = aNewFiles.map(att => ({
+        //                 Fileid: att.Fileid,
+        //                 Reqno: sBtprn,
+        //                 Reqtype: "ADApproval",
+        //                 Reqitem: String(iIndex + 1).padStart(3, "0")
+        //             }));
+        //             aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
+        //         }
+        //     });
+
+        //     // First process deletes, then create new
+        //     Promise.allSettled(aDeletePromises).then(() => {
+        //         if (aAllAttachmentsPayload.length) {
+        //             const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
+        //             oSrvModel.create("/LinkFiles", oPayload, {
+        //                 success: () => console.log("✅ Linked all files"),
+        //                 error: (err) => console.error("❌ Linking failed", err)
+        //             });
+        //         } else {
+        //             console.log("ℹ️ No new files to link");
+        //         }
+        //     });
+        // },
+
+        _saveRowAttachments: function (aTableData, sBtprn) {
+    const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+    let aAllAttachmentsPayload = [];
+    let aFilesToDelete = [];
+
+    // Collect all files to delete and new files to link
+    aTableData.forEach((oRow, iIndex) => {
+        const aCurrent = oRow.Attachments || [];
+        const aOriginal = oRow._OriginalAttachments || [];
+
+        // --- Deleted files ---
+        const aDeletedFiles = aOriginal.filter(orig =>
+            !aCurrent.find(att => att.Fileid === orig.Fileid)
+        );
+        aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
+
+        // --- New files ---
+        const aNewFiles = aCurrent.filter(att => !att.Linked);
+        if (aNewFiles.length) {
+            const aRowAttachments = aNewFiles.map(att => ({
+                Fileid: att.Fileid,
+                Reqno: sBtprn,
+                Reqtype: "ADApproval",
+                Reqitem: String(iIndex + 1).padStart(3, "0")
+            }));
+            aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
+        }
+    });
+
+    // Sequential delete using Promise chain
+    const deleteFilesSequentially = async () => {
+        for (let i = 0; i < aFilesToDelete.length; i++) {
+            const file = aFilesToDelete[i];
+            console.log(`🗑️ Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
+            
+            try {
+                await new Promise((resolve, reject) => {
+                    oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
+                        success: () => {
+                            console.log(`✅ Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
+                            resolve();
+                        },
+                        error: (err) => {
+                            console.error(`❌ Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
+                            resolve(); // Continue even if one fails
+                        }
+                    });
+                });
+                
+                // Small delay between operations
+                await new Promise(resolve => setTimeout(resolve, 100));
+            } catch (error) {
+                console.error(`❌ Unexpected error deleting file: ${file.Fileid}`, error);
+            }
+        }
+        
+        // All deletions completed, now link new files
+        this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
+    };
+
+    // Start sequential deletion
+    if (aFilesToDelete.length > 0) {
+        console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
+        deleteFilesSequentially();
+    } else {
+        // No files to delete, proceed directly to linking
+        this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
+    }
+},
+
+// Helper function to link new attachments
+_linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
+    if (aAllAttachmentsPayload.length) {
+        console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
+        const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
+        oSrvModel.create("/LinkFiles", oPayload, {
+            success: () => {
+                console.log("✅ Successfully linked all new files");
+            },
+            error: (err) => {
+                console.error("❌ Linking failed", err);
+            }
+        });
+    } else {
+        console.log("ℹ️ No new files to link");
+    }
+},
         triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
             let that = this;
 
@@ -1247,6 +1015,334 @@ sap.ui.define([
         getResourceBundle: function () {
             return this.getOwnerComponent().getModel("i18n").getResourceBundle();
         },
+
+
+        // File upload implementation using your backend service
+        onGenericAttachmentPress: function (oEvent, oTable) {
+            var oButton = oEvent.getSource();
+            var oTable = this.byId(oTable);
+
+            if (!oTable) {
+                sap.m.MessageBox.error("Table not found");
+                return;
+            }
+
+            // Get table rows based on table type
+            var aItems = [];
+            if (oTable.getItems) {
+                // sap.m.Table
+                aItems = oTable.getItems();
+            } else if (oTable.getRows) {
+                // sap.ui.table.Table
+                aItems = oTable.getRows();
+            } else if (oTable.getAggregation && oTable.getAggregation("items")) {
+                // Generic approach
+                aItems = oTable.getAggregation("items");
+            } else {
+                console.log("Table type:", oTable.getMetadata().getName());
+                sap.m.MessageBox.error("Unsupported table type");
+                return;
+            }
+
+            console.log("Found table items:", aItems.length);
+
+            // Find which row this button belongs to
+            var iRowIndex = -1;
+
+            // Loop through table items to find the row containing our button
+            for (var i = 0; i < aItems.length; i++) {
+                var oItem = aItems[i];
+                // Check if this row contains our button (traverse the control tree)
+                if (this._isButtonInRow(oButton, oItem)) {
+                    iRowIndex = i;
+                    break;
+                }
+            }
+
+            if (iRowIndex === -1) {
+                console.error("Button not found in any row. Button parent hierarchy:");
+                this._logParentHierarchy(oButton);
+                sap.m.MessageBox.error("Could not determine which row was clicked");
+                return;
+            }
+
+            // Convert row index to Reqitem format (001, 002, 003)
+            var sReqitem = (iRowIndex + 1).toString().padStart(3, '0');
+            this._iCurrentRowIndex = iRowIndex; // Store for later use
+            this._sCurrentReqitem = sReqitem;
+
+            console.log("Row clicked:", iRowIndex, "Reqitem:", sReqitem);
+
+            // Create a file input element
+            var oFileInput = document.createElement("input");
+            oFileInput.type = "file";
+            oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif"; // Optional: restrict file types
+
+            // When user selects a file
+            oFileInput.onchange = async function (e) {
+                var oFile = e.target.files[0];
+                if (oFile) {
+                    // Show file selected message
+                    MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
+
+                    // Call upload function
+                    await this.onGenericUploadFileToBackend(oFile, iRowIndex);
+                    oEvent.getSource().setVisible(false);
+                }
+            }.bind(this);
+
+            // Trigger file selection dialog
+            oFileInput.click();
+
+
+        },
+
+        // Helper function to debug parent hierarchy
+        _logParentHierarchy: function (oControl) {
+            var aHierarchy = [];
+            var oParent = oControl;
+
+            while (oParent && aHierarchy.length < 10) { // Limit to avoid infinite loops
+                aHierarchy.push(oParent.getMetadata().getName() + " (ID: " + (oParent.getId() || "none") + ")");
+                oParent = oParent.getParent();
+            }
+
+            console.log("Control hierarchy:", aHierarchy);
+        },
+
+        // Helper function to check if a button is within a specific table row
+        _isButtonInRow: function (oButton, oTableItem) {
+            var oParent = oButton.getParent();
+
+            // Traverse up the control hierarchy to find if we reach the table item
+            while (oParent) {
+                if (oParent === oTableItem) {
+                    return true;
+                }
+                oParent = oParent.getParent();
+            }
+
+            return false;
+        },
+
+        // onGenericUploadFileToBackend: function (oFile, iRowIndex,) {
+        //     var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+        //     var oFormData = new FormData();
+        //     oFormData.append("fileData", oFile);
+        //     var sToken = oSrvModel.getSecurityToken();
+        //     var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
+        //     BusyIndicator.show();
+
+        //     // Create XMLHttpRequest for file upload
+        //     var xhr = new XMLHttpRequest();
+
+        //     xhr.onreadystatechange = function () {
+        //         if (xhr.readyState === 4) { // Request completed
+        //             BusyIndicator.hide();
+        //             if (xhr.status === 201 || xhr.status === 200) {
+        //                 try {
+        //                     var sResponse = xhr.responseText;
+        //                     var xml = jQuery.parseXML(sResponse);
+        //                     var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
+        //                     this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, iRowIndex);
+        //                     MessageToast.show("File uploaded successfully!");
+
+        //                 } catch (e) {
+        //                     console.error("Error parsing upload response:", e);
+        //                     MessageToast.show("Upload completed but failed to parse response");
+        //                 }
+        //             } else {
+        //                 // Error
+        //                 console.error("Upload failed:", xhr.status, xhr.statusText);
+        //                 sap.m.MessageBox.error("Upload failed: " + xhr.statusText);
+        //             }
+        //         }
+        //     }.bind(this);
+
+        //     xhr.onerror = function () {
+        //         sap.ui.core.BusyIndicator.hide();
+        //         sap.m.MessageBox.error("Upload failed due to network error");
+        //     };
+
+        //     // Setup request
+        //     xhr.open("POST", sUploadUrl, true);
+
+        //     // Add headers
+        //     xhr.setRequestHeader("X-CSRF-Token", sToken);
+        //     xhr.setRequestHeader("slug", oFile.name); // Important: filename as slug header
+
+        //     // Send the request
+        //     xhr.send(oFormData);
+        // },
+
+
+        onGenericUploadFileToBackend: function (oFile, vRowRef, sCollectionPath) {
+            var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+            var oFormData = new FormData();
+            oFormData.append("fileData", oFile);
+            var sToken = oSrvModel.getSecurityToken();
+            var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
+            BusyIndicator.show();
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    BusyIndicator.hide();
+                    if (xhr.status === 201 || xhr.status === 200) {
+                        try {
+                            var sResponse = xhr.responseText;
+                            var xml = jQuery.parseXML(sResponse);
+                            var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
+
+                            // 🔑 decide how to update
+                            if (typeof vRowRef === "number") {
+                                // create screen → rowIndex
+                                this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, vRowRef);
+                            } else if (vRowRef && vRowRef.getPath) {
+                                // edit screen → bindingContext
+                                var sRowPath = vRowRef.getPath();
+                                var oModel = vRowRef.getModel();
+                                var aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
+
+                                aAttachments.push({
+                                    Fileid: sFileid,
+                                    Filename: oFile.name,
+                                    MimeType: oFile.type,
+                                    Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
+                                });
+
+                                oModel.setProperty(sRowPath + "/Attachments", aAttachments);
+                                console.log("Updated attachments for path:", sRowPath);
+                            }
+
+                            MessageToast.show("File uploaded successfully!");
+                        } catch (e) {
+                            console.error("Error parsing upload response:", e);
+                            MessageToast.show("Upload completed but failed to parse response");
+                        }
+                    } else {
+                        console.error("Upload failed:", xhr.status, xhr.statusText);
+                        sap.m.MessageBox.error("Upload failed: " + xhr.statusText);
+                    }
+                }
+            }.bind(this);
+
+            xhr.onerror = function () {
+                BusyIndicator.hide();
+                sap.m.MessageBox.error("Upload failed due to network error");
+            };
+
+            xhr.open("POST", sUploadUrl, true);
+            xhr.setRequestHeader("X-CSRF-Token", sToken);
+            xhr.setRequestHeader("slug", oFile.name);
+            xhr.send(oFormData);
+        },
+
+
+        onGenericUpdateAttachmentModel: function (sFileid, sFileName, sMimeType, iRowIndex) {
+            const oModel = this.getModel("listOfSelectedAssetsModel");
+            let aAssets = oModel.getProperty("/assets") || sCollectionPath;
+
+            if (!aAssets[iRowIndex]) {
+                console.error("Invalid row index for attachment update");
+                return;
+            }
+
+            // Attachment object
+            const oAttachmentData = {
+                Fileid: sFileid,
+                Filename: sFileName,
+                MimeType: sMimeType,
+                Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
+            };
+
+            if (!aAssets[iRowIndex].Attachments) {
+                aAssets[iRowIndex].Attachments = [];
+            }
+            aAssets[iRowIndex].Attachments.push(oAttachmentData);
+
+
+            oModel.setProperty("/assets", aAssets);
+
+
+
+            console.log("Updated asset with attachments:", aAssets[iRowIndex]);
+        },
+
+
+        onGenericDeleteAttachment: function (oEvent) {
+            let uploadButton = oEvent.getSource().getParent().getParent().getParent().getParent().getItems()[1];
+            console.log("Delete button pressed");
+
+            const oAttachmentContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+            console.log("Attachment context:", oAttachmentContext);
+
+            if (!oAttachmentContext) {
+                console.warn("No attachment context found.");
+                return;
+            }
+
+            const sFileName = oAttachmentContext.getProperty("Filename");
+            console.log("File to delete:", sFileName);
+
+            // Get the parent context (row)
+            const oAttachmentPath = oAttachmentContext.getPath();
+            console.log("Attachment path:", oAttachmentPath);
+
+            const oRowPath = oAttachmentPath.split("/Attachments")[0];
+            console.log("Row path:", oRowPath);
+
+            const oModel = this.getView().getModel("listOfSelectedAssetsModel");
+            console.log("Model object:", oModel);
+
+            const aAttachments = oModel.getProperty(oRowPath + "/Attachments") || [];
+            console.log("Current attachments array:", aAttachments);
+
+            // Remove only the clicked attachment
+            const aUpdated = aAttachments.filter(att => att.Filename !== sFileName);
+            console.log("Updated attachments array:", aUpdated);
+
+            oModel.setProperty(oRowPath + "/Attachments", aUpdated);
+            MessageToast.show("Attachment deleted successfully.");
+            uploadButton.setVisible(true)
+        },
+
+        onGenericDownloadItem: function (oEvent) {
+            const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+            const sFileId = oContext.getProperty("Fileid");
+            const sMimeType = oContext.getProperty("MimeType");
+            const sFileName = oContext.getProperty("Filename");
+
+            const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+            const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
+
+            // Download using fetch
+            fetch(sUrl, { credentials: "include" })
+                .then(res => res.blob())
+                .then(blob => {
+                    const newBlob = new Blob([blob], { type: sMimeType });
+                    const url = window.URL.createObjectURL(newBlob);
+
+                    // Create temporary link to trigger download
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = sFileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch(err => {
+                    console.error("Download failed", err);
+                    sap.m.MessageBox.error("Failed to download file.");
+                });
+        },
+
+
+
+
 
     });
 });

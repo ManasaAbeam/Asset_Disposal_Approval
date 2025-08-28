@@ -29,6 +29,11 @@ server:
             authenticationType: BasicAuthentication
             destination: DS4_110_BAS
             path: /sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV/
+          - url: http://ds4.sap.smu.edu.sg:44300
+            client: '110'
+            authenticationType: BasicAuthentication
+            destination: DS4_110_BAS
+            path: /sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -56,5 +61,9 @@ server:
           - urlPath: /sap/opu/odata/sap/ZUI_ADW_ASSET_REQUEST_SRV
             metadataPath: ./webapp/localService/ZUI_ADW_ASSET_REQUEST_SRV/metadata.xml
             mockdataPath: ./webapp/localService/ZUI_ADW_ASSET_REQUEST_SRV/data
+            generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV
+            metadataPath: ./webapp/localService/ZUI_SMU_ATTACHMENTS_SRV/metadata.xml
+            mockdataPath: ./webapp/localService/ZUI_SMU_ATTACHMENTS_SRV/data
             generateMockData: true
         annotations: []

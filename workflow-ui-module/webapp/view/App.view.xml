@@ -1,13 +1,10 @@
-<mvc:View 
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    displayBlock="true"
+<mvc:View xmlns:html="http://www.w3.org/1999/xhtml" displayBlock="true"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:uxap="sap.uxap"
     xmlns:c="sap.ui.core"
     xmlns="sap.ui.table"
     xmlns:layout="sap.ui.layout"
-    xmlns:m="sap.m" 
-    controllerName="fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.App">
+    xmlns:m="sap.m" controllerName="fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.App">
 
     <uxap:ObjectPageLayout id="ObjectPageLayout" showFooter="true">
 
@@ -18,13 +15,13 @@
                         <uxap:blocks>
                             <layout:VerticalLayout width="100%">
                                 <!-- Asset Table -->
-                                <Table id="idtEditAssetRequest" rows="{listOfSelectedAssetsModel>/value}" selectionMode="None" fixedColumnCount="2" >
+                                <Table id="idtEditAssetRequest" rows="{listOfSelectedAssetsModel>/value}" selectionMode="None" fixedColumnCount="2">
                                     <extension>
                                         <m:OverflowToolbar style="Clear">
                                             <m:Title id="idtitle" text="{i18n>titleSelectedAssets}"/>
                                         </m:OverflowToolbar>
                                     </extension>
-                            
+
                                     <columns>
                                         <Column width="11rem">
                                             <m:Label text="{i18n>lblCompanyCode}" />
@@ -75,7 +72,7 @@
                                                 <m:Label text="{
             path: 'listOfSelectedAssetsModel>Aktivd',
             formatter: '.formatCapitalizationDate'
-        }" />    
+        }" />
                                             </template>
                                         </Column>
                                         <Column width="7rem">
@@ -124,10 +121,10 @@
                                             <m:Label text="{i18n>lblValidityEndDate}" />
                                             <template>
                                                 <!-- <m:Label text="{listOfSelectedAssetsModel>GmToDate}" /> -->
-                                                  <m:Label text="{
+                                                <m:Label text="{
             path: 'listOfSelectedAssetsModel>GmToDate',
             formatter: '.formatCapitalizationDate'
-        }" />  
+        }" />
                                             </template>
                                         </Column>
                                         <Column width="11rem">
@@ -142,7 +139,7 @@
                                                 <m:Label text="{listOfSelectedAssetsModel>Currency}" />
                                             </template>
                                         </Column>
-                                         <Column width="18rem">
+                                        <Column width="18rem">
                                             <m:Label text="{i18n>lblDepreTillDate}" />
                                             <template>
                                                 <m:Text text="{listOfSelectedAssetsModel>Nafag}"></m:Text>
@@ -178,28 +175,36 @@
                                                 <m:Text text="{listOfSelectedAssetsModel>Prozs}" />
                                             </template>
                                         </Column>
-                                        <Column width="18rem">
+                                        <!-- <Column width="18rem">
                                             <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
                                             <template>
                                                 <m:HBox justifyContent="Center">
                                                     <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
                                                 </m:HBox>
                                             </template>
-                                        </Column>
+                                        </Column> -->
+
+                                       <Column width="18rem">
+    <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
+    <template>
+        <m:VBox>
+            <m:Link
+                text="{listOfSelectedAssetsModel>Attachments/0/Filename}"
+                wrapping="true"
+                press=".onGenericDownloadItem" 
+                visible="{= ${listOfSelectedAssetsModel>Attachments}.length > 0 }"/>
+        </m:VBox>
+    </template>
+</Column>
+
+
                                     </columns>
                                 </Table>
 
                                 <!-- Approver Comments Section Below Table -->
                                 <m:VBox class="sapUiSmallMarginTop" width="100%">
                                     <m:Label text="{i18n>lblApproverComments}" design="Bold" />
-                                                            <m:TextArea id="idApproverComments" placeholder="{i18n>phEnterComments}" rows="2" width="100%" />
-                                    <!-- <m:TextArea 
-                                        id="idApproverComments" 
-                                        placeholder="{i18n>phEnterComments}" 
-                                        rows="3" 
-                                        width="100%" 
-                                        value="{listOfSelectedAssetsModel>/Header/ApproverComments}" 
-                                        enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" /> -->
+                                    <m:TextArea id="idApproverComments" placeholder="{i18n>phEnterComments}" rows="2" width="100%" />
                                 </m:VBox>
                             </layout:VerticalLayout>
                         </uxap:blocks>

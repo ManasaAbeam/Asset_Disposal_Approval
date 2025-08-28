@@ -42,6 +42,15 @@
           "localUri": "localService/ZUI_ADW_ASSET_REQUEST_SRV/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZUI_SMU_ATTACHMENTS_SRV": {
+        "uri": "/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZUI_SMU_ATTACHMENTS_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -119,6 +128,11 @@
       },
       "ZUI_ADW_ASSET_REQUEST_SRV": {
         "dataSource": "ZUI_ADW_ASSET_REQUEST_SRV",
+        "preload": true,
+        "settings": {}
+      },
+      "ZUI_SMU_ATTACHMENTS_SRV": {
+        "dataSource": "ZUI_SMU_ATTACHMENTS_SRV",
         "preload": true,
         "settings": {}
       }

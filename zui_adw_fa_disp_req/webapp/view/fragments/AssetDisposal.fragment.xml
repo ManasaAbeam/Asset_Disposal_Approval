@@ -127,7 +127,7 @@
                     <Column width="18rem">
                         <Text text="{i18n>lblAssetPhysicalDisposalRequired}" />
                     </Column>
-                     <Column width="18rem" visible="false">
+                    <Column width="18rem" visible="false">
                         <Text text="{i18n>lblBalQty}" />
                     </Column>
                     <Column width="18rem" visible="false">
@@ -172,7 +172,7 @@
                             <Text text="{DepArea}" />
                             <Text text="{PhYear}" />
                             <Text text="{DepreTillDate}" />
-                            <ComboBox required="true" items="{disposalRequiredModel>/DisposalRequiredOptions}" change=".onDisposalRequiredChange">
+                            <ComboBox required="true" items="{disposalRequiredModel>/DisposalRequiredOptions}">
                                 <core:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
                             </ComboBox>
 

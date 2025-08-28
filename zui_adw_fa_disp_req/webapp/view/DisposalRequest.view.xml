@@ -162,7 +162,7 @@
 					<Column width="18rem">
 						<m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
 						<template>
-							<m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" change=".onDisposalRequiredChange">
+							<m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" >
 								<c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
 							</m:ComboBox>
 						</template>
