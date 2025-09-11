@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_ANALYTICS',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Analytics.v1" Alias="Analytics"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CODELIST',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.CodeList.v1" Alias="SAP__CodeList"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_MEASURES',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Measures.V1" Alias="Measures"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_UI',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.UI.v1" Alias="UI"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/iwfnd/catalogservice;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_VALIDATION',Version='0001',SAP__Origin='LOCAL')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Validation.V1" Alias="Validation"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZFARCV_CUST_BILL_DET_CDS" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="T077XType" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SPRAS"/>
+                    <PropertyRef Name="KTOKD"/>
+                </Key>
+                <Property Name="SPRAS" Type="Edm.String" Nullable="false" MaxLength="2" sap:label="Language Key"/>
+                <Property Name="KTOKD" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:label="Account group"/>
+                <Property Name="TXT30" Type="Edm.String" MaxLength="30" sap:label="Name"/>
+            </EntityType>
+            <EntityType Name="ZFARCV_CUST_BILL_DETType" sap:label="Customer billing" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Rbukrs"/>
+                    <PropertyRef Name="Gjahr"/>
+                    <PropertyRef Name="Belnr"/>
+                    <PropertyRef Name="docln"/>
+                </Key>
+                <Property Name="Rbukrs" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:required-in-filter="true" sap:label="Company Code" sap:value-list="standard"/>
+                <Property Name="Gjahr" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="NonNegative" sap:label="Fiscal Year"/>
+                <Property Name="Belnr" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="UpperCase" sap:label="Document Number" sap:quickinfo="Document Number of an Accounting Document"/>
+                <Property Name="docln" Type="Edm.String" Nullable="false" MaxLength="6" sap:display-format="UpperCase" sap:label="G/L Line Item" sap:quickinfo="Six-Character General Ledger Line Item"/>
+                <Property Name="kunnr" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Customer Account" sap:quickinfo="Customer Number" sap:value-list="standard"/>
+                <Property Name="blart" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Document type" sap:quickinfo="Document Type" sap:value-list="standard"/>
+                <Property Name="bldat" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:filter-restriction="interval" sap:label="Invoice/Document Date" sap:quickinfo="Document Date in Document"/>
+                <Property Name="budat" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:filter-restriction="interval" sap:label="Posting Date" sap:quickinfo="Posting Date in the Document"/>
+                <Property Name="ktokd" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Customer Account Group" sap:value-list="standard"/>
+                <Property Name="ltext" Type="Edm.String" MaxLength="20" sap:label="Description" sap:quickinfo="Document Type Description"/>
+                <Property Name="cpudt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Entry Date" sap:quickinfo="Day On Which Accounting Document Was Entered"/>
+                <Property Name="augbl" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Clearing Document" sap:quickinfo="Document Number of the Clearing Document"/>
+                <Property Name="augdt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Clearing Date"/>
+                <Property Name="rwcur" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="Transaction Currency" sap:semantics="currency-code"/>
+                <Property Name="name1" Type="Edm.String" MaxLength="35" sap:label="Name" sap:quickinfo="Name 1"/>
+                <Property Name="land1" Type="Edm.String" MaxLength="3" sap:display-format="UpperCase" sap:label="Country/Region Key"/>
+                <Property Name="ca_grp" Type="Edm.String" MaxLength="35"/>
+                <Property Name="akont" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Reconciliation acct" sap:quickinfo="Reconciliation Account in General Ledger"/>
+                <Property Name="prctr" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Profit Center"/>
+                <Property Name="wsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Trans. Crcy" sap:quickinfo="Amount in Transaction Currency"/>
+                <Property Name="hsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Comp Cd Crcy" sap:quickinfo="Amount in Company Code Currency"/>
+                <Property Name="mwskz" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Tax Code" sap:quickinfo="Tax on sales/purchases code"/>
+                <Property Name="tax_wsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Trans. Crcy" sap:quickinfo="Amount in Transaction Currency"/>
+                <Property Name="tax_hsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Comp Cd Crcy" sap:quickinfo="Amount in Company Code Currency"/>
+                <Property Name="racct" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Account Number"/>
+                <Property Name="txt50" Type="Edm.String" MaxLength="50" sap:label="G/L Acct Long Text" sap:quickinfo="G/L Account Long Text"/>
+                <Property Name="rcntr" Type="Edm.String" MaxLength="10" sap:display-format="UpperCase" sap:label="Cost Center"/>
+                <Property Name="rev_ltext" Type="Edm.String" MaxLength="40" sap:label="Description"/>
+                <Property Name="ps_psp_pnr" Type="Edm.String" MaxLength="24" sap:display-format="NonNegative" sap:label="WBS Element" sap:quickinfo="Work Breakdown Structure Element (WBS Element)"/>
+                <Property Name="post1" Type="Edm.String" MaxLength="40" sap:label="Description" sap:quickinfo="PS: Short description (1st text line)"/>
+                <Property Name="rgrant_nbr" Type="Edm.String" MaxLength="20" sap:display-format="UpperCase" sap:label="Grant"/>
+                <Property Name="description" Type="Edm.String" MaxLength="80" sap:label="Description" sap:quickinfo="Descriptive Text"/>
+                <Property Name="rev_wsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Trans. Crcy" sap:quickinfo="Amount in Transaction Currency"/>
+                <Property Name="rev_hsl" Type="Edm.Decimal" Precision="24" Scale="3" sap:label="Amnt in Comp Cd Crcy" sap:quickinfo="Amount in Company Code Currency"/>
+                <Property Name="xblnr" Type="Edm.String" MaxLength="16"/>
+                <Property Name="bktxt" Type="Edm.String" MaxLength="25"/>
+                <Property Name="zuonr" Type="Edm.String" MaxLength="18"/>
+                <Property Name="sgtxt" Type="Edm.String" MaxLength="50"/>
+                <Property Name="bschl" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Posting Key"/>
+                <Property Name="tax_bschl" Type="Edm.String" MaxLength="2" sap:display-format="UpperCase" sap:label="Posting Key"/>
+                <NavigationProperty Name="to_t077" Relationship="ZFARCV_CUST_BILL_DET_CDS.assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60" FromRole="FromRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60" ToRole="ToRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60"/>
+            </EntityType>
+            <EntityType Name="ZI_Account_DocumentType_VHType" sap:label="Accounting Document type" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="AccountingDocumentType"/>
+                </Key>
+                <Property Name="AccountingDocumentType" Type="Edm.String" Nullable="false" MaxLength="2" sap:display-format="UpperCase" sap:text="AccountingDocumentType_Text" sap:label="Customer" sap:quickinfo="Journal Entry Type"/>
+                <Property Name="AccountingDocumentType_Text" Type="Edm.String" MaxLength="20" sap:label="JE Type Name" sap:quickinfo="Document Type Name" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="ZI_Account_Group_VHType" sap:label="Customer Account Group" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="CustomerAccountGroup"/>
+                </Key>
+                <Property Name="CustomerAccountGroup" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:text="CustomerAccountGroup_Text" sap:label="Customer Account" sap:quickinfo="Customer Account Group"/>
+                <Property Name="CustomerAccountGroup_Text" Type="Edm.String" MaxLength="30" sap:label="Name" sap:quickinfo="Account Group Name" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="ZI_CompanyCode_VHType" sap:label="Company Code Value Help" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="CompanyCode"/>
+                </Key>
+                <Property Name="CompanyCode" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:text="CompanyCodeName" sap:label="Company Code"/>
+                <Property Name="CompanyCodeName" Type="Edm.String" MaxLength="25" sap:label="CompanyCode Name" sap:quickinfo="Name of Company Code or Company"/>
+            </EntityType>
+            <EntityType Name="ZI_Customer_VHType" sap:label="Customer Value Help" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Customer"/>
+                </Key>
+                <Property Name="Customer" Type="Edm.String" Nullable="false" MaxLength="10" sap:display-format="UpperCase" sap:text="CustomerName" sap:label="Customer" sap:quickinfo="Customer Number"/>
+                <Property Name="CustomerName" Type="Edm.String" MaxLength="80" sap:label="Customer Name" sap:quickinfo="Name of Customer"/>
+            </EntityType>
+            <Association Name="assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60" sap:content-version="1">
+                <End Type="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType" Multiplicity="1" Role="FromRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60"/>
+                <End Type="ZFARCV_CUST_BILL_DET_CDS.T077XType" Multiplicity="0..1" Role="ToRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60"/>
+            </Association>
+            <EntityContainer Name="ZFARCV_CUST_BILL_DET_CDS_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="T077X" EntityType="ZFARCV_CUST_BILL_DET_CDS.T077XType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZFARCV_CUST_BILL_DET" EntityType="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:requires-filter="true" sap:content-version="1"/>
+                <EntitySet Name="ZI_Account_DocumentType_VH" EntityType="ZFARCV_CUST_BILL_DET_CDS.ZI_Account_DocumentType_VHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ZI_Account_Group_VH" EntityType="ZFARCV_CUST_BILL_DET_CDS.ZI_Account_Group_VHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ZI_CompanyCode_VH" EntityType="ZFARCV_CUST_BILL_DET_CDS.ZI_CompanyCode_VHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <EntitySet Name="ZI_Customer_VH" EntityType="ZFARCV_CUST_BILL_DET_CDS.ZI_Customer_VHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:searchable="true" sap:content-version="1"/>
+                <AssociationSet Name="assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60" Association="ZFARCV_CUST_BILL_DET_CDS.assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="ZFARCV_CUST_BILL_DET" Role="FromRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60"/>
+                    <End EntitySet="T077X" Role="ToRole_assoc_6A1C81C9B55EA6DF4A966E1B9FDE4E60"/>
+                </AssociationSet>
+            </EntityContainer>
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType/Rbukrs" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Company Code Value Help"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_CompanyCode_VH"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="Rbukrs"/>
+                                    <PropertyValue Property="ValueListProperty" String="CompanyCode"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CompanyCodeName"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType/kunnr" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Customer Value Help"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_Customer_VH"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="kunnr"/>
+                                    <PropertyValue Property="ValueListProperty" String="Customer"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CustomerName"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType/blart" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Accounting Document type"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_Account_DocumentType_VH"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="blart"/>
+                                    <PropertyValue Property="ValueListProperty" String="AccountingDocumentType"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="AccountingDocumentType_Text"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType/ktokd" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Customer Account Group"/>
+                        <PropertyValue Property="CollectionPath" String="ZI_Account_Group_VH"/>
+                        <PropertyValue Property="SearchSupported" Bool="true"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="ktokd"/>
+                                    <PropertyValue Property="ValueListProperty" String="CustomerAccountGroup"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="CustomerAccountGroup_Text"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DET_CDS_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ApplyMultiUnitBehaviorForSortingAndFiltering" Bool="true"/>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DETType/budat" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.FieldControl" EnumMember="Common.FieldControlType/Mandatory"/>
+            </Annotations>
+            <Annotations Target="ZFARCV_CUST_BILL_DET_CDS.ZFARCV_CUST_BILL_DET_CDS_Entities/ZFARCV_CUST_BILL_DET" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Capabilities.FilterRestrictions">
+                    <Record>
+                        <PropertyValue Property="RequiresFilter" Bool="true"/>
+                        <PropertyValue Property="RequiredProperties">
+                            <Collection>
+                                <PropertyPath>Rbukrs</PropertyPath>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="FilterExpressionRestrictions">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="bldat"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                                <Record>
+                                    <PropertyValue Property="Property" PropertyPath="budat"/>
+                                    <PropertyValue Property="AllowedExpressions" String="SingleRange"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+                <Annotation Term="Capabilities.NavigationRestrictions">
+                    <Record>
+                        <PropertyValue Property="RestrictedProperties">
+                            <Collection>
+                                <Record>
+                                    <PropertyValue Property="NavigationProperty" NavigationPropertyPath="to_t077"/>
+                                    <PropertyValue Property="InsertRestrictions">
+                                        <Record>
+                                            <PropertyValue Property="Insertable" Bool="false"/>
+                                        </Record>
+                                    </PropertyValue>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <atom:link rel="self" href="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/sap/ZFARCV_CUST_BILL_DET_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="https://ds4.sap.smu.edu.sg:44300/sap/opu/odata/sap/ZFARCV_CUST_BILL_DET_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

@@ -8,36 +8,5 @@
       "key": "No",
       "text": "No"
     }
-  ],
-"DisposalReasons": [
-  {
-    "key": "DAM",
-    "text": "Damaged Beyond Repair"
-  },
-  {
-    "key": "OBS",
-    "text": "Obsolete Equipment"
-  },
-  {
-    "key": "UPG",
-    "text": "Replaced with Upgrade"
-  },
-  {
-    "key": "DON",
-    "text": "Donated to External Party"
-  },
-  {
-    "key": "LOS",
-    "text": "Lost or Stolen"
-  },
-  {
-    "key": "SOL",
-    "text": "Sold to Third Party"
-  },
-  {
-    "key": "SCR",
-    "text": "Scrapped"
-  }
-]
-
+  ]
 }

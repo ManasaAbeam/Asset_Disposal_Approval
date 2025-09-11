@@ -136,11 +136,6 @@
         "dataSource": "ZUI_SMU_ATTACHMENTS_SRV",
         "preload": true,
         "settings": {}
-      },
-       "viewModel": {
-        "type": "sap.ui.model.json.JSONModel",
-        "settings": {},
-        "preload": false
       }
     },
     "resources": {

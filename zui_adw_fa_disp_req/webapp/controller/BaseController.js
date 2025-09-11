@@ -12,6 +12,11 @@ sap.ui.define([
 
     return Controller.extend("zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.BaseController", {
 
+        /**
+         * Returns the router instance of the current component for navigation.
+         * @returns {sap.ui.core.routing.Router} The router instance.
+         * @public
+         */
         getRouter: function () {
             return this.getOwnerComponent().getRouter();
         },
@@ -20,43 +25,38 @@ sap.ui.define([
             const sSearchValue = oEvent.getParameter("value");
             const oUserModel = this.getModel("currentUser");
             const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
-
             const aSearchFilters = [];
             if (sSearchValue) {
                 aSearchFilters.push(new Filter("Btprn", FilterOperator.Contains, sSearchValue));
             }
             let oCombinedSearchFilter = null;
             if (aSearchFilters.length > 0) {
-                oCombinedSearchFilter = new Filter(aSearchFilters, false); // OR logic for search
+                oCombinedSearchFilter = new Filter(aSearchFilters, false);
             }
-
-            // --- User filter ---
             const oUserFilter = new Filter("CrBtpuser", FilterOperator.EQ, sUserEmail);
-
-            // --- Status filter (only Draft or Rejected) ---
             const oStatusFilter = new Filter({
                 filters: [
                     new Filter("ReqStatus", FilterOperator.EQ, "Save As Draft"),
                     new Filter("ReqStatus", FilterOperator.Contains, "Rejected")
                 ],
-                and: false // OR logic between these two
+                and: false
             });
-
-            // --- Combine all filters (AND logic) ---
             const aFinalFilters = [oUserFilter, oStatusFilter];
             if (oCombinedSearchFilter) {
                 aFinalFilters.push(oCombinedSearchFilter);
             }
-
-            const oFinalFilter = new Filter(aFinalFilters, true); // AND logic for all
-
-            // --- Apply filter ---
+            const oFinalFilter = new Filter(aFinalFilters, true);
             const oBinding = oEvent.getSource().getBinding("items");
             if (oBinding) {
                 oBinding.filter(oFinalFilter);
             }
         },
 
+        /**
+         * helper method that applies a filter to an input field's suggestion items based on the currently logged-in user's email.
+         * @param {sap.m.Input} oInput The input control to apply the filter on.
+         * @private
+         */
         applyUserFilterToInput: function (oInput) {
             const oUserModel = this.getModel("currentUser");
             const sUserEmail = oUserModel.getProperty("/email") || "dummy.user@com";
@@ -72,6 +72,14 @@ sap.ui.define([
             });
         },
 
+        /**
+         * helper method to open a generic value help dialog for any input field.
+         * Loads the dialog fragment if not already loaded, applies filters if needed, and opens the dialog.
+         * @param {sap.ui.base.Event} oEvent The event triggered by the input field.
+         * @param {string} sFragmentName The fragment name of the value help dialog.
+         * @param {string} sFilterField The field name to filter the dialog items.
+         * @Public
+         */
         onGenericValueHelp: function (oEvent, sFragmentName, sFilterField) {
             let that = this;
             this._sInputId = oEvent.getSource().getId();
@@ -111,7 +119,7 @@ sap.ui.define([
                     const aFilters = [oUserFilter, oStatusFilter];
                     let oItemsBinding = oDialog.getBinding("items");
                     if (oItemsBinding) {
-                        oItemsBinding.filter(new Filter(aFilters, true)); // AND between user + status
+                        oItemsBinding.filter(new Filter(aFilters, true));
                     } else {
                         oDialog.attachEventOnce("afterOpen", function () {
                             let oLateBinding = oDialog.getBinding("items");
@@ -121,34 +129,59 @@ sap.ui.define([
                         });
                     }
                 }
-
                 oDialog.open();
             });
         },
+
+        /**
+         * Filters items in a value help dialog based on the user's search input.
+         * @param {sap.ui.base.Event} oEvent The search event triggered by the value help dialog.
+         * @private
+         */
         onGenericValueHelpSearch: function (oEvent) {
             let sValue = oEvent.getParameter("value");
-            let oControl = oEvent.getSource();
-            while (oControl && !(oControl instanceof sap.m.SelectDialog)) {
-                oControl = oControl.getParent();
-            }
-            let oDialog = oControl;
+            let oDialog = oEvent.getSource();
             let sFilterFields = oDialog.data("filterFields");
             let aFilterFields = sFilterFields ? sFilterFields.split(",") : [];
-            let aFilters = aFilterFields.map(function (field) {
-                return new sap.ui.model.Filter(
+            let aSearchFilters = aFilterFields.map(function (field) {
+                return new Filter(
                     field.trim(),
-                    sap.ui.model.FilterOperator.Contains,
+                    FilterOperator.Contains,
                     sValue
                 );
             });
-            let oCombinedFilter = new sap.ui.model.Filter({
-                filters: aFilters,
-                and: false
-            });
-            oEvent.getSource().getBinding("items").filter([oCombinedFilter]);
+
+            let oSearchFilter = null;
+            if (aSearchFilters.length > 1) {
+                oSearchFilter = new Filter({
+                    filters: aSearchFilters,
+                    and: false
+                });
+            } else if (aSearchFilters.length === 1) {
+                oSearchFilter = aSearchFilters[0];
+            }
+            let sCostCenter = this.byId("inpAssetCostCenter").getValue();
+            let oCostCenterFilter = null;
+            if (sCostCenter) {
+                oCostCenterFilter = new Filter("CostCenter", FilterOperator.EQ, sCostCenter);
+            }
+            let aFinalFilters = [];
+            if (oSearchFilter && oCostCenterFilter) {
+                aFinalFilters.push(new Filter([oCostCenterFilter, oSearchFilter], true));
+            } else if (oCostCenterFilter) {
+                aFinalFilters.push(oCostCenterFilter);
+            } else if (oSearchFilter) {
+                aFinalFilters.push(oSearchFilter);
+            }
+            oEvent.getSource().getBinding("items").filter(aFinalFilters);
         },
 
 
+        /**
+         * Handles the closing of a value help dialog, updating the input field with the selected item(s) and clearing filters.
+         * @param {sap.ui.base.Event} oEvent The close event triggered by the value help dialog.
+         * @private
+         */
         onGenericValueHelpClose: function (oEvent) {
             let oDialog = oEvent.getSource();
             let bMultiSelect = oDialog.getMultiSelect();
@@ -179,11 +212,17 @@ sap.ui.define([
                     oInput.setValue(oSelectedItem.getTitle());
                 }
             }
-
             oEvent.getSource().getBinding("items").filter([]);
         },
 
-        //which is used to check the filters are empty are not
+
+        /**
+        * Internal helper method that checks if all filter inputs are empty and updates visibility property accordingly
+        * @param {string[]} aInputIds array of input control IDs to check for values
+        * @param {string} sModelName the name of the model to update
+        * @param {string} sPropertyPath the property path in the model to set visibility (true if filters have values, false if empty)
+        * @public
+        */
         checkIfFiltersAreEmpty: function (aInputIds, sModelName, sPropertyPath) {
             const oView = this.getView();
             const oModel = this.getModel(sModelName);
@@ -196,6 +235,13 @@ sap.ui.define([
             });
             oModel.setProperty(sPropertyPath, !bAllEmpty);
         },
+
+        /**
+         * Generic helper method to perform search and filter table data based on filter bar values.
+         * @param {sap.ui.comp.filterbar.FilterBar} oFilterBar The filter bar containing filter inputs.
+         * @param {sap.m.Table} oTable The table to be updated with the search results.
+         * @public
+         */
         onSearch: function (oFilterBar, oTable) {
             const oResourceBundle = this.getResourceBundle();
             let that = this;
@@ -230,30 +276,28 @@ sap.ui.define([
                     let oControl = oFilterGroupItem.getControl();
                     let sFieldName = oFilterGroupItem.getName();
 
-                    // 🔹 Check if control is MultiInput (asset number)
                     if (oControl instanceof sap.m.MultiInput) {
                         let aTokens = oControl.getTokens();
                         if (aTokens.length > 0) {
                             let aTokenFilters = aTokens.map(function (oToken) {
-                                return new sap.ui.model.Filter(
+                                return new Filter(
                                     sFieldName,
-                                    sap.ui.model.FilterOperator.Contains,
+                                    FilterOperator.Contains,
                                     oToken.getText()
                                 );
                             });
-                            // combine multiple asset numbers with OR
-                            aTableFilters.push(new sap.ui.model.Filter({
+                            aTableFilters.push(new Filter({
                                 filters: aTokenFilters,
                                 and: false
                             }));
                         }
                     } else {
-                        // 🔹 Normal Input (cost center, etc.)
+
                         let sValue = oControl.getValue();
                         if (sValue && sValue.trim() !== "") {
-                            let oFilter = new sap.ui.model.Filter(
+                            let oFilter = new Filter(
                                 sFieldName,
-                                sap.ui.model.FilterOperator.Contains,
+                                FilterOperator.Contains,
                                 sValue.trim()
                             );
                             aTableFilters.push(oFilter);
@@ -261,42 +305,51 @@ sap.ui.define([
                     }
                 }
 
-                // 🔹 Add validity date filter
                 let today = new Date();
                 today.setHours(0, 0, 0, 0);
                 let formattedDate = this.formatDateToYMD(today);
 
-                let oDateFilter = new sap.ui.model.Filter({
+                let oDateFilter = new Filter({
                     filters: [
-                        new sap.ui.model.Filter("ValidityEndDate", sap.ui.model.FilterOperator.LE, formattedDate),
-                        new sap.ui.model.Filter("ValidityEndDate", sap.ui.model.FilterOperator.EQ, null)
+                        new Filter("ValidityEndDate", FilterOperator.LE, formattedDate),
+                        new Filter("ValidityEndDate", FilterOperator.EQ, null)
                     ],
                     and: false
                 });
 
                 aTableFilters.push(oDateFilter);
 
-                // 🔹 BalValue >= 0 AND Currency = 'SGD'
-                let oBalValueFilter = new sap.ui.model.Filter({
+                //   BalValue >= 0 AND Currency = 'SGD'
+                let oBalValueFilter = new Filter({
                     filters: [
-                        new sap.ui.model.Filter("BalValue", sap.ui.model.FilterOperator.GT, 0),
-                        new sap.ui.model.Filter("Currency", sap.ui.model.FilterOperator.EQ, "SGD")
+                        new Filter("BalValue", FilterOperator.GT, 0),
+                        new Filter("Currency", FilterOperator.EQ, "SGD")
                     ],
                     and: true
                 });
                 aTableFilters.push(oBalValueFilter);
 
+                //  Exclude assets where both BalValue & BalQty are 0
+                let oExcludeZeroFilter = new Filter({
+                    filters: [
+                        new Filter("BalValue", FilterOperator.NE, 0),
+                        new Filter("BalQty", FilterOperator.NE, 0),
+                        new Filter("BaseUnit", FilterOperator.EQ, "EA")
 
-                // 🔹 Apply filter to table
+                    ],
+                    and: true
+                });
+                aTableFilters.push(oExcludeZeroFilter);
+
                 let oBinding = oTable.getBinding("items");
                 if (oBinding) {
                     if (aTableFilters.length > 0) {
                         oBinding.filter(aTableFilters);
-                        MessageBox.information(oResourceBundle.getText("msgFiltersApplied"));
+                        // MessageBox.information(oResourceBundle.getText("msgFiltersApplied"));
                         this.getModel("visibilityModel").setProperty("/columlist", true);
                     } else {
                         oBinding.filter([]);
-                        MessageBox.information(oResourceBundle.getText("msgNoFiltersApplied"));
+                        // MessageBox.information(oResourceBundle.getText("msgNoFiltersApplied"));
                         this.getModel("visibilityModel").setProperty("/columlist", false);
                     }
                 }
@@ -378,22 +431,13 @@ sap.ui.define([
 
             if (!aTableData || aTableData.length === 0) {
                 bValidationError = true;
-                aErrorMessages.push(oBundle.getText("errorNoDataToValidate") || "No data to validate");
+                aErrorMessages.push(oBundle.getText("errorNoDataToValidate"));
                 return {
                     hasError: bValidationError,
                     errorMessages: aErrorMessages
                 };
             }
-
             aTableData.forEach(function (oRowData) {
-                // Existing validations
-                if (!oRowData.AssetPhysicalDisposalRequired && !oRowData.Zphya) {
-                    bValidationError = true;
-                    if (!aErrorMessages.includes(oBundle.getText("errorAssetPhysicalDisposalRequired"))) {
-                        aErrorMessages.push(oBundle.getText("errorAssetPhysicalDisposalRequired"));
-                    }
-                }
-
                 if (!oRowData.DisposalReason && !oRowData.Rstgr) {
                     bValidationError = true;
                     if (!aErrorMessages.includes(oBundle.getText("errorDisposalReason"))) {
@@ -412,33 +456,23 @@ sap.ui.define([
                     }
                 }
 
-                // NEW VALIDATION: Check if DisposalQuantity exceeds Quantity
                 let quantity = parseFloat(oRowData.BalQty || oRowData.AmMenge);
                 let disposalQuantity = parseFloat(oRowData.DisposalQuantity || oRowData.Menge);
-
-                // Only validate if both values exist and are valid numbers
                 if (disposalQuantity && quantity && !isNaN(disposalQuantity) && !isNaN(quantity)) {
                     if (disposalQuantity > quantity) {
                         bValidationError = true;
-                        let errorMessage = oBundle.getText("errorDisposalQuantityExceedsQuantity") ||
-                            "Enter Disposal Quantity less than Quantity";
+                        let errorMessage = oBundle.getText("errorDisposalQuantityExceedsQuantity");
                         if (!aErrorMessages.includes(errorMessage)) {
                             aErrorMessages.push(errorMessage);
                         }
                     }
                 }
-
-
-                // NEW VALIDATION: Check if DisposalValue exceeds BalValue
                 let balValue = parseFloat(oRowData.BalValue || oRowData.Answl);
                 let disposalValue = parseFloat(oRowData.DisposalValue || oRowData.Anbtr);
-
-                // Only validate if both values exist and are valid numbers
                 if (disposalValue && balValue && !isNaN(disposalValue) && !isNaN(balValue)) {
                     if (disposalValue > balValue) {
                         bValidationError = true;
-                        let errorMessage = oBundle.getText("errorDisposalValueExceedsBalValue") ||
-                            "Enter Disposal Value less than Balance Value";
+                        let errorMessage = oBundle.getText("errorDisposalValueExceedsBalValue");
                         if (!aErrorMessages.includes(errorMessage)) {
                             aErrorMessages.push(errorMessage);
                         }
@@ -461,7 +495,6 @@ sap.ui.define([
 
 
         formatCapitalizationDate: function (oValue, sGmGrantNbr) {
-            // Only check if grant ID is provided
             if (sGmGrantNbr !== undefined && sGmGrantNbr === "NOT_RELEVANT_FOR_GM") {
                 return "";
             }
@@ -472,20 +505,16 @@ sap.ui.define([
 
             let oDate;
 
-            // Handle Date object
             if (oValue instanceof Date) {
                 oDate = oValue;
             }
-            // Handle "YYYY-MM-DD" string
             else if (typeof oValue === "string") {
                 oDate = new Date(oValue);
             }
-            // Handle timestamps or other formats
+
             else {
                 oDate = new Date(oValue);
             }
-
-            // Format date to DD.MM.YYYY
             let oDateFormat = DateFormat.getDateInstance({ pattern: "dd.MM.yyyy" });
             return oDateFormat.format(oDate);
         },
@@ -519,7 +548,7 @@ sap.ui.define([
                     "Anln2": oRow.Anln2 || oRow.AssetSub,
                     "Anlkl": oRow.Anlkl || oRow.AssetClass,
                     "Txa50Nlt": oRow.Txa50Nlt || oRow.Description,
-                    "AmMenge": oRow.AmMenge || oRow.Quantity,
+                    "AmMenge": oRow.AmMenge || oRow.BalQty,
                     "Meins": oRow.Meins || oRow.BaseUnit,
                     "Ord42": oRow.Ord42 || oRow.Group2AssetEvaluationKey || "",
                     "Stort": oRow.Stort || oRow.AssetLocation || "",
@@ -536,7 +565,7 @@ sap.ui.define([
                     "Aktivd": oRow.Aktivd ?
                         (typeof oRow.Aktivd === 'string' ? oRow.Aktivd : formatSAPDateTime(new Date(oRow.Aktivd))) :
                         (oRow.AssetCapitalizationDate ? formatSAPDateTime(new Date(oRow.AssetCapitalizationDate)) : formatSAPDateTime(now)),
-                    "Answl": oRow.Answl || oRow.APC_Value,
+                    "Answl": oRow.Answl || oRow.BalValue,
                     "Zstat": sZstat,
                     "Ord41": oRow.Ord41 || oRow.Order1,
                     "Nafag": oRow.Nafag || oRow.DepreTillDate,
@@ -546,12 +575,11 @@ sap.ui.define([
                     "Gjahr": ""
                 };
 
-                // Handle edit mode OR workflow failure scenario where Btprn and Itemno are present
                 if (bIsEditMode || (oRow.Btprn && oRow.Itemno)) {
                     oItem.Btprn = oRow.Btprn;
                     oItem.Itemno = oRow.Itemno;
                 }
-                // // Add GmToDate only if one exists
+
                 if (oRow.GmToDate) {
                     oItem.GmToDate = typeof oRow.GmToDate === "string"
                         ? oRow.GmToDate
@@ -561,7 +589,7 @@ sap.ui.define([
                     oItem.GmToDate = formatSAPDateTime(new Date(oRow.ValidityEndDate));
                 }
                 else {
-                    // oItem.GmToDate = formatSAPDateTime(new Date(11111111));
+
                     oItem.GmToDate = oRow.GmToDate || oRow.ValidityEndDate;
                 }
 
@@ -600,8 +628,6 @@ sap.ui.define([
                                 console.log("Silent save completed successfully");
                             }
                         }
-
-                        // 🔗 Now link attachments after request created
                         if (oData && oData.Btprn) {
                             that._saveRowAttachments(aTableData, oData.Btprn);
                         }
@@ -619,194 +645,85 @@ sap.ui.define([
                 }
             });
         },
-        // Function to process all table data without delete
-        // _saveRowAttachments: function (aTableData, sBtprn) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     console.log("🔗 [Attachment Save] Start for all rows with Request ID:", sBtprn);
-
-        //     // Iterate over each row to collect all new attachments
-        //     let aAllAttachmentsPayload = [];
-
-        //     aTableData.forEach((oRow, iIndex) => {
-        //         if (oRow.Attachments && oRow.Attachments.length > 0) {
-        //             const aNewFiles = oRow.Attachments.filter(att => !att.Linked);
-        //             if (aNewFiles.length) {
-        //                 const aRowAttachments = aNewFiles.map(att => ({
-        //                     Fileid: att.Fileid,
-        //                     Reqno: sBtprn,
-        //                     Reqtype: "ADApproval",
-        //                     Reqitem: String(iIndex + 1).padStart(3, "0")
-        //                 }));
-        //                 aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-        //             }
-        //         }
-        //     });
-
-        //     if (aAllAttachmentsPayload.length) {
-        //         const oPayload = {
-        //             Comments: "",
-        //             Attachments: aAllAttachmentsPayload
-        //         };
-
-        //         console.log("📤 [Attachment Save] Payload for all rows:", oPayload);
-
-        //         // Single POST call for all attachments
-        //         oSrvModel.create("/LinkFiles", oPayload, {
-        //             success: (oData, response) => {
-        //                 console.log("✅ [Attachment Save] All files linked successfully");
-        //                 console.log("🔎 [Attachment Save] OData response:", oData);
-        //             },
-        //             error: (oError) => {
-        //                 console.error("❌ [Attachment Save] Error linking files");
-        //                 console.error("⚠️ [Attachment Save] Error details:", oError);
-        //             }
-        //         });
-        //     } else {
-        //         console.log("ℹ️ [Attachment Save] No new files to link for any row");
-        //     }
-        // },
-
-    
-        //working with delete for 2 functions
-        // _saveRowAttachments: function (aTableData, sBtprn) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     let aAllAttachmentsPayload = [];
-        //     let aDeletePromises = [];
-
-        //     aTableData.forEach((oRow, iIndex) => {
-        //         const aCurrent = oRow.Attachments || [];
-        //         const aOriginal = oRow._OriginalAttachments || [];
-
-        //         // --- Deleted files ---
-        //         const aDeletedFiles = aOriginal.filter(orig =>
-        //             !aCurrent.find(att => att.Fileid === orig.Fileid)
-        //         );
-        //         aDeletedFiles.forEach(file => {
-        //             aDeletePromises.push(new Promise((resolve, reject) => {
-        //                 oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
-        //                     success: () => { console.log("✅ Deleted", file.Fileid); resolve(); },
-        //                     error: (err) => { console.error("❌ Delete failed", err); reject(err) }
-        //                 });
-        //             }));
-        //         });
-
-        //         // --- New files ---
-        //         const aNewFiles = aCurrent.filter(att => !att.Linked);
-        //         if (aNewFiles.length) {
-        //             const aRowAttachments = aNewFiles.map(att => ({
-        //                 Fileid: att.Fileid,
-        //                 Reqno: sBtprn,
-        //                 Reqtype: "ADApproval",
-        //                 Reqitem: String(iIndex + 1).padStart(3, "0")
-        //             }));
-        //             aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-        //         }
-        //     });
-
-        //     // First process deletes, then create new
-        //     Promise.allSettled(aDeletePromises).then(() => {
-        //         if (aAllAttachmentsPayload.length) {
-        //             const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
-        //             oSrvModel.create("/LinkFiles", oPayload, {
-        //                 success: () => console.log("✅ Linked all files"),
-        //                 error: (err) => console.error("❌ Linking failed", err)
-        //             });
-        //         } else {
-        //             console.log("ℹ️ No new files to link");
-        //         }
-        //     });
-        // },
-
         _saveRowAttachments: function (aTableData, sBtprn) {
-    const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+            const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
 
-    let aAllAttachmentsPayload = [];
-    let aFilesToDelete = [];
+            let aAllAttachmentsPayload = [];
+            let aFilesToDelete = [];
 
-    // Collect all files to delete and new files to link
-    aTableData.forEach((oRow, iIndex) => {
-        const aCurrent = oRow.Attachments || [];
-        const aOriginal = oRow._OriginalAttachments || [];
+            aTableData.forEach((oRow, iIndex) => {
+                const aCurrent = oRow.Attachments || [];
+                const aOriginal = oRow._OriginalAttachments || [];
 
-        // --- Deleted files ---
-        const aDeletedFiles = aOriginal.filter(orig =>
-            !aCurrent.find(att => att.Fileid === orig.Fileid)
-        );
-        aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
+                const aDeletedFiles = aOriginal.filter(orig =>
+                    !aCurrent.find(att => att.Fileid === orig.Fileid)
+                );
+                aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
 
-        // --- New files ---
-        const aNewFiles = aCurrent.filter(att => !att.Linked);
-        if (aNewFiles.length) {
-            const aRowAttachments = aNewFiles.map(att => ({
-                Fileid: att.Fileid,
-                Reqno: sBtprn,
-                Reqtype: "ADApproval",
-                Reqitem: String(iIndex + 1).padStart(3, "0")
-            }));
-            aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-        }
-    });
+                const aNewFiles = aCurrent.filter(att => !att.Linked);
+                if (aNewFiles.length) {
+                    const aRowAttachments = aNewFiles.map(att => ({
+                        Fileid: att.Fileid,
+                        Reqno: sBtprn,
+                        Reqtype: "ADApproval",
+                        Reqitem: String(iIndex + 1).padStart(3, "0")
+                    }));
+                    aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
+                }
+            });
 
-    // Sequential delete using Promise chain
-    const deleteFilesSequentially = async () => {
-        for (let i = 0; i < aFilesToDelete.length; i++) {
-            const file = aFilesToDelete[i];
-            console.log(`🗑️ Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-            
-            try {
-                await new Promise((resolve, reject) => {
-                    oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
-                        success: () => {
-                            console.log(`✅ Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-                            resolve();
-                        },
-                        error: (err) => {
-                            console.error(`❌ Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
-                            resolve(); // Continue even if one fails
-                        }
-                    });
+            const deleteFilesSequentially = async () => {
+                for (let i = 0; i < aFilesToDelete.length; i++) {
+                    const file = aFilesToDelete[i];
+                    console.log(` Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
+
+                    try {
+                        await new Promise((resolve, reject) => {
+                            oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
+                                success: () => {
+                                    console.log(`Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
+                                    resolve();
+                                },
+                                error: (err) => {
+                                    console.error(` Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
+                                    resolve(); 
+                                }
+                            });
+                        });
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (error) {
+                        console.error(` Unexpected error deleting file: ${file.Fileid}`, error);
+                    }
+                }
+
+                this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
+            };
+
+            if (aFilesToDelete.length > 0) {
+                console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
+                deleteFilesSequentially();
+            } else {
+                this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
+            }
+        },
+
+        // Helper function to link new attachments
+        _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
+            if (aAllAttachmentsPayload.length) {
+                console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
+                const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
+                oSrvModel.create("/LinkFiles", oPayload, {
+                    success: () => {
+                        console.log("✅ Successfully linked all new files");
+                    },
+                    error: (err) => {
+                        console.error("❌ Linking failed", err);
+                    }
                 });
-                
-                // Small delay between operations
-                await new Promise(resolve => setTimeout(resolve, 100));
-            } catch (error) {
-                console.error(`❌ Unexpected error deleting file: ${file.Fileid}`, error);
+            } else {
+                console.log("ℹ️ No new files to link");
             }
-        }
-        
-        // All deletions completed, now link new files
-        this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-    };
-
-    // Start sequential deletion
-    if (aFilesToDelete.length > 0) {
-        console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
-        deleteFilesSequentially();
-    } else {
-        // No files to delete, proceed directly to linking
-        this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-    }
-},
-
-// Helper function to link new attachments
-_linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
-    if (aAllAttachmentsPayload.length) {
-        console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
-        const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
-        oSrvModel.create("/LinkFiles", oPayload, {
-            success: () => {
-                console.log("✅ Successfully linked all new files");
-            },
-            error: (err) => {
-                console.error("❌ Linking failed", err);
-            }
-        });
-    } else {
-        console.log("ℹ️ No new files to link");
-    }
-},
+        },
         triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
             let that = this;
 
@@ -824,7 +741,6 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
 
                 const approverData = await this.getApproverDetails();
 
-                // Updated workflow payload - flat context
                 const workflowPayload = {
                     definitionId: "ap21.smu-dev.zuiadwfixedassetsdisposal.fixedAssetsDisposal_Process",
                     context: {
@@ -836,7 +752,7 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                         FUMANApprovers: approverData.FUMAN,
                         HODApprovers: approverData.HOD,
                         OFINApprovers: approverData.OFIN,
-                        GrantApprovers: approverData.Grant
+                        GrantApprovers: approverData.GFIN
                     }
                 };
 
@@ -940,25 +856,38 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
 
         _handleSaveError: function (oError, sAction, oBundle) {
             BusyIndicator.hide();
+
             let sErrorMsg = (sAction === "submit") ?
                 oBundle.getText("msgSubmitError") :
                 oBundle.getText("msgDraftError");
+
             let detailedError = "";
-            if (oError && oError.message) {
-                detailedError = ": " + oError.message;
+
+            try {
+                if (oError && oError.responseText) {
+                    let errorDetails = JSON.parse(oError.responseText);
+                    if (errorDetails.error && errorDetails.error.message && errorDetails.error.message.value) {
+                        detailedError = ": " + errorDetails.error.message.value;
+                    }
+                    else if (errorDetails.error &&
+                        errorDetails.error.innererror &&
+                        errorDetails.error.innererror.errordetails &&
+                        errorDetails.error.innererror.errordetails.length > 0) {
+                        detailedError = ": " + errorDetails.error.innererror.errordetails[0].message;
+                    }
+                }
+                else if (oError && oError.message) {
+                    detailedError = ": " + oError.message;
+                }
+            } catch (e) {
+                console.error("Error parsing responseText:", e);
+                if (oError && oError.message) {
+                    detailedError = ": " + oError.message;
+                }
             }
 
             MessageBox.error(sErrorMsg + detailedError);
             console.error("Error:", oError);
-
-            if (oError && oError.responseText) {
-                try {
-                    let errorDetails = JSON.parse(oError.responseText);
-                    console.error("Error Details:", errorDetails);
-                } catch (e) {
-                    console.error("Raw Error Response:", oError.responseText);
-                }
-            }
         },
 
         getTableData: function (oModel) {
@@ -971,7 +900,11 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             return [];
         },
 
-        // This function fetches the logged-in user's information
+        /**
+        * Fetches the currently logged-in user's information and updates the "currentUser" model.
+        * @returns {Promise<void>} A promise that resolves once the user info is fetched.
+        * @public
+        */
         getUserInfo: async function () {
             const url = this.getBaseURL() + "/user-api/currentUser";
             const oModel = this.getModel("currentUser");
@@ -1000,59 +933,76 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             }
         },
 
+        /**  
+         * Retrieves a model by name from the current view.  
+         * @param {string} sName - The name of the model to retrieve.  
+         * @returns {sap.ui.model.Model} The requested model instance.  
+         * @public  
+         */
         getModel: function (sName) {
             return this.getView().getModel(sName);
         },
 
+        /**  
+         * Sets a model with a given name on the current view.  
+         * @param {sap.ui.model.Model} oModel - The model instance to set.  
+         * @param {string} sName - The name to assign to the model.  
+         * @returns {sap.ui.core.mvc.View} The view with the assigned model.  
+         * @public  
+         */
         setModel: function (oModel, sName) {
             return this.getView().setModel(oModel, sName);
         },
 
+        /**  
+         * Retrieves the base URL of the application.  
+         * @returns {string} The base URL path of the application.  
+         * @public  
+         */
         getBaseURL: function () {
             return sap.ui.require.toUrl("zui/adw/fixedassetsdisposalapproval/zuiadwfadispreq");
         },
 
+        /**  
+         * Gets the i18n resource bundle for localized texts.  
+         * @returns {sap.base.i18n.ResourceBundle} The resource bundle instance.  
+         * @public  
+         */
         getResourceBundle: function () {
             return this.getOwnerComponent().getModel("i18n").getResourceBundle();
         },
 
-
-        // File upload implementation using your backend service
+        /**  
+         * Handles file upload action for the selected asset row using backend service.  
+         * @param {sap.ui.base.Event} oEvent - The press event triggered by the attachment action.  
+         * @param {sap.m.Table} oTable - The table containing the asset rows.  
+         * @public  
+         */
         onGenericAttachmentPress: function (oEvent, oTable) {
             var oButton = oEvent.getSource();
             var oTable = this.byId(oTable);
 
             if (!oTable) {
-                sap.m.MessageBox.error("Table not found");
+                MessageBox.error("Table not found");
                 return;
             }
-
-            // Get table rows based on table type
             var aItems = [];
             if (oTable.getItems) {
-                // sap.m.Table
                 aItems = oTable.getItems();
             } else if (oTable.getRows) {
-                // sap.ui.table.Table
                 aItems = oTable.getRows();
             } else if (oTable.getAggregation && oTable.getAggregation("items")) {
-                // Generic approach
                 aItems = oTable.getAggregation("items");
             } else {
                 console.log("Table type:", oTable.getMetadata().getName());
-                sap.m.MessageBox.error("Unsupported table type");
+                MessageBox.error("Unsupported table type");
                 return;
             }
-
             console.log("Found table items:", aItems.length);
 
-            // Find which row this button belongs to
             var iRowIndex = -1;
-
-            // Loop through table items to find the row containing our button
             for (var i = 0; i < aItems.length; i++) {
                 var oItem = aItems[i];
-                // Check if this row contains our button (traverse the control tree)
                 if (this._isButtonInRow(oButton, oItem)) {
                     iRowIndex = i;
                     break;
@@ -1062,36 +1012,28 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             if (iRowIndex === -1) {
                 console.error("Button not found in any row. Button parent hierarchy:");
                 this._logParentHierarchy(oButton);
-                sap.m.MessageBox.error("Could not determine which row was clicked");
+                MessageBox.error("Could not determine which row was clicked");
                 return;
             }
-
-            // Convert row index to Reqitem format (001, 002, 003)
             var sReqitem = (iRowIndex + 1).toString().padStart(3, '0');
-            this._iCurrentRowIndex = iRowIndex; // Store for later use
+            this._iCurrentRowIndex = iRowIndex;
             this._sCurrentReqitem = sReqitem;
 
             console.log("Row clicked:", iRowIndex, "Reqitem:", sReqitem);
 
-            // Create a file input element
             var oFileInput = document.createElement("input");
             oFileInput.type = "file";
-            oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif"; // Optional: restrict file types
+            oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
 
-            // When user selects a file
             oFileInput.onchange = async function (e) {
                 var oFile = e.target.files[0];
                 if (oFile) {
-                    // Show file selected message
-                    MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
-
-                    // Call upload function
+                    //MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
                     await this.onGenericUploadFileToBackend(oFile, iRowIndex);
                     oEvent.getSource().setVisible(false);
                 }
             }.bind(this);
 
-            // Trigger file selection dialog
             oFileInput.click();
 
 
@@ -1102,7 +1044,7 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             var aHierarchy = [];
             var oParent = oControl;
 
-            while (oParent && aHierarchy.length < 10) { // Limit to avoid infinite loops
+            while (oParent && aHierarchy.length < 10) {
                 aHierarchy.push(oParent.getMetadata().getName() + " (ID: " + (oParent.getId() || "none") + ")");
                 oParent = oParent.getParent();
             }
@@ -1113,8 +1055,6 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
         // Helper function to check if a button is within a specific table row
         _isButtonInRow: function (oButton, oTableItem) {
             var oParent = oButton.getParent();
-
-            // Traverse up the control hierarchy to find if we reach the table item
             while (oParent) {
                 if (oParent === oTableItem) {
                     return true;
@@ -1125,57 +1065,13 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             return false;
         },
 
-        // onGenericUploadFileToBackend: function (oFile, iRowIndex,) {
-        //     var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-        //     var oFormData = new FormData();
-        //     oFormData.append("fileData", oFile);
-        //     var sToken = oSrvModel.getSecurityToken();
-        //     var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
-        //     BusyIndicator.show();
-
-        //     // Create XMLHttpRequest for file upload
-        //     var xhr = new XMLHttpRequest();
-
-        //     xhr.onreadystatechange = function () {
-        //         if (xhr.readyState === 4) { // Request completed
-        //             BusyIndicator.hide();
-        //             if (xhr.status === 201 || xhr.status === 200) {
-        //                 try {
-        //                     var sResponse = xhr.responseText;
-        //                     var xml = jQuery.parseXML(sResponse);
-        //                     var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
-        //                     this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, iRowIndex);
-        //                     MessageToast.show("File uploaded successfully!");
-
-        //                 } catch (e) {
-        //                     console.error("Error parsing upload response:", e);
-        //                     MessageToast.show("Upload completed but failed to parse response");
-        //                 }
-        //             } else {
-        //                 // Error
-        //                 console.error("Upload failed:", xhr.status, xhr.statusText);
-        //                 sap.m.MessageBox.error("Upload failed: " + xhr.statusText);
-        //             }
-        //         }
-        //     }.bind(this);
-
-        //     xhr.onerror = function () {
-        //         sap.ui.core.BusyIndicator.hide();
-        //         sap.m.MessageBox.error("Upload failed due to network error");
-        //     };
-
-        //     // Setup request
-        //     xhr.open("POST", sUploadUrl, true);
-
-        //     // Add headers
-        //     xhr.setRequestHeader("X-CSRF-Token", sToken);
-        //     xhr.setRequestHeader("slug", oFile.name); // Important: filename as slug header
-
-        //     // Send the request
-        //     xhr.send(oFormData);
-        // },
-
-
+        /**  
+         * Uploads files to the backend for the specified collection path.  
+         * @param {File} oFile - The file object to be uploaded.  
+         * @param {any} vRowRef - Reference to the related row/asset.  
+         * @param {string} sCollectionPath - Backend collection path (e.g., FileSet).  
+         * @public  
+         */
         onGenericUploadFileToBackend: function (oFile, vRowRef, sCollectionPath) {
             var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
             var oFormData = new FormData();
@@ -1194,13 +1090,9 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                             var sResponse = xhr.responseText;
                             var xml = jQuery.parseXML(sResponse);
                             var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
-
-                            // 🔑 decide how to update
                             if (typeof vRowRef === "number") {
-                                // create screen → rowIndex
                                 this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, vRowRef);
                             } else if (vRowRef && vRowRef.getPath) {
-                                // edit screen → bindingContext
                                 var sRowPath = vRowRef.getPath();
                                 var oModel = vRowRef.getModel();
                                 var aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
@@ -1223,14 +1115,14 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                         }
                     } else {
                         console.error("Upload failed:", xhr.status, xhr.statusText);
-                        sap.m.MessageBox.error("Upload failed: " + xhr.statusText);
+                        MessageBox.error("Upload failed: " + xhr.statusText);
                     }
                 }
             }.bind(this);
 
             xhr.onerror = function () {
                 BusyIndicator.hide();
-                sap.m.MessageBox.error("Upload failed due to network error");
+                MessageBox.error("Upload failed due to network error");
             };
 
             xhr.open("POST", sUploadUrl, true);
@@ -1239,7 +1131,14 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
             xhr.send(oFormData);
         },
 
-
+        /**  
+         * Updates files related to the selected asset in the FileSet entity.  
+         * @param {string} sFileid - Unique identifier of the file.  
+         * @param {string} sFileName - Name of the uploaded file.  
+         * @param {string} sMimeType - MIME type of the uploaded file.  
+         * @param {number} iRowIndex - Row index of the asset in the table.  
+         * @public  
+         */
         onGenericUpdateAttachmentModel: function (sFileid, sFileName, sMimeType, iRowIndex) {
             const oModel = this.getModel("listOfSelectedAssetsModel");
             let aAssets = oModel.getProperty("/assets") || sCollectionPath;
@@ -1248,8 +1147,6 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                 console.error("Invalid row index for attachment update");
                 return;
             }
-
-            // Attachment object
             const oAttachmentData = {
                 Fileid: sFileid,
                 Filename: sFileName,
@@ -1261,16 +1158,16 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                 aAssets[iRowIndex].Attachments = [];
             }
             aAssets[iRowIndex].Attachments.push(oAttachmentData);
-
-
             oModel.setProperty("/assets", aAssets);
-
-
-
             console.log("Updated asset with attachments:", aAssets[iRowIndex]);
         },
 
 
+        /**
+         * Handles Deleting the uploaded file linked to the selected asset From Local Model.
+         * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
+         * @public
+         */
         onGenericDeleteAttachment: function (oEvent) {
             let uploadButton = oEvent.getSource().getParent().getParent().getParent().getParent().getItems()[1];
             console.log("Delete button pressed");
@@ -1285,46 +1182,38 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
 
             const sFileName = oAttachmentContext.getProperty("Filename");
             console.log("File to delete:", sFileName);
-
-            // Get the parent context (row)
             const oAttachmentPath = oAttachmentContext.getPath();
             console.log("Attachment path:", oAttachmentPath);
-
             const oRowPath = oAttachmentPath.split("/Attachments")[0];
             console.log("Row path:", oRowPath);
-
             const oModel = this.getView().getModel("listOfSelectedAssetsModel");
             console.log("Model object:", oModel);
-
             const aAttachments = oModel.getProperty(oRowPath + "/Attachments") || [];
             console.log("Current attachments array:", aAttachments);
-
-            // Remove only the clicked attachment
             const aUpdated = aAttachments.filter(att => att.Filename !== sFileName);
             console.log("Updated attachments array:", aUpdated);
-
             oModel.setProperty(oRowPath + "/Attachments", aUpdated);
             MessageToast.show("Attachment deleted successfully.");
             uploadButton.setVisible(true)
         },
 
+        /**
+         * Handles downloading the uploaded file linked to the selected asset.
+         * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
+         * @public
+         */
         onGenericDownloadItem: function (oEvent) {
             const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
             const sFileId = oContext.getProperty("Fileid");
             const sMimeType = oContext.getProperty("MimeType");
             const sFileName = oContext.getProperty("Filename");
-
             const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
             const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
-
-            // Download using fetch
             fetch(sUrl, { credentials: "include" })
                 .then(res => res.blob())
                 .then(blob => {
                     const newBlob = new Blob([blob], { type: sMimeType });
                     const url = window.URL.createObjectURL(newBlob);
-
-                    // Create temporary link to trigger download
                     const a = document.createElement("a");
                     a.href = url;
                     a.download = sFileName;
@@ -1336,13 +1225,9 @@ _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
                 })
                 .catch(err => {
                     console.error("Download failed", err);
-                    sap.m.MessageBox.error("Failed to download file.");
+                    MessageBox.error("Failed to download file.");
                 });
-        },
-
-
-
-
+        }
 
     });
 });

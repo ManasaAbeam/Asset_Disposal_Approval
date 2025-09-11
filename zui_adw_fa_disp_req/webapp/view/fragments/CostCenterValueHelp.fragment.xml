@@ -6,7 +6,7 @@
                 path: 'CostCenterName',
                 descending: false
             }
-        }"  search="onGenericValueHelpSearch" confirm=".onGenericValueHelpClose" cancel=".onGenericValueHelpClose">
+        }" search="onGenericValueHelpSearch" confirm=".onGenericValueHelpClose" cancel=".onGenericValueHelpClose">
         <customData>
             <core:CustomData key="filterFields" value="CostCenter,CostCenterName" />
         </customData>

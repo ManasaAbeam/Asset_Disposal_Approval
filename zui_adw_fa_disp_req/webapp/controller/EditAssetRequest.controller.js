@@ -39,24 +39,6 @@ sap.ui.define([
 
             oSrvModel.read("/AttachmentsList", {
                 filters: aFilters,
-                // success: (oData) => {
-                //     const aAttachments = oData.results.map(item => ({
-                //         Fileid: item.Fileid,
-                //         Filename: item.Filename,
-                //         MimeType: item.MimeType,
-                //         Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
-                //         Linked: true
-                //     }));
-
-                //     // inject attachments into that row in your table model
-                //     oRowContext.getModel("listOfSelectedAssetsModel")
-                //         .setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-
-                //     // Store original copy per row
-                //     oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
-                //         JSON.parse(JSON.stringify(aAttachments))
-                //     );
-                // },
                 success: (oData) => {
                     const aAttachments = oData.results.map(item => ({
                         Fileid: item.Fileid,
@@ -68,14 +50,12 @@ sap.ui.define([
 
                     const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
                     oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-
-                    // Store original copy per row
                     oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
                         JSON.parse(JSON.stringify(aAttachments))
                     );
                 },
                 error: (oError) => {
-                    console.error("❌ Error while loading attachments:", oError);
+                    console.error("Error while loading attachments:", oError);
                 }
             });
         },
@@ -131,16 +111,9 @@ sap.ui.define([
                 this.getRouter().navTo("RouteWorkList");
             }.bind(this));
         },
-        // File upload implementation using your backend service
-        // onAttachmentPress: function (oEvent) {
-        //   this.onGenericAttachmentPress(oEvent,"idtEditAssetRequest");
-
-        // },
 
         onAttachmentPress: function (oEvent) {
             var oButton = oEvent.getSource();
-
-            // Create input synchronously here, not inside another async function
             var oFileInput = document.createElement("input");
             oFileInput.type = "file";
             oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
@@ -148,12 +121,10 @@ sap.ui.define([
             oFileInput.onchange = async function (e) {
                 var oFile = e.target.files[0];
                 if (oFile) {
-                    // call your generic upload logic here
                     await this.onGenericUploadFileToBackend(oFile, oButton.getBindingContext("listOfSelectedAssetsModel"), "/Items");
                 }
             }.bind(this);
-
-            oFileInput.click(); // <-- browser treats this as a user action
+            oFileInput.click(); 
         },
 
 
@@ -167,8 +138,6 @@ sap.ui.define([
         onDisposalPercentageChange: function (oEvent) {
             let oInputValue = oEvent.getSource();
             let sValue = oInputValue.getValue();
-
-
             let oPercentageInput = oInputValue.getParent().getCells()[22];
 
             if (sValue && sValue !== "0") {
@@ -177,20 +146,11 @@ sap.ui.define([
                 oPercentageInput.setEditable(true);
             }
         },
+
         onDisposaValueChange: function (oEvent) {
             let oInputValue = oEvent.getSource();
             let sValue = oInputValue.getValue();
-
-            let oApcValue = oInputValue.getParent().getCells()[16].getProperty("text");
-            // if(sValue>oApcValue){
-            // oInputValue.setValueState("Error");
-            // }
-            // else{
-            //     oInputValue.setValueState("none");
-            // }
-            debugger;
             let oPercentageInput = oInputValue.getParent().getCells()[23];
-
             if (sValue && sValue !== "0") {
                 oPercentageInput.setEditable(false);
             } else {

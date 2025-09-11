@@ -1,9 +1,10 @@
 sap.ui.define(
   [
     "sap/ui/core/mvc/Controller",
-    "sap/ui/core/format/DateFormat"
+    "sap/ui/core/format/DateFormat",
+    "sap/m/MessageBox"
   ],
-  function (BaseController, DateFormat) {
+  function (BaseController, DateFormat, MessageBox) {
     "use strict";
 
     return BaseController.extend("fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.App", {
@@ -24,32 +25,6 @@ sap.ui.define(
         }
       },
 
-
-
-      //   getAssetDetails: async function (oId) {          
-      //     var that = this;
-      //     var oModel = this.getView().getModel("zi_adw_asset_details");
-      //     var sServiceUrl = oModel.sServiceUrl;
-      //     var sUrl = sServiceUrl + "/AssetDetails?$filter=Btprn eq '" + oId + "'";
-
-      //     try {
-      //         const oResponse = await $.ajax({
-      //             url: sUrl,
-      //             method: "GET",
-      //             headers: {
-      //                 "Accept": "application/json"
-      //             }
-      //         });
-      //         console.log("Header:", oResponse); 
-      //         this.getOwnerComponent().getModel("listOfSelectedAssetsModel").setData(oResponse);      
-      //         console.log(this.getOwnerComponent().getModel("listOfSelectedAssetsModel").getData()) ;
-
-      //     } catch (error) {
-      //         console.error("Error in getAssetDetails:", error);
-      //     }
-      // },
-
-
       getAssetDetails: async function (oId) {
         var that = this;
         var oModel = this.getView().getModel("zi_adw_asset_details");
@@ -66,11 +41,7 @@ sap.ui.define(
           });
 
           console.log("Header:", oResponse);
-
-          // Push data into WF UI JSON model
           this.getOwnerComponent().getModel("listOfSelectedAssetsModel").setData(oResponse);
-
-          // ✅ Now load attachments row by row
           this._loadAllAttachments();
 
         } catch (error) {
@@ -79,10 +50,10 @@ sap.ui.define(
       },
       _loadAllAttachments: function () {
         const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        const aItems = oModel.getProperty("/value");   // WF UI returns items under `/value`
+        const aItems = oModel.getProperty("/value");   
 
-        const sReqno = aItems.length > 0 ? aItems[0].Btprn : null; // your workflow request number
-        const sReqtype = "ADApproval"; // or whatever you save
+        const sReqno = aItems.length > 0 ? aItems[0].Btprn : null; 
+        const sReqtype = "ADApproval"; 
 
         if (!aItems || aItems.length === 0) return;
 
@@ -117,14 +88,12 @@ sap.ui.define(
 
             const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
             oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-
-            // store original copy if needed
             oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
               JSON.parse(JSON.stringify(aAttachments))
             );
           },
           error: (oError) => {
-            console.error("❌ Error while loading attachments:", oError);
+            console.error("Error while loading attachments:", oError);
           }
         });
       },
@@ -134,7 +103,7 @@ sap.ui.define(
         const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
         const aAttachments = oContext.getProperty("Attachments");
         if (!aAttachments || aAttachments.length === 0) {
-          sap.m.MessageBox.warning("No attachment found.");
+         MessageBox.warning("No attachment found.");
           return;
         }
         const oAttachment = aAttachments[0]; // since you bound to Attachments/0
@@ -160,12 +129,10 @@ sap.ui.define(
           })
           .catch(err => {
             console.error("Download failed", err);
-            sap.m.MessageBox.error("Failed to download file.");
+            MessageBox.error("Failed to download file.");
           });
       },
 
-
-      // This function fetches the logged-in user's information
       getUserInfo: async function () {
         const url = this.getBaseURL() + "/user-api/currentUser";
         const oModel = this.getView().getModel("currentUser");
@@ -203,26 +170,21 @@ sap.ui.define(
         }
 
         let oDate;
-
-        // Handle Date object
         if (oValue instanceof Date) {
           oDate = oValue;
         }
-        // Handle "YYYY-MM-DD" string
+      
         else if (typeof oValue === "string") {
           oDate = new Date(oValue);
         }
-        // Handle timestamps or other formats
+        
         else {
           oDate = new Date(oValue);
         }
 
-        // Format date to DD.MM.YYYY
         let oDateFormat = DateFormat.getDateInstance({ pattern: "dd.MM.yyyy" });
         return oDateFormat.format(oDate);
       },
-
-
 
     });
   }

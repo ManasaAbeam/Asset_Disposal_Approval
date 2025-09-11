@@ -1,10 +1,10 @@
 sap.ui.define([
     "zui/adw/fixedassetsdisposalapproval/zuiadwfadispreq/controller/BaseController",
     "sap/m/MessageBox",
-    "sap/ui/core/BusyIndicator",
-    "sap/m/MessageToast"
+    "sap/ui/core/BusyIndicator"
+  
 
-], (BaseController, MessageBox, BusyIndicator, MessageToast) => {
+], (BaseController, MessageBox, BusyIndicator) => {
     "use strict";
 
     return BaseController.extend("zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.controller.DisposalRequest", {
@@ -76,14 +76,10 @@ sap.ui.define([
             this.onGenericDeleteAttachment(oEvent)   
         },
 
-
         onDisposalPercentageChange: function (oEvent) {
             let oInputValue = oEvent.getSource();
-            let sValue = oInputValue.getValue();
-
-           
+            let sValue = oInputValue.getValue();      
             let oPercentageInput =oInputValue.getParent().getCells()[22];
-
             if (sValue && sValue !== "0") {
                 oPercentageInput.setEditable(false);
             } else {
@@ -93,17 +89,7 @@ sap.ui.define([
         onDisposaValueChange: function (oEvent) {
             let oInputValue = oEvent.getSource();
             let sValue = oInputValue.getValue();
-
-            let oApcValue =oInputValue.getParent().getCells()[16].getProperty("text");
-            // if(sValue>oApcValue){
-            // oInputValue.setValueState("Error");
-            // }
-            // else{
-            //     oInputValue.setValueState("none");
-            // }
-            debugger;
             let oPercentageInput =oInputValue.getParent().getCells()[23];
-
             if (sValue && sValue !== "0") {
                 oPercentageInput.setEditable(false);
             } else {

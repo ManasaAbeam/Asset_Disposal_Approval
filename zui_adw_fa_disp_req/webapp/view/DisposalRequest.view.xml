@@ -12,7 +12,6 @@
 						<m:Title id="title" text="{i18n>titleSelectedAssets}"/>
 					</m:OverflowToolbar>
 				</extension>
-
 				<rowMode>
 					<rowmodes:Auto maxRowCount="{listOfSelectedAssetsModel>/length}" />
 				</rowMode>
@@ -50,8 +49,7 @@
 					<Column width="12rem">
 						<m:Label text="{i18n>lblQuantity}" />
 						<template>
-							<!-- <m:Label text="{listOfSelectedAssetsModel>Quantity}" /> -->
-								<m:Label text="{listOfSelectedAssetsModel>BalQty}" />
+							<m:Label text="{listOfSelectedAssetsModel>BalQty}" />
 						</template>
 					</Column>
 					<Column width="9rem">
@@ -63,11 +61,9 @@
 					<Column width="9rem">
 						<m:Label text="{i18n>lblAssetCapitalizationDate}" />
 						<template>
-							<!-- <m:Label text="{listOfSelectedAssetsModel>AssetCapitalizationDate}" /> -->
-							<m:Label text="{
-            path: 'listOfSelectedAssetsModel>AssetCapitalizationDate',
-            formatter: '.formatCapitalizationDate'
-        }" />
+						<m:Label text="{
+                                 path: 'listOfSelectedAssetsModel>AssetCapitalizationDate',
+                                 formatter: '.formatCapitalizationDate'}" />
 						</template>
 					</Column>
 					<Column width="7rem">
@@ -115,11 +111,9 @@
 					<Column width="11rem">
 						<m:Label text="{i18n>lblValidityEndDate}" />
 						<template>
-							<!-- <m:Label text="{listOfSelectedAssetsModel>ValidityEndDate}" /> -->
-							<m:Label text="{
-            path: 'listOfSelectedAssetsModel>ValidityEndDate',
-            formatter: '.formatCapitalizationDate'
-        }" />
+						<m:Label text="{
+                                 path: 'listOfSelectedAssetsModel>ValidityEndDate',
+                                 formatter: '.formatCapitalizationDate'}" />
 						</template>
 					</Column>
 					<Column width="11rem">
@@ -128,7 +122,6 @@
 							<m:Label text="{listOfSelectedAssetsModel>BalValue}" />
 						</template>
 					</Column>
-
 					<Column width="11rem">
 						<m:Label text="{i18n>lblCurrency}" />
 						<template>
@@ -142,32 +135,14 @@
 							<m:Label text="{listOfSelectedAssetsModel>DepreTillDate}" />
 						</template>
 					</Column>
-
-					<!-- <Column width="11rem">
-						<m:Label text="{i18n>lblBalQty}" />
-						<template>
-							<m:Label text="{listOfSelectedAssetsModel>BalQty}" />
-						</template>
-					</Column>
-
-					<Column width="11rem">
-						<m:Label text="{i18n>lblBalValue}" />
-						<template>
-							<m:Label text="{listOfSelectedAssetsModel>BalValue}" />
-						</template>
-					</Column> -->
-
-					
-
 					<Column width="18rem">
 						<m:Label text="{i18n>lblAssetPhysicalDisposalRequired}" required="true" />
 						<template>
-							<m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}" >
+							<m:ComboBox editable="false" selectedKey="{listOfSelectedAssetsModel>AssetPhysicalDisposalRequired}" items="{disposalRequiredModel>/DisposalRequiredOptions}">
 								<c:Item key="{disposalRequiredModel>key}" text="{disposalRequiredModel>text}" />
 							</m:ComboBox>
 						</template>
 					</Column>
-
 					<Column width="12rem">
 						<m:Label text="{i18n>lblDisposalReason}" required="true"/>
 						<template>
@@ -217,8 +192,6 @@
 							</m:HBox>
 						</template>
 					</Column>
-
-
 				</columns>
 			</Table>
 		</m:content>
@@ -228,8 +201,6 @@
 					<m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onSaveDraftPress" />
 					<m:Button text="{i18n>btnSubmit}" type="Accept" press=".onSubmitPress" />
 					<m:Button text="{i18n>btnCancel}" type="Reject" press=".onCancelPress" />
-					<!-- <m:Button text="Trigger Workflow" icon="sap-icon://workflow-tasks" press=".onTestEF" /> -->
-					<!-- <m:Button text="Save attachment" icon="sap-icon://workflow-tasks" press=".onSaveAttachments" /> -->
 				</m:contentRight>
 			</m:Bar>
 		</m:footer>

@@ -79,11 +79,9 @@
                                     <Column width="9rem">
                                         <m:Label text="{i18n>lblAssetCapitalizationDate}" />
                                         <template>
-                                            <!-- <m:Label text="{path: 'listOfSelectedAssetsModel>Aktivd', type: 'sap.ui.model.odata.type.Date' }" /> -->
                                             <m:Label text="{
-            path: 'listOfSelectedAssetsModel>Aktivd',
-            formatter: '.formatCapitalizationDate'
-        }" />
+                                                 path: 'listOfSelectedAssetsModel>Aktivd',
+                                                 formatter: '.formatCapitalizationDate'}" />
                                         </template>
                                     </Column>
                                     <Column width="7rem">
@@ -132,19 +130,9 @@
                                     <Column width="11rem">
                                         <m:Label text="{i18n>lblValidityEndDate}" />
                                         <template>
-                                            <!-- <m:Label text="{path: 'listOfSelectedAssetsModel>GmToDate', type: 'sap.ui.model.odata.type.Date'}" /> -->
                                             <m:Label text="{
-            path: 'listOfSelectedAssetsModel>GmToDate',
-            formatter: '.formatCapitalizationDate'
-        }" />
-
-                                            <!-- <m:Label text="{
-    parts: [
-        { path: 'listOfSelectedAssetsModel>GmToDate' },
-        { path: 'listOfSelectedAssetsModel>GmGrantNbr' }
-    ],
-    formatter: '.formatCapitalizationDate'
-}" /> -->
+                                                     path: 'listOfSelectedAssetsModel>GmToDate',
+                                                     formatter: '.formatCapitalizationDate'}" />
                                         </template>
                                     </Column>
                                     <Column width="11rem">
@@ -177,9 +165,9 @@
                                     <Column width="12rem">
                                         <m:Label text="{i18n>lblDisposalReason}" required="true" />
                                         <template>
-                                            <m:ComboBox selectedKey="{listOfSelectedAssetsModel>Rstgr}" editable="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" items="{path: '/ReasonCodes',  sorter: {
-                            path: 'Txt40',
-                            descending: false},
+                                            <m:ComboBox selectedKey="{listOfSelectedAssetsModel>Rstgr}"  items="{path: '/ReasonCodes',  sorter: {
+                                                    path: 'Txt40',
+                                                    descending: false},
 		                                            filters: [{path: 'Btpdevid', operator: 'EQ', value1: 'FA-BTP-001'}]}">
                                                 <c:Item key="{Rstgr}" text="{Txt40}" />
                                             </m:ComboBox>
@@ -229,9 +217,9 @@
         <uxap:footer>
             <m:OverflowToolbar>
                 <m:ToolbarSpacer />
-                <m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onEditSaveDraftPress" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
-                <m:Button text="{i18n>btnSubmit}" type="Accept" press=".onEditSubmitPress" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
-                <m:Button text="{i18n>btnCancel}" type="Reject" press=".onEditCancelPress" enabled="{= ${listOfSelectedAssetsModel>/Header/Status}.includes('Rejected') || ${listOfSelectedAssetsModel>/Header/Status} === 'Save As Draft' }" />
+                <m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onEditSaveDraftPress"  />
+                <m:Button text="{i18n>btnSubmit}" type="Accept" press=".onEditSubmitPress"  />
+                <m:Button text="{i18n>btnCancel}" type="Reject" press=".onEditCancelPress" />
             </m:OverflowToolbar>
         </uxap:footer>
     </uxap:ObjectPageLayout>

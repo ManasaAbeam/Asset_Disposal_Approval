@@ -4,15 +4,12 @@
     xmlns="sap.m">
     <IconTabBar id="idIconTabBarNoIcons" expanded="true" class="sapUiResponsiveContentPadding" stretchContentHeight="true">
         <items>
-        
             <IconTabFilter id="idAssetIconTabFilter" text="{i18n>txtAssetIconTabFilter}" key="assetDisposal">
                 <core:Fragment fragmentName="zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.view.fragments.AssetDisposal" type="XML" />
             </IconTabFilter>
-            <IconTabFilter  id="idRequestsIconTabFilter" text="{i18n>txtRequestsIconTabFilter}" key="requests">
+            <IconTabFilter id="idRequestsIconTabFilter" text="{i18n>txtRequestsIconTabFilter}" key="requests">
                 <core:Fragment fragmentName="zui.adw.fixedassetsdisposalapproval.zuiadwfadispreq.view.fragments.Requests" type="XML" />
             </IconTabFilter>
         </items>
     </IconTabBar>
-  
-
 </mvc:View>

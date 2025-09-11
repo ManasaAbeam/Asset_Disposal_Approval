@@ -15,8 +15,6 @@
                                 </fb:control>
                             </fb:FilterGroupItem>
                         </fb:filterGroupItems>
-
-
                     </fb:FilterBar>
                 </f:content>
             </f:DynamicPageHeader>
@@ -26,8 +24,7 @@
                 <headerToolbar>
                     <OverflowToolbar>
                         <ToolbarSpacer />
-                         <Button id="idEdit" text= "{i18n>btnEdit}" type="Emphasized" press="onEditAssetRequests" />
-                        <!-- <Button id="idEdit" text="{= ${RequestItemsModel>/RequestItemsData/0/Zstat} === 'Rejected' || ${RequestItemsModel>/RequestItemsData/0/Zstat} === 'Save As Draft' ? ${i18n>btnEdit} : ${i18n>btnDisplay} }" type="Emphasized" press="onEditAssetRequests" /> -->
+                        <Button id="idEdit" text= "{i18n>btnEdit}" type="Emphasized" press="onEditAssetRequests" />
                     </OverflowToolbar>
                 </headerToolbar>
                 <columns>
@@ -37,8 +34,6 @@
                     <Column visible="false">
                         <Text text="{i18n>colHCompanyCode}" />
                     </Column>
-
-
                     <Column>
                         <Text text="{i18n>colStatus}" />
                     </Column>
@@ -124,7 +119,6 @@
                         <cells>
                             <Text text="{RequestItemsModel>/RequestId}"/>
                             <Text text="{RequestItemsModel>Bukrs}"/>
-
                             <Text text="{RequestItemsModel>Zstat}"/>
                             <Text text="{RequestItemsModel>Btprn}"/>
                             <Text text="{RequestItemsModel>Itemno}"/>
@@ -157,5 +151,4 @@
             </Table>
         </f:content>
     </f:DynamicPage>
-
 </core:FragmentDefinition>

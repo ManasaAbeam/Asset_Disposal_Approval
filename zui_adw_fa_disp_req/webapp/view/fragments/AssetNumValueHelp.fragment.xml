@@ -2,16 +2,20 @@
     xmlns:core="sap.ui.core">
     <SelectDialog id="selectDialogg"
       multiSelect="true"
-       title="{i18n>dlgTitleSelectAssetNumber}"  items="{
-            path: '/Asset_VH',
+       title="{i18n>dlgTitleSelectAssetNumber}"  
+       items="{
+            path: '/AssetDetailVH',
             sorter: {
-                path: 'MasterFixedAssetDescription',
+                path: 'FixedAssetDescription',
                 descending: false
             }
-        }" search=".onGenericValueHelpSearch" confirm=".onGenericValueHelpClose" cancel=".onGenericValueHelpClose">
+        }" 
+        search=".onGenericValueHelpSearch" 
+        confirm=".onGenericValueHelpClose" 
+        cancel=".onGenericValueHelpClose">
     <customData>
-        <core:CustomData key="filterFields" value="MasterFixedAsset,MasterFixedAssetDescription" />
+        <core:CustomData key="filterFields" value="MasterFixedAsset,FixedAssetDescription" />
     </customData>
-        <StandardListItem title="{MasterFixedAsset}" description="{MasterFixedAssetDescription}"  />
-    </SelectDialog>
+    <StandardListItem title="{MasterFixedAsset}" description="{FixedAssetDescription}"  />
+</SelectDialog>
 </core:FragmentDefinition>
