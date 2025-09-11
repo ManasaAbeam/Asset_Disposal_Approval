@@ -202,6 +202,7 @@
 					<m:Button text="{i18n>btnSubmit}" type="Accept" press=".onSubmitPress" />
 					<m:Button text="{i18n>btnCancel}" type="Reject" press=".onCancelPress" />
 				</m:contentRight>
+				
 			</m:Bar>
 		</m:footer>
 	</m:Page>
