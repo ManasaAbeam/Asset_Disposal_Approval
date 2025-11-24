@@ -42,6 +42,24 @@
           "localUri": "localService/ZUI_SMU_ATTACHMENTS_SRV/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "doa": {
+        "uri": "/odata/v4/doa/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/doa/metadata.xml",
+          "odataVersion": "4.0"
+        }
+      },
+      "attachment": {
+        "uri": "/odata/v4/attachment/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/attachment/metadata.xml",
+          "odataVersion": "4.0"
+        }
       }
     },
     "crossNavigation": {
@@ -136,6 +154,24 @@
         "dataSource": "ZUI_SMU_ATTACHMENTS_SRV",
         "preload": true,
         "settings": {}
+      },
+      "doa": {
+        "dataSource": "doa",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "attachment": {
+        "dataSource": "attachment",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
       }
     },
     "resources": {

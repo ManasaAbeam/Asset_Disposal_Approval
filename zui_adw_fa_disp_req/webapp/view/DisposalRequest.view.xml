@@ -61,7 +61,7 @@
 					<Column width="9rem">
 						<m:Label text="{i18n>lblAssetCapitalizationDate}" />
 						<template>
-						<m:Label text="{
+							<m:Label text="{
                                  path: 'listOfSelectedAssetsModel>AssetCapitalizationDate',
                                  formatter: '.formatCapitalizationDate'}" />
 						</template>
@@ -111,7 +111,7 @@
 					<Column width="11rem">
 						<m:Label text="{i18n>lblValidityEndDate}" />
 						<template>
-						<m:Label text="{
+							<m:Label text="{
                                  path: 'listOfSelectedAssetsModel>ValidityEndDate',
                                  formatter: '.formatCapitalizationDate'}" />
 						</template>
@@ -176,6 +176,8 @@
 						</template>
 					</Column>
 
+					
+
 					<Column width="18rem">
 						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
 						<template>
@@ -192,6 +194,10 @@
 							</m:HBox>
 						</template>
 					</Column>
+
+
+		
+
 				</columns>
 			</Table>
 		</m:content>
@@ -202,7 +208,7 @@
 					<m:Button text="{i18n>btnSubmit}" type="Accept" press=".onSubmitPress" />
 					<m:Button text="{i18n>btnCancel}" type="Reject" press=".onCancelPress" />
 				</m:contentRight>
-				
+
 			</m:Bar>
 		</m:footer>
 	</m:Page>

@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+        <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="DOAService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation Term="Core.Links">
+                <Collection>
+                    <Record>
+                        <PropertyValue Property="rel" String="author"/>
+                        <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+                    </Record>
+                </Collection>
+            </Annotation>
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="DOARule" EntityType="DOAService.DOARule"/>
+                <EntitySet Name="DOAApprover" EntityType="DOAService.DOAApprover"/>
+                <EntitySet Name="VerifierApprover" EntityType="DOAService.VerifierApprover"/>
+                <EntitySet Name="OtherApprovers" EntityType="DOAService.OtherApprovers"/>
+                <EntitySet Name="applicationInfo" EntityType="DOAService.applicationInfo"/>
+                <EntitySet Name="Applications" EntityType="DOAService.Applications"/>
+                <EntitySet Name="wbsInfo" EntityType="DOAService.wbsInfo"/>
+                <EntitySet Name="exceptionUserGroup" EntityType="DOAService.exceptionUserGroup"/>
+                <FunctionImport Name="getCostCenter" Function="DOAService.getCostCenter"/>
+                <ActionImport Name="callWorkflow" Action="DOAService.callWorkflow"/>
+                <ActionImport Name="updateWorkflowStatus" Action="DOAService.updateWorkflowStatus"/>
+                <FunctionImport Name="getEmpDetails" Function="DOAService.getEmpDetails"/>
+                <FunctionImport Name="getActiveEmployees" Function="DOAService.getActiveEmployees"/>
+                <ActionImport Name="updateWBSInfo" Action="DOAService.updateWBSInfo"/>
+                <FunctionImport Name="getApproverDetails" Function="DOAService.getApproverDetails"/>
+            </EntityContainer>
+            <EntityType Name="DOARule">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="costCenter" Type="Edm.String" MaxLength="30"/>
+                <Property Name="approverID" Type="Edm.String" MaxLength="60"/>
+                <Property Name="thresholdAmountFrom" Type="Edm.Decimal" Precision="15" Scale="2"/>
+                <Property Name="thresholdAmountTo" Type="Edm.Decimal" Precision="15" Scale="2"/>
+                <Property Name="currency" Type="Edm.String" MaxLength="20"/>
+                <Property Name="validFrom" Type="Edm.Date"/>
+                <Property Name="validTo" Type="Edm.Date"/>
+                <Property Name="backupApproverID" Type="Edm.String" MaxLength="60"/>
+                <Property Name="comments" Type="Edm.String" MaxLength="150"/>
+                <Property Name="status" Type="Edm.String" MaxLength="30"/>
+                <Property Name="workflowStatus" Type="Edm.String" MaxLength="20"/>
+                <Property Name="approvedTimeStamp" Type="Edm.String" MaxLength="20"/>
+            </EntityType>
+            <EntityType Name="DOAApprover">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="costCenter" Type="Edm.String" MaxLength="30"/>
+                <Property Name="costCenterDesc" Type="Edm.String" MaxLength="60"/>
+                <Property Name="postionDesc" Type="Edm.String" MaxLength="60"/>
+                <Property Name="positionID" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeId" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeName" Type="Edm.String" MaxLength="20"/>
+                <Property Name="employeeEmail" Type="Edm.String" MaxLength="50"/>
+                <Property Name="thresholdAmount" Type="Edm.String"/>
+                <Property Name="validFrom" Type="Edm.Date"/>
+                <Property Name="validTo" Type="Edm.Date"/>
+                <Property Name="system_ariba" Type="Edm.String" MaxLength="5"/>
+                <Property Name="system_s4" Type="Edm.String" MaxLength="5"/>
+                <Property Name="system_concurTravel" Type="Edm.String" MaxLength="5"/>
+                <Property Name="system_concurExp" Type="Edm.String" MaxLength="5"/>
+                <Property Name="status" Type="Edm.String" MaxLength="30"/>
+                <Property Name="revenue" Type="Edm.String" MaxLength="15"/>
+            </EntityType>
+            <EntityType Name="VerifierApprover">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="costCenter" Type="Edm.String" MaxLength="30"/>
+                <Property Name="costCenterDesc" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeId" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeName" Type="Edm.String" MaxLength="20"/>
+                <Property Name="employeeEmail" Type="Edm.String" MaxLength="50"/>
+                <Property Name="validFrom" Type="Edm.Date"/>
+                <Property Name="validTo" Type="Edm.Date"/>
+                <Property Name="level" Type="Edm.String" MaxLength="10"/>
+                <Property Name="status" Type="Edm.String" MaxLength="30"/>
+            </EntityType>
+            <EntityType Name="OtherApprovers">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="appID" Type="Edm.String" MaxLength="30"/>
+                <Property Name="subObject" Type="Edm.String" MaxLength="50"/>
+                <Property Name="process" Type="Edm.String" MaxLength="50"/>
+                <Property Name="exceptionUserGroup" Type="Edm.String" MaxLength="70"/>
+                <Property Name="type" Type="Edm.String" MaxLength="30"/>
+                <Property Name="postionDesc" Type="Edm.String" MaxLength="60"/>
+                <Property Name="positionID" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeId" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeName" Type="Edm.String" MaxLength="20"/>
+                <Property Name="employeeEmail" Type="Edm.String" MaxLength="50"/>
+                <Property Name="validFrom" Type="Edm.Date"/>
+                <Property Name="validTo" Type="Edm.Date"/>
+                <Property Name="level" Type="Edm.String" MaxLength="10"/>
+                <Property Name="status" Type="Edm.String" MaxLength="30"/>
+            </EntityType>
+            <EntityType Name="applicationInfo">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="applicationID" Type="Edm.String" MaxLength="50"/>
+                <Property Name="applicationDesc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="subObject" Type="Edm.String" MaxLength="50"/>
+                <Property Name="process" Type="Edm.String" MaxLength="50"/>
+                <Property Name="exceptionUserGroup" Type="Edm.String" MaxLength="70"/>
+                <Property Name="levels" Type="Edm.String" MaxLength="10"/>
+            </EntityType>
+            <EntityType Name="Applications">
+                <Key>
+                    <PropertyRef Name="applicationID"/>
+                </Key>
+                <Property Name="applicationID" Type="Edm.String" MaxLength="50" Nullable="false"/>
+                <Property Name="applicationDesc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="process_Create" Type="Edm.String" MaxLength="5"/>
+                <Property Name="process_Update" Type="Edm.String" MaxLength="5"/>
+            </EntityType>
+            <EntityType Name="wbsInfo">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="costCenter" Type="Edm.String" MaxLength="20"/>
+                <Property Name="costCenterDesc" Type="Edm.String" MaxLength="50"/>
+                <Property Name="wbsElement" Type="Edm.String" MaxLength="40"/>
+                <Property Name="wbsElementDesc" Type="Edm.String" MaxLength="50"/>
+                <Property Name="employeeName" Type="Edm.String" MaxLength="50"/>
+                <Property Name="employeeEmail" Type="Edm.String" MaxLength="100"/>
+                <Property Name="employeeID" Type="Edm.String" MaxLength="30"/>
+                <Property Name="level" Type="Edm.String" MaxLength="10"/>
+                <Property Name="status" Type="Edm.String" MaxLength="15"/>
+            </EntityType>
+            <EntityType Name="exceptionUserGroup">
+                <Key>
+                    <PropertyRef Name="ID"/>
+                </Key>
+                <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="createdBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="modifiedAt" Type="Edm.DateTimeOffset" Precision="7"/>
+                <Property Name="modifiedBy" Type="Edm.String" MaxLength="255"/>
+                <Property Name="appID" Type="Edm.String" MaxLength="30"/>
+                <Property Name="appDesc" Type="Edm.String" MaxLength="100"/>
+                <Property Name="subObject" Type="Edm.String" MaxLength="50"/>
+                <Property Name="process" Type="Edm.String" MaxLength="50"/>
+                <Property Name="exceptionUserGroup" Type="Edm.String" MaxLength="70"/>
+                <Property Name="postionDesc" Type="Edm.String" MaxLength="60"/>
+                <Property Name="positionID" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeId" Type="Edm.String" MaxLength="60"/>
+                <Property Name="employeeName" Type="Edm.String" MaxLength="20"/>
+                <Property Name="employeeEmail" Type="Edm.String" MaxLength="50"/>
+                <Property Name="validFrom" Type="Edm.Date"/>
+                <Property Name="validTo" Type="Edm.Date"/>
+                <Property Name="level" Type="Edm.String" MaxLength="10"/>
+                <Property Name="status" Type="Edm.String" MaxLength="30"/>
+            </EntityType>
+            <Function Name="getCostCenter" IsBound="false" IsComposable="false">
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Action Name="callWorkflow" IsBound="false">
+                <Parameter Name="ID" Type="Edm.String"/>
+                <Parameter Name="thresholdAmountFrom" Type="Edm.String"/>
+                <Parameter Name="thresholdAmountTo" Type="Edm.String"/>
+                <Parameter Name="costCenter" Type="Edm.String"/>
+                <Parameter Name="approverID" Type="Edm.String"/>
+                <Parameter Name="currency" Type="Edm.String"/>
+                <Parameter Name="validFrom" Type="Edm.String"/>
+                <Parameter Name="validTo" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Action Name="updateWorkflowStatus" IsBound="false">
+                <Parameter Name="ID" Type="Edm.String"/>
+                <Parameter Name="status" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Function Name="getEmpDetails" IsBound="false" IsComposable="false">
+                <Parameter Name="searchTerm" Type="Edm.String" MaxLength="30"/>
+                <Parameter Name="costCenter" Type="Edm.String" MaxLength="20"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Function Name="getActiveEmployees" IsBound="false" IsComposable="false">
+                <Parameter Name="costCenter" Type="Edm.String" MaxLength="20"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Action Name="updateWBSInfo" IsBound="false">
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Function Name="getApproverDetails" IsBound="false" IsComposable="false">
+                <Parameter Name="applicationID" Type="Edm.String" MaxLength="30"/>
+                <Parameter Name="costCenter" Type="Edm.String" MaxLength="20"/>
+                <Parameter Name="subObject" Type="Edm.String" MaxLength="50"/>
+                <Parameter Name="process" Type="Edm.String" MaxLength="30"/>
+                <Parameter Name="email" Type="Edm.String" MaxLength="100"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Function>
+            <Annotations Target="DOAService.DOARule/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOARule/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOARule/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOARule/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOARule/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOAApprover/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOAApprover/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOAApprover/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOAApprover/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.DOAApprover/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.VerifierApprover/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.VerifierApprover/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.VerifierApprover/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.VerifierApprover/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.VerifierApprover/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.OtherApprovers/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.OtherApprovers/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.OtherApprovers/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.OtherApprovers/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.OtherApprovers/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.applicationInfo/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.applicationInfo/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.applicationInfo/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.applicationInfo/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.applicationInfo/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.wbsInfo/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.wbsInfo/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.wbsInfo/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.wbsInfo/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.wbsInfo/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.exceptionUserGroup/ID">
+                <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+            </Annotations>
+            <Annotations Target="DOAService.exceptionUserGroup/createdAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Created On"/>
+            </Annotations>
+            <Annotations Target="DOAService.exceptionUserGroup/createdBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Immutable" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Created By"/>
+            </Annotations>
+            <Annotations Target="DOAService.exceptionUserGroup/modifiedAt">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Common.Label" String="Changed On"/>
+            </Annotations>
+            <Annotations Target="DOAService.exceptionUserGroup/modifiedBy">
+                <Annotation Term="UI.HiddenFilter" Bool="true"/>
+                <Annotation Term="UI.ExcludeFromNavigationContext" Bool="true"/>
+                <Annotation Term="Core.Computed" Bool="true"/>
+                <Annotation Term="Core.Description" String="User's unique ID"/>
+                <Annotation Term="Common.Label" String="Changed By"/>
+            </Annotations>
+            <Annotations Target="DOAService.getEmpDetails(Edm.String,Edm.String)/searchTerm">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getEmpDetails(Edm.String,Edm.String)/costCenter">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getActiveEmployees(Edm.String)/costCenter">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getApproverDetails(Edm.String,Edm.String,Edm.String,Edm.String,Edm.String)/applicationID">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getApproverDetails(Edm.String,Edm.String,Edm.String,Edm.String,Edm.String)/costCenter">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getApproverDetails(Edm.String,Edm.String,Edm.String,Edm.String,Edm.String)/subObject">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getApproverDetails(Edm.String,Edm.String,Edm.String,Edm.String,Edm.String)/process">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="DOAService.getApproverDetails(Edm.String,Edm.String,Edm.String,Edm.String,Edm.String)/email">
+                <Annotation Term="Core.OptionalParameter">
+                    <Record Type="Core.OptionalParameterType"/>
+                </Annotation>
+            </Annotations>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

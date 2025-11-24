@@ -645,6 +645,78 @@ sap.ui.define([
                 }
             });
         },
+        // _saveRowAttachments: async function (aTableData, sBtprn) {
+        //     const oBackendModel = this.getModel("attachment");
+
+        //     if (!aTableData || aTableData.length === 0) {
+        //         console.log("🚫 No attachments found.");
+        //         return;
+        //     }
+
+        //     try {
+        //         const aResults = []; // Store all responses
+
+        //         for (let oAttachment of aTableData) {
+        //             // OData payload must match CDS fields
+        //             const oPayload = {
+        //                 Reqno: sBtprn,
+        //                 Reqitem: oAttachment.Attachments[0].Reqitem,
+        //                 Reqtype: oAttachment.Attachments[0].Reqtype,
+        //                 FileID: oAttachment.Attachments[0].FileID,
+        //                 fileName: oAttachment.Attachments[0].fileName,
+        //                 mediaType: oAttachment.Attachments[0].mediaType,
+        //                 file: oAttachment.Attachments[0].file    // base64 content
+        //             };
+
+        //             console.log("Uploading file:", oPayload.fileName);
+
+        //             // 🔹 Create binding for the action/function
+        //             const oBinding = oBackendModel.bindContext("/uploadFileToSharePoint(...)");
+
+        //             // 🔹 Set parameters
+        //             oBinding.setParameter("Reqno", oPayload.Reqno);
+        //             oBinding.setParameter("Reqitem", oPayload.Reqitem);
+        //             oBinding.setParameter("Reqtype", oPayload.Reqtype);
+        //             oBinding.setParameter("FileID", oPayload.FileID);
+        //             oBinding.setParameter("fileName", oPayload.fileName);
+        //             oBinding.setParameter("mediaType", oPayload.mediaType);
+        //             oBinding.setParameter("file", oPayload.file);
+
+        //             // 🔹 Execute and get response
+        //             await oBinding.execute();
+        //             const oContext = await oBinding.getBoundContext().requestObject();
+
+        //             console.log("✔ Backend Response:", oContext);
+
+        //             // 🔹 Extract the response data
+        //             const aResponseData = oContext?.value || [];
+
+        //             // Process each response
+        //             aResponseData.forEach(oResponse => {
+        //                 console.log("✔ File uploaded successfully:", {
+        //                     FileID: oResponse.FileID,
+        //                     fileName: oResponse.fileName,
+        //                     url: oResponse.url,
+        //                     message: oResponse.message
+        //                 });
+
+        //                 aResults.push(oResponse);
+        //             });
+        //         }
+
+        //         console.log("✔ All uploads completed:", aResults);
+        //         MessageToast.show(`${aResults.length} attachment(s) uploaded successfully!`);
+
+        //         return aResults;
+
+        //     } catch (err) {
+        //         console.error("❌ Upload failed:", err);
+        //         MessageToast.show("Attachment upload failed!");
+        //         throw err;
+        //     }
+        // },
+
+
         _saveRowAttachments: function (aTableData, sBtprn) {
             const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
 
@@ -686,7 +758,7 @@ sap.ui.define([
                                 },
                                 error: (err) => {
                                     console.error(` Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
-                                    resolve(); 
+                                    resolve();
                                 }
                             });
                         });
@@ -739,7 +811,9 @@ sap.ui.define([
                 let sPhysicalDisposalFlag = bHasPhysicalDisposal ? "yes" : "no";
                 let sGrantIdFlag = bHasGrantId ? "yes" : "no";
 
-                const approverData = await this.getApproverDetails();
+                // const approverData = await this.getApproverDetails();
+                const approverData = await this.getApproverDetails(oSaveData, sPhysicalDisposalFlag, sGrantIdFlag);
+
 
                 const workflowPayload = {
                     definitionId: "ap21.smu-dev.zuiadwfixedassetsdisposal.fixedAssetsDisposal_Process",
@@ -810,34 +884,122 @@ sap.ui.define([
             }
         },
 
-        getApproverDetails: async function () {
+        //retriving approvers from G-table insted DOA Working fine 
+        // getApproverDetails: async function () {
+        //     try {
+        //         const oModel = this.getModel();
+        //         const oBindList = oModel.bindList("/AssetApprovers")
+        //         const aContexts = await oBindList.requestContexts();
+        //         console.log("AssetApprovers contexts fetched:", aContexts);
+        //         const approverData = aContexts.map(oContext => oContext.getObject());
+        //         console.log("AssetApprovers data:", approverData);
+        //         const approverGroups = {};
+        //         approverData.forEach(approver => {
+        //             if (!approverGroups[approver.Aprgrp]) {
+        //                 approverGroups[approver.Aprgrp] = [];
+        //             }
+        //             approverGroups[approver.Aprgrp].push(approver.Btpuser);
+        //         });
+        //         const processedApproverData = {};
+        //         Object.keys(approverGroups).forEach(group => {
+        //             processedApproverData[group] = approverGroups[group].join(",");
+        //         });
+
+        //         console.log("Processed approver data:", processedApproverData);
+        //         return processedApproverData;
+
+        //     } catch (error) {
+        //         console.error("Error fetching or processing approver details:", error);
+        //         throw error;
+        //     }
+        // },
+
+        getApproverDetails: async function (oSaveData, sPhysicalDisposalFlag, sGrantIdFlag) {
             try {
-                const oModel = this.getModel();
-                const oBindList = oModel.bindList("/AssetApprovers")
-                const aContexts = await oBindList.requestContexts();
-                console.log("AssetApprovers contexts fetched:", aContexts);
-                const approverData = aContexts.map(oContext => oContext.getObject());
-                console.log("AssetApprovers data:", approverData);
-                const approverGroups = {};
-                approverData.forEach(approver => {
-                    if (!approverGroups[approver.Aprgrp]) {
-                        approverGroups[approver.Aprgrp] = [];
+                const oModel = this.getOwnerComponent().getModel("doa"); // DOA model
+                const sApplicationID = "FAD";
+                const sCostCenter = oSaveData.Items?.results?.[0]?.Kostl || "";
+                const sEmail = oSaveData.CrBtpuser || "";
+
+                // 🔹 Determine subObject (Disposal / Non-Disposal)
+                const sProcess = sPhysicalDisposalFlag === "yes" ? "Disposal" : "Non-Disposal";
+                console.log("sProcess ", sProcess)
+
+
+                // 🔹 Determine process (Grant / Non-Grant)
+                const sSubObject = sGrantIdFlag === "yes" ? "Grant" : "Non-Grant";
+                console.log("subobject ", sSubObject)
+
+                if (!sCostCenter || !sEmail) {
+                    throw new Error("Missing required data: cost center or email");
+                }
+
+                // 🔹 Construct the correct path (with service name prefix)
+            const sPath = `/getApproverDetails(applicationID='${sApplicationID}',costCenter='${sCostCenter}',subObject='${sSubObject}',process='${sProcess}',email='${sEmail}')`;
+              //  const sPath = `/getApproverDetails(applicationID='FAD',costCenter='C1021-00',subObject='Grant',process='Non-Disposal',email='')`;
+
+                console.log("Calling DOA API:", sPath);
+
+                // 🔹 Call the backend
+                const oBinding = oModel.bindContext(sPath);
+                const oContext = await oBinding.requestObject();
+
+                console.log("Fetched approver details from DOA:", oContext);
+
+                // Safety check for returned data
+                const aApprovers = oContext?.value || [];
+
+
+                // Prepare approver groups based on LEVEL
+                const approverData = {
+                    HOD: "",
+                    FUMAN: "",
+                    OFIN: "",
+                    GFIN: "",
+                    CFO: ""
+                };
+
+                const levelGroups = {};
+                aApprovers.forEach(approver => {
+                    const level = approver.LEVEL;
+                    const email = approver.EMPLOYEEEMAIL;
+                    if (!level || !email) return;
+
+                    if (!levelGroups[level]) {
+                        levelGroups[level] = [];
                     }
-                    approverGroups[approver.Aprgrp].push(approver.Btpuser);
-                });
-                const processedApproverData = {};
-                Object.keys(approverGroups).forEach(group => {
-                    processedApproverData[group] = approverGroups[group].join(",");
+                    levelGroups[level].push(email);
                 });
 
-                console.log("Processed approver data:", processedApproverData);
-                return processedApproverData;
+                // ⭐ Final dynamic mapping based on "sProcess"
+                // Non-Disposal → 3 levels
+                // Disposal → 4 levels
+                if (sProcess === "Non-Disposal") {
+                    approverData.HOD = (levelGroups["1"] || []).join(",");
+                    approverData.OFIN = (levelGroups["2"] || []).join(",");  // Grant/Non-Grant
+                    approverData.GFIN = (levelGroups["2"] || []).join(",");
+                    approverData.CFO = (levelGroups["3"] || []).join(",");
+                } else {
+                    // Disposal
+                    approverData.HOD = (levelGroups["1"] || []).join(",");
+                    approverData.FUMAN = (levelGroups["2"] || []).join(",");
+                    approverData.OFIN = (levelGroups["3"] || []).join(",");
+                    approverData.GFIN = (levelGroups["3"] || []).join(",");
+                    approverData.CFO = (levelGroups["4"] || []).join(",");
+                }
+
+
+                console.log("Processed approver data (mapped by LEVEL):", approverData);
+
+                return approverData;
 
             } catch (error) {
-                console.error("Error fetching or processing approver details:", error);
+                console.error("Error fetching approver details from DOA:", error);
                 throw error;
             }
         },
+
+
 
         _handleSaveSuccess: function (oData, sAction, oBundle) {
             BusyIndicator.hide();

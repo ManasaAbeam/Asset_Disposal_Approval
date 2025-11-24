@@ -1,5 +1,6 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc"
     xmlns:uxap="sap.uxap"
+    xmlns:unified="sap.ui.unified"
     xmlns:c="sap.ui.core"
     xmlns="sap.ui.table"
     xmlns:layout="sap.ui.layout"
@@ -165,7 +166,7 @@
                                     <Column width="12rem">
                                         <m:Label text="{i18n>lblDisposalReason}" required="true" />
                                         <template>
-                                            <m:ComboBox selectedKey="{listOfSelectedAssetsModel>Rstgr}"  items="{path: '/ReasonCodes',  sorter: {
+                                            <m:ComboBox selectedKey="{listOfSelectedAssetsModel>Rstgr}" items="{path: '/ReasonCodes',  sorter: {
                                                     path: 'Txt40',
                                                     descending: false},
 		                                            filters: [{path: 'Btpdevid', operator: 'EQ', value1: 'FA-BTP-001'}]}">
@@ -204,6 +205,8 @@
                                                     </m:CustomListItem>
                                                 </m:List>
                                                 <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
+
+                                                <!-- <unified:FileUploader id="fuEditUpload" uploadOnChange="false" sameFilenameAllowed="true" multiple="false" change=".onAttachmentSelected" buttonOnly="true" icon="sap-icon://upload" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0 }" /> -->
                                             </m:HBox>
                                         </template>
                                     </Column>
@@ -217,8 +220,8 @@
         <uxap:footer>
             <m:OverflowToolbar>
                 <m:ToolbarSpacer />
-                <m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onEditSaveDraftPress"  />
-                <m:Button text="{i18n>btnSubmit}" type="Accept" press=".onEditSubmitPress"  />
+                <m:Button text="{i18n>btnSaveDraft}" type="Emphasized" press=".onEditSaveDraftPress" />
+                <m:Button text="{i18n>btnSubmit}" type="Accept" press=".onEditSubmitPress" />
                 <m:Button text="{i18n>btnCancel}" type="Reject" press=".onEditCancelPress" />
             </m:OverflowToolbar>
         </uxap:footer>

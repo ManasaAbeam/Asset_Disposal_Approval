@@ -15,6 +15,20 @@
       "csrfProtection": false
     },
     {
+      "source": "^/odata/v4/doa/(.*)$",
+      "target": "/odata/v4/doa/$1",
+      "destination": "SMU_DOA",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
+      "source": "^/odata/v4/attachment/(.*)$",
+      "target": "/odata/v4/attachment/$1",
+      "destination": "BTP_Sharepoint_Interface_Fin",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
       "source": "^/workflow/(.*)$",
       "target": "/workflow/$1",
       "destination": "spa_process_automation_workflow",
