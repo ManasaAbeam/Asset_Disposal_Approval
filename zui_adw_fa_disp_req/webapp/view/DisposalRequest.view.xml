@@ -176,9 +176,9 @@
 						</template>
 					</Column>
 
-					
 
-					<Column width="18rem">
+
+					<!-- <Column width="18rem">
 						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
 						<template>
 							<m:HBox justifyContent="SpaceBetween" alignItems="Center">
@@ -193,10 +193,28 @@
 								<m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
 							</m:HBox>
 						</template>
+					</Column> -->
+
+
+					<Column width="18rem">
+						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
+						<template>
+							<m:HBox justifyContent="SpaceBetween" alignItems="Center">								<!-- Existing attachments list -->
+								<m:List items="{listOfSelectedAssetsModel>Attachments}">
+									<m:CustomListItem>
+										<m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
+											<m:Link text="{= ${listOfSelectedAssetsModel>fileName}.length > 20 ? ${listOfSelectedAssetsModel>fileName}.substring(0, 20) + '...' : ${listOfSelectedAssetsModel>fileName}}" press=".onDownloadItem" />
+											<m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" />
+										</m:HBox>
+									</m:CustomListItem>
+								</m:List>								<!-- DIRECT FILE UPLOADER -->
+								<unified:FileUploader id="fileUploader" uploadOnChange="false" sameFilenameAllowed="true" multiple="false" change=".onAttachmentSelected" buttonOnly="true" icon="sap-icon://upload" tooltip="{i18n>tooltipUploadAttachment}" />
+							</m:HBox>
+						</template>
 					</Column>
 
 
-		
+
 
 				</columns>
 			</Table>

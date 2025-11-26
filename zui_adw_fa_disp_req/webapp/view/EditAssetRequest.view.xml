@@ -204,9 +204,9 @@
                                                         </m:HBox>
                                                     </m:CustomListItem>
                                                 </m:List>
-                                                <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
+                                                <!-- <m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" /> -->
 
-                                                <!-- <unified:FileUploader id="fuEditUpload" uploadOnChange="false" sameFilenameAllowed="true" multiple="false" change=".onAttachmentSelected" buttonOnly="true" icon="sap-icon://upload" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0 }" /> -->
+                                                <unified:FileUploader id="fuEditUpload" uploadOnChange="false" sameFilenameAllowed="true" multiple="false" change=".onAttachmentSelected" buttonOnly="true" icon="sap-icon://upload" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0 }" />
                                             </m:HBox>
                                         </template>
                                     </Column>

@@ -66,15 +66,15 @@ sap.ui.define([
             }.bind(this));
         },
 
-        onAttachmentPress: function (oEvent) {
-         this.onGenericAttachmentPress(oEvent,"idtDisposalRequest");          
-        },
+        // onAttachmentPress: function (oEvent) {
+        //  this.onGenericAttachmentPress(oEvent,"idtDisposalRequest");          
+        // },
 
-         onDownloadItem: function (oEvent) {
-            this.onGenericDownloadItem(oEvent);
-        },
+        //  onDownloadItem: function (oEvent) {
+        //     this.onGenericDownloadItem(oEvent);
+        // },
 
-
+        //connected to cap without generic nature
         // onAttachmentSelected: function (oEvent) {
         //     const oFileUploader = oEvent.getSource();
         //     const file = oEvent.getParameter("files")[0];
@@ -94,8 +94,8 @@ sap.ui.define([
 
         //         const oAttachment = {
         //             file: base64,
-        //             Reqno: reqNo,                   // <-- Final required format
-        //             Reqitem: reqNo,                 // If you want Reqitem same
+        //             Reqno: reqNo,                 
+        //             Reqitem: reqNo,                 
         //             FileID: "",
         //             Reqtype: "FAD",
         //             fileName: file.name,
@@ -107,48 +107,56 @@ sap.ui.define([
 
         //         aAssets[rowIndex].Attachments.push(oAttachment);
 
-        //         // Update model
         //         oModel.setProperty("/assets", aAssets);
 
         //         sap.m.MessageToast.show("Attachment uploaded successfully");
 
-        //         // Clear file
         //         oFileUploader.clear();
         //     };
 
         //     reader.readAsDataURL(file);
         // },
-       
+
+        onAttachmentSelected: function (oEvent) {
+            this.uploadAttachmentGeneric(
+                oEvent,
+                "listOfSelectedAssetsModel",   // model name
+                "/assets",                     // array path
+                false                          // new upload → no existing FileID
+            );
+        },
+
+        //working fine with sharepoint
         // onDownloadItem: function (oEvent) {
         //     const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
         //     const oAttachment = oCtx.getObject();
 
         //     const base64 = oAttachment.file;
         //     const fileName = oAttachment.fileName;
-        //     const mediaType = oAttachment.mediaType;  // VERY IMPORTANT
+        //     const mediaType = oAttachment.mediaType;
 
-        //     // Decode base64 → binary
         //     const byteCharacters = atob(base64);
         //     const byteNumbers = new Array(byteCharacters.length);
         //     for (let i = 0; i < byteCharacters.length; i++) {
         //         byteNumbers[i] = byteCharacters.charCodeAt(i);
         //     }
 
-        //     // Convert to Blob with correct MIME type
         //     const byteArray = new Uint8Array(byteNumbers);
         //     const blob = new Blob([byteArray], { type: mediaType });
 
-        //     // Create download link
         //     const link = document.createElement("a");
         //     link.href = URL.createObjectURL(blob);
         //     link.download = fileName;
 
-        //     // Trigger click
         //     link.click();
 
-        //     // Cleanup
         //     URL.revokeObjectURL(link.href);
         // },
+
+        onDownloadItem: function (oEvent) {
+            this.onGenericDownloadItem(oEvent);
+        },
+
         onDeleteAttachment: function (oEvent) {
             this.onGenericDeleteAttachment(oEvent)
         },

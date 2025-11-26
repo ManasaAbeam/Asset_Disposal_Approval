@@ -616,7 +616,7 @@ sap.ui.define([
             BusyIndicator.show(0);
 
             oBackendModel.create("/AssetDispSet", oPayload, {
-                success: function (oData) {
+                success: async function (oData) {
                     try {
                         if (sAction === "submit" && !bSilent) {
                             that.triggerWorkflowAfterSave(oData, sAction, oBundle, aTableData);
@@ -629,7 +629,8 @@ sap.ui.define([
                             }
                         }
                         if (oData && oData.Btprn) {
-                            that._saveRowAttachments(aTableData, oData.Btprn);
+                            await that._deleteBackendAttachments();
+                            await that._saveRowAttachments(aTableData, oData.Btprn);
                         }
 
 
@@ -645,157 +646,313 @@ sap.ui.define([
                 }
             });
         },
-        // _saveRowAttachments: async function (aTableData, sBtprn) {
-        //     const oBackendModel = this.getModel("attachment");
+        _deleteBackendAttachments: async function () {
+            if (!this._aDeletedAttachments || this._aDeletedAttachments.length === 0) {
+                console.log("No backend attachments to delete");
+                return;
+            }
 
-        //     if (!aTableData || aTableData.length === 0) {
-        //         console.log("🚫 No attachments found.");
-        //         return;
-        //     }
+            try {
+                await this.deleteRowAttachments(this._aDeletedAttachments);
+                console.log("✔ Deleted from backend:", this._aDeletedAttachments);
 
-        //     try {
-        //         const aResults = []; // Store all responses
+                // Clear after successful delete
+                this._aDeletedAttachments = [];
 
-        //         for (let oAttachment of aTableData) {
-        //             // OData payload must match CDS fields
-        //             const oPayload = {
+            } catch (e) {
+                console.error("❌ Backend delete failed:", e);
+                MessageToast.show("Failed to delete removed attachments");
+            }
+        },
+
+        _saveRowAttachments: async function (aTableData, sBtprn) {
+            const oBackendModel = this.getModel("attachment");
+
+            if (!aTableData || aTableData.length === 0) {
+                console.log("🚫 No attachments found.");
+                return;
+            }
+
+            try {
+                const aResults = [];
+
+                for (let oAttachment of aTableData) {
+
+                    if (!oAttachment.Attachments || oAttachment.Attachments.length === 0) {
+                        console.log("⏭️ Skipped row — No attachments for Reqitem:", oAttachment.Reqitem);
+                        continue;
+                    }
+
+                    const oPayload = {
+                        Reqno: sBtprn,
+                        Reqitem: oAttachment.Attachments[0].Reqitem,
+                        Reqtype: oAttachment.Attachments[0].Reqtype,
+                        FileID: oAttachment.Attachments[0].FileID,
+                        fileName: oAttachment.Attachments[0].fileName,
+                        mediaType: oAttachment.Attachments[0].mediaType,
+                        file: oAttachment.Attachments[0].file    // base64 content
+                    };
+
+                    console.log("Uploading file:", oPayload.fileName);
+
+                    // 🔹 Create binding for the action/function
+                    const oBinding = oBackendModel.bindContext("/uploadFileToSharePoint(...)");
+
+                    // 🔹 Set parameters
+                    oBinding.setParameter("Reqno", oPayload.Reqno);
+                    oBinding.setParameter("Reqitem", oPayload.Reqitem);
+                    oBinding.setParameter("Reqtype", oPayload.Reqtype);
+                    oBinding.setParameter("FileID", oPayload.FileID);
+                    oBinding.setParameter("fileName", oPayload.fileName);
+                    oBinding.setParameter("mediaType", oPayload.mediaType);
+                    oBinding.setParameter("file", oPayload.file);
+
+                    // 🔹 Execute and get response
+                    await oBinding.execute();
+                    const oContext = await oBinding.getBoundContext().requestObject();
+
+                    console.log("✔ Backend Response:", oContext);
+
+                    // 🔹 Extract the response data
+                    const aResponseData = oContext?.value || [];
+
+                    // Process each response
+                    aResponseData.forEach(oResponse => {
+                        console.log("✔ File uploaded successfully:", {
+                            FileID: oResponse.FileID,
+                            fileName: oResponse.fileName,
+                            url: oResponse.url,
+                            message: oResponse.message
+                        });
+
+                        aResults.push(oResponse);
+                    });
+                }
+
+                console.log("✔ All uploads completed:", aResults);
+                MessageToast.show(`${aResults.length} attachment(s) uploaded successfully!`);
+
+                return aResults;
+
+            } catch (err) {
+                console.error("❌ Upload failed:", err);
+                MessageToast.show("Attachment upload failed!");
+                throw err;
+            }
+        },
+
+        uploadAttachmentGeneric: function (oEvent, sModelName, sArrayPath, bKeepExistingFileID) {
+            const oFileUploader = oEvent.getSource();
+            const file = oEvent.getParameter("files")[0];
+            if (!file) return;
+
+            const oCtx = oFileUploader.getBindingContext(sModelName);
+            const rowPath = oCtx.getPath();               // e.g. "/assets/2" or "/Items/3"
+            const rowIndex = parseInt(rowPath.split("/").pop());
+
+            // Convert index → Reqno ("001")
+            const reqNo = (rowIndex + 1).toString().padStart(3, "0");
+
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const base64 = e.target.result.split(",")[1];
+
+                const oModel = this.getView().getModel(sModelName);
+                const aData = oModel.getProperty(sArrayPath); // e.g. "/assets" or "/Items"
+
+                // Pick existing FileID if required
+                let existingFileID = "";
+                if (bKeepExistingFileID &&
+                    aData[rowIndex].Attachments &&
+                    aData[rowIndex].Attachments.length > 0) {
+                    existingFileID = aData[rowIndex].Attachments[0].FileID || "";
+                }
+
+                // Generic attachment structure
+                const oAttachment = {
+                    file: base64,
+                    Reqno: reqNo,
+                    Reqitem: reqNo,
+                    Reqtype: "FAD",
+                    FileID: existingFileID,
+                    fileName: file.name,
+                    Filename: file.name,
+                    mediaType: file.type
+                };
+
+                // Always replace existing array (only 1 attachment allowed)
+                aData[rowIndex].Attachments = [oAttachment];
+
+                oModel.setProperty(sArrayPath, aData);
+
+                sap.m.MessageToast.show("Attachment uploaded successfully");
+
+                oFileUploader.clear();
+            };
+
+            reader.readAsDataURL(file);
+        },
+
+
+        onGenericDeleteAttachment: function (oEvent) {
+            const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+            if (!oCtx) return;
+
+            const oData = oCtx.getObject();
+            const oModel = this.getModel("listOfSelectedAssetsModel");
+            const sPath = oCtx.getPath();
+            const sRowPath = sPath.split("/Attachments")[0];
+
+            // 🔹 Track backend attachments for deletion later (on Save/Submit)
+            if (oData.Fileid) {
+                if (!this._aDeletedAttachments) this._aDeletedAttachments = [];
+                this._aDeletedAttachments.push({
+                    Reqno: oData.Reqno,
+                    Reqtype: oData.Reqtype,
+                    Reqitem: oData.Reqitem,
+                    FileID: oData.Fileid
+                });
+            }
+
+            // 🔹 Remove from frontend model
+            const aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
+            const aUpdated = aAttachments.filter(att => att.Filename !== oData.Filename);
+
+            oModel.setProperty(sRowPath + "/Attachments", aUpdated);
+
+            MessageToast.show("Attachment removed");
+        },
+
+
+        deleteRowAttachments: async function (aDeletedAttachments) {
+
+            const oBackendModel = this.getModel("attachment");
+
+            // Nothing to delete
+            if (!aDeletedAttachments || aDeletedAttachments.length === 0) {
+                console.log("🚫 No deleted items received.");
+                return;
+            }
+
+            try {
+                // FORM FINAL PAYLOAD EXACTLY LIKE BACKEND EXPECTS
+                const aPayloadList = aDeletedAttachments.map(oAtt => ({
+                    Reqno: oAtt.Reqno,
+                    Reqtype: oAtt.Reqtype,
+                    Reqitem: oAtt.Reqitem,
+                    FileID: oAtt.Fileid
+                }));
+
+                const oFinalPayload = { data: aPayloadList };
+
+                console.log("📤 FINAL DELETE PAYLOAD:", oFinalPayload);
+
+                // Bind action
+                const oDeleteBinding = oBackendModel.bindContext("/deleteAttachmentsFromSharePoint(...)");
+
+                // Set parameter "data"
+                oDeleteBinding.setParameter("data", oFinalPayload.data);
+
+                // Fire action
+                await oDeleteBinding.execute();
+
+                const oResponse = await oDeleteBinding.getBoundContext().requestObject();
+                console.log("✔ DELETE RESPONSE:", oResponse);
+
+                MessageToast.show("Attachment deleted from SharePoint");
+
+                return oResponse;
+
+            } catch (err) {
+                console.error("❌ Delete failed:", err);
+                MessageToast.show("Failed to delete attachment");
+                throw err;
+            }
+        },
+
+
+
+
+        // _saveRowAttachments: function (aTableData, sBtprn) {
+        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+        //     let aAllAttachmentsPayload = [];
+        //     let aFilesToDelete = [];
+
+        //     aTableData.forEach((oRow, iIndex) => {
+        //         const aCurrent = oRow.Attachments || [];
+        //         const aOriginal = oRow._OriginalAttachments || [];
+
+        //         const aDeletedFiles = aOriginal.filter(orig =>
+        //             !aCurrent.find(att => att.Fileid === orig.Fileid)
+        //         );
+        //         aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
+
+        //         const aNewFiles = aCurrent.filter(att => !att.Linked);
+        //         if (aNewFiles.length) {
+        //             const aRowAttachments = aNewFiles.map(att => ({
+        //                 Fileid: att.Fileid,
         //                 Reqno: sBtprn,
-        //                 Reqitem: oAttachment.Attachments[0].Reqitem,
-        //                 Reqtype: oAttachment.Attachments[0].Reqtype,
-        //                 FileID: oAttachment.Attachments[0].FileID,
-        //                 fileName: oAttachment.Attachments[0].fileName,
-        //                 mediaType: oAttachment.Attachments[0].mediaType,
-        //                 file: oAttachment.Attachments[0].file    // base64 content
-        //             };
+        //                 Reqtype: "ADApproval",
+        //                 Reqitem: String(iIndex + 1).padStart(3, "0")
+        //             }));
+        //             aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
+        //         }
+        //     });
 
-        //             console.log("Uploading file:", oPayload.fileName);
+        //     const deleteFilesSequentially = async () => {
+        //         for (let i = 0; i < aFilesToDelete.length; i++) {
+        //             const file = aFilesToDelete[i];
+        //             console.log(` Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
 
-        //             // 🔹 Create binding for the action/function
-        //             const oBinding = oBackendModel.bindContext("/uploadFileToSharePoint(...)");
-
-        //             // 🔹 Set parameters
-        //             oBinding.setParameter("Reqno", oPayload.Reqno);
-        //             oBinding.setParameter("Reqitem", oPayload.Reqitem);
-        //             oBinding.setParameter("Reqtype", oPayload.Reqtype);
-        //             oBinding.setParameter("FileID", oPayload.FileID);
-        //             oBinding.setParameter("fileName", oPayload.fileName);
-        //             oBinding.setParameter("mediaType", oPayload.mediaType);
-        //             oBinding.setParameter("file", oPayload.file);
-
-        //             // 🔹 Execute and get response
-        //             await oBinding.execute();
-        //             const oContext = await oBinding.getBoundContext().requestObject();
-
-        //             console.log("✔ Backend Response:", oContext);
-
-        //             // 🔹 Extract the response data
-        //             const aResponseData = oContext?.value || [];
-
-        //             // Process each response
-        //             aResponseData.forEach(oResponse => {
-        //                 console.log("✔ File uploaded successfully:", {
-        //                     FileID: oResponse.FileID,
-        //                     fileName: oResponse.fileName,
-        //                     url: oResponse.url,
-        //                     message: oResponse.message
+        //             try {
+        //                 await new Promise((resolve, reject) => {
+        //                     oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
+        //                         success: () => {
+        //                             console.log(`Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
+        //                             resolve();
+        //                         },
+        //                         error: (err) => {
+        //                             console.error(` Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
+        //                             resolve();
+        //                         }
+        //                     });
         //                 });
-
-        //                 aResults.push(oResponse);
-        //             });
+        //                 await new Promise(resolve => setTimeout(resolve, 100));
+        //             } catch (error) {
+        //                 console.error(` Unexpected error deleting file: ${file.Fileid}`, error);
+        //             }
         //         }
 
-        //         console.log("✔ All uploads completed:", aResults);
-        //         MessageToast.show(`${aResults.length} attachment(s) uploaded successfully!`);
+        //         this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
+        //     };
 
-        //         return aResults;
-
-        //     } catch (err) {
-        //         console.error("❌ Upload failed:", err);
-        //         MessageToast.show("Attachment upload failed!");
-        //         throw err;
+        //     if (aFilesToDelete.length > 0) {
+        //         console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
+        //         deleteFilesSequentially();
+        //     } else {
+        //         this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
         //     }
         // },
 
-
-        _saveRowAttachments: function (aTableData, sBtprn) {
-            const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-            let aAllAttachmentsPayload = [];
-            let aFilesToDelete = [];
-
-            aTableData.forEach((oRow, iIndex) => {
-                const aCurrent = oRow.Attachments || [];
-                const aOriginal = oRow._OriginalAttachments || [];
-
-                const aDeletedFiles = aOriginal.filter(orig =>
-                    !aCurrent.find(att => att.Fileid === orig.Fileid)
-                );
-                aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
-
-                const aNewFiles = aCurrent.filter(att => !att.Linked);
-                if (aNewFiles.length) {
-                    const aRowAttachments = aNewFiles.map(att => ({
-                        Fileid: att.Fileid,
-                        Reqno: sBtprn,
-                        Reqtype: "ADApproval",
-                        Reqitem: String(iIndex + 1).padStart(3, "0")
-                    }));
-                    aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-                }
-            });
-
-            const deleteFilesSequentially = async () => {
-                for (let i = 0; i < aFilesToDelete.length; i++) {
-                    const file = aFilesToDelete[i];
-                    console.log(` Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-
-                    try {
-                        await new Promise((resolve, reject) => {
-                            oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
-                                success: () => {
-                                    console.log(`Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-                                    resolve();
-                                },
-                                error: (err) => {
-                                    console.error(` Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
-                                    resolve();
-                                }
-                            });
-                        });
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    } catch (error) {
-                        console.error(` Unexpected error deleting file: ${file.Fileid}`, error);
-                    }
-                }
-
-                this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-            };
-
-            if (aFilesToDelete.length > 0) {
-                console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
-                deleteFilesSequentially();
-            } else {
-                this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-            }
-        },
-
-        // Helper function to link new attachments
-        _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
-            if (aAllAttachmentsPayload.length) {
-                console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
-                const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
-                oSrvModel.create("/LinkFiles", oPayload, {
-                    success: () => {
-                        console.log("✅ Successfully linked all new files");
-                    },
-                    error: (err) => {
-                        console.error("❌ Linking failed", err);
-                    }
-                });
-            } else {
-                console.log("ℹ️ No new files to link");
-            }
-        },
+        // // Helper function to link new attachments
+        // _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
+        //     if (aAllAttachmentsPayload.length) {
+        //         console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
+        //         const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
+        //         oSrvModel.create("/LinkFiles", oPayload, {
+        //             success: () => {
+        //                 console.log("✅ Successfully linked all new files");
+        //             },
+        //             error: (err) => {
+        //                 console.error("❌ Linking failed", err);
+        //             }
+        //         });
+        //     } else {
+        //         console.log("ℹ️ No new files to link");
+        //     }
+        // },
         triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
             let that = this;
 
@@ -935,8 +1092,8 @@ sap.ui.define([
                 }
 
                 // 🔹 Construct the correct path (with service name prefix)
-            const sPath = `/getApproverDetails(applicationID='${sApplicationID}',costCenter='${sCostCenter}',subObject='${sSubObject}',process='${sProcess}',email='${sEmail}')`;
-              //  const sPath = `/getApproverDetails(applicationID='FAD',costCenter='C1021-00',subObject='Grant',process='Non-Disposal',email='')`;
+                const sPath = `/getApproverDetails(applicationID='${sApplicationID}',costCenter='${sCostCenter}',subObject='${sSubObject}',process='${sProcess}',email='${sEmail}')`;
+                //  const sPath = `/getApproverDetails(applicationID='FAD',costCenter='C1021-00',subObject='Grant',process='Non-Disposal',email='')`;
 
                 console.log("Calling DOA API:", sPath);
 
@@ -1330,65 +1487,118 @@ sap.ui.define([
          * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
          * @public
          */
-        onGenericDeleteAttachment: function (oEvent) {
-            let uploadButton = oEvent.getSource().getParent().getParent().getParent().getParent().getItems()[1];
-            console.log("Delete button pressed");
+        // onGenericDeleteAttachment: function (oEvent) {
+        //     let uploadButton = oEvent.getSource().getParent().getParent().getParent().getParent().getItems()[1];
+        //     console.log("Delete button pressed");
 
-            const oAttachmentContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-            console.log("Attachment context:", oAttachmentContext);
+        //     const oAttachmentContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+        //     console.log("Attachment context:", oAttachmentContext);
 
-            if (!oAttachmentContext) {
-                console.warn("No attachment context found.");
-                return;
-            }
+        //     if (!oAttachmentContext) {
+        //         console.warn("No attachment context found.");
+        //         return;
+        //     }
 
-            const sFileName = oAttachmentContext.getProperty("Filename");
-            console.log("File to delete:", sFileName);
-            const oAttachmentPath = oAttachmentContext.getPath();
-            console.log("Attachment path:", oAttachmentPath);
-            const oRowPath = oAttachmentPath.split("/Attachments")[0];
-            console.log("Row path:", oRowPath);
-            const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-            console.log("Model object:", oModel);
-            const aAttachments = oModel.getProperty(oRowPath + "/Attachments") || [];
-            console.log("Current attachments array:", aAttachments);
-            const aUpdated = aAttachments.filter(att => att.Filename !== sFileName);
-            console.log("Updated attachments array:", aUpdated);
-            oModel.setProperty(oRowPath + "/Attachments", aUpdated);
-            MessageToast.show("Attachment deleted successfully.");
-            uploadButton.setVisible(true)
-        },
+        //     const sFileName = oAttachmentContext.getProperty("Filename");
+        //     console.log("File to delete:", sFileName);
+        //     const oAttachmentPath = oAttachmentContext.getPath();
+        //     console.log("Attachment path:", oAttachmentPath);
+        //     const oRowPath = oAttachmentPath.split("/Attachments")[0];
+        //     console.log("Row path:", oRowPath);
+        //     const oModel = this.getView().getModel("listOfSelectedAssetsModel");
+        //     console.log("Model object:", oModel);
+        //     const aAttachments = oModel.getProperty(oRowPath + "/Attachments") || [];
+        //     console.log("Current attachments array:", aAttachments);
+        //     const aUpdated = aAttachments.filter(att => att.Filename !== sFileName);
+        //     console.log("Updated attachments array:", aUpdated);
+        //     oModel.setProperty(oRowPath + "/Attachments", aUpdated);
+        //     MessageToast.show("Attachment deleted successfully.");
+        //     uploadButton.setVisible(true)
+        // },
 
         /**
          * Handles downloading the uploaded file linked to the selected asset.
          * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
          * @public
          */
-        onGenericDownloadItem: function (oEvent) {
-            const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-            const sFileId = oContext.getProperty("Fileid");
-            const sMimeType = oContext.getProperty("MimeType");
-            const sFileName = oContext.getProperty("Filename");
-            const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-            const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
-            fetch(sUrl, { credentials: "include" })
-                .then(res => res.blob())
-                .then(blob => {
-                    const newBlob = new Blob([blob], { type: sMimeType });
-                    const url = window.URL.createObjectURL(newBlob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = sFileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
+        // onGenericDownloadItem: function (oEvent) {
+        //     const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+        //     const sFileId = oContext.getProperty("Fileid");
+        //     const sMimeType = oContext.getProperty("MimeType");
+        //     const sFileName = oContext.getProperty("Filename");
+        //     const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+        //     const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
+        //     fetch(sUrl, { credentials: "include" })
+        //         .then(res => res.blob())
+        //         .then(blob => {
+        //             const newBlob = new Blob([blob], { type: sMimeType });
+        //             const url = window.URL.createObjectURL(newBlob);
+        //             const a = document.createElement("a");
+        //             a.href = url;
+        //             a.download = sFileName;
+        //             document.body.appendChild(a);
+        //             a.click();
+        //             a.remove();
 
-                    window.URL.revokeObjectURL(url);
-                })
-                .catch(err => {
-                    console.error("Download failed", err);
-                    MessageBox.error("Failed to download file.");
-                });
+        //             window.URL.revokeObjectURL(url);
+        //         })
+        //         .catch(err => {
+        //             console.error("Download failed", err);
+        //             MessageBox.error("Failed to download file.");
+        //         });
+        // }
+
+
+        onGenericDownloadItem: function (oEvent) {
+
+            const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+            if (!oCtx) {
+                console.error("❌ No binding context found for download.");
+                return;
+            }
+
+            const oAttachment = oCtx.getObject();
+
+            // Normalize field names
+            const fileName =
+                oAttachment.fileName?.trim() ||
+                oAttachment.Filename?.trim() ||
+                oAttachment.filename?.trim() ||
+                "attachment";
+
+            const mediaType =
+                oAttachment.mediaType ||
+                oAttachment.Mediatype ||
+                "application/octet-stream";
+
+            // 1️⃣ SharePoint Download
+            if (oAttachment.Fileid && oAttachment.Url) {
+                window.open(oAttachment.Url, "_blank");
+                return;
+            }
+
+            // 2️⃣ Base64 Download
+            const base64 = oAttachment.file || oAttachment.File || oAttachment.Base64;
+
+            if (!base64) {
+                console.warn("⚠️ No file content found for base64 download.");
+                return;
+            }
+
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mediaType });
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;  // always valid now
+            link.click();
+            URL.revokeObjectURL(link.href);
         }
 
     });
