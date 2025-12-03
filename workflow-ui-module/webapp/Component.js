@@ -29,52 +29,52 @@ sap.ui.define(
           // set the device model
           this.setModel(models.createDeviceModel(), "device");
 
-          this.setTaskModels();
+        //   this.setTaskModels();
 
-          const rejectOutcomeId = "reject";
-          this.getInboxAPI().addAction(
-              {
-              action: rejectOutcomeId,
-              label: "Reject",
-              type: "reject",
-              },
-              function () {
-              this.completeTask(false, rejectOutcomeId);
-              },
-              this
-          );
-          const approveOutcomeId = "approve";
-          this.getInboxAPI().addAction(
-              {
-              action: approveOutcomeId,
-              label: "Approve",
-              type: "accept",
-              },
-              function () {
-              this.completeTask(true, approveOutcomeId);
-              },
-              this
-          );
-          },
+        //   const rejectOutcomeId = "reject";
+        //   this.getInboxAPI().addAction(
+        //       {
+        //       action: rejectOutcomeId,
+        //       label: "Reject",
+        //       type: "reject",
+        //       },
+        //       function () {
+        //       this.completeTask(false, rejectOutcomeId);
+        //       },
+        //       this
+        //   );
+        //   const approveOutcomeId = "approve";
+        //   this.getInboxAPI().addAction(
+        //       {
+        //       action: approveOutcomeId,
+        //       label: "Approve",
+        //       type: "accept",
+        //       },
+        //       function () {
+        //       this.completeTask(true, approveOutcomeId);
+        //       },
+        //       this
+        //   );
+        //   },
 
-          setTaskModels: function () {
-          // set the task model
-          var startupParameters = this.getComponentData().startupParameters;
-          this.setModel(startupParameters.taskModel, "task");
+        //   setTaskModels: function () {
+        //   // set the task model
+        //   var startupParameters = this.getComponentData().startupParameters;
+        //   this.setModel(startupParameters.taskModel, "task");
 
-          // set the task context model
-          var taskContextModel = new sap.ui.model.json.JSONModel(
-              this._getTaskInstancesBaseURL() + "/context"
-          );
-          this.setModel(taskContextModel, "context");
-          },
+        //   // set the task context model
+        //   var taskContextModel = new sap.ui.model.json.JSONModel(
+        //       this._getTaskInstancesBaseURL() + "/context"
+        //   );
+        //   this.setModel(taskContextModel, "context");
+        //   },
 
-          _getTaskInstancesBaseURL: function () {
-          return (
-              this._getWorkflowRuntimeBaseURL() +
-              "/task-instances/" +
-              this.getTaskInstanceID()
-          );
+        //   _getTaskInstancesBaseURL: function () {
+        //   return (
+        //       this._getWorkflowRuntimeBaseURL() +
+        //       "/task-instances/" +
+        //       this.getTaskInstanceID()
+        //   );
           },
 
           _getWorkflowRuntimeBaseURL: function () {  

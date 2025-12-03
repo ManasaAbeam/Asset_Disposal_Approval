@@ -34,6 +34,10 @@ server:
             authenticationType: BasicAuthentication
             destination: DS4_110_BAS
             path: /sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/
+          - url: https://singapore-management-university-smu-dev-development-btp518078f0.cfapps.ap21.hana.ondemand.com
+            authenticationType: OAuth2ClientCredentials
+            destination: BTP_Sharepoint_Interface_Fin
+            path: /odata/v4/attachment/
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:

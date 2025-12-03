@@ -9,7 +9,7 @@ sap.ui.define(
 
     return BaseController.extend("fixedassetsdisposalapproval.adw.wf.workflowuimodule.controller.App", {
       onInit() {
-      //  this.getAssetDetails("0000200329");
+        // this.getAssetDetails("0000200513");
         this.getUserInfo();
       },
 
@@ -19,8 +19,8 @@ sap.ui.define(
           setTimeout(() => {
             var oContextData = this.getOwnerComponent().getModel("context").getData();
             this._oID = oContextData.Btprn;
-            console.log("btprn-", this._oID); 
-            this.getAssetDetails(this._oID);             
+            console.log("btprn-", this._oID);
+            this.getAssetDetails(this._oID);
           }, 1000);
         }
       },
@@ -42,95 +42,182 @@ sap.ui.define(
 
           console.log("Header:", oResponse);
           this.getOwnerComponent().getModel("listOfSelectedAssetsModel").setData(oResponse);
-          this._loadAllAttachments();
+          //this._loadAllAttachments();
+          // ✔ Load attachments same as EDIT screen
+          this._loadAllAttachments_WF();
 
         } catch (error) {
           console.error("Error in getAssetDetails:", error);
         }
       },
-      _loadAllAttachments: function () {
+      _loadAllAttachments_WF: function () {
         const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        const aItems = oModel.getProperty("/value");   
+        const aItems = oModel.getProperty("/value") || [];
 
-        const sReqno = aItems.length > 0 ? aItems[0].Btprn : null; 
-        const sReqtype = "ADApproval"; 
+        if (aItems.length === 0) return;
 
-        if (!aItems || aItems.length === 0) return;
+        const sReqno = aItems[0].Btprn;      // Req number from WF header
+        const sReqtype = "FAD";       // Your workflow Reqtype
 
         aItems.forEach((oRow, index) => {
-          this._loadRowAttachments(
-            sReqno,
-            sReqtype,
-            String(index + 1).padStart(3, "0"),
-            new sap.ui.model.Context(oModel, "/value/" + index)
+          const sReqitem = String(index + 1).padStart(3, "0");
+
+          const oRowContext = new sap.ui.model.Context(
+            oModel,
+            "/value/" + index
           );
+
+          this._loadRowAttachments_WF(sReqno, sReqtype, sReqitem, oRowContext);
         });
       },
-      _loadRowAttachments: function (sReqno, sReqtype, sReqitem, oRowContext) {
-        const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+      _loadRowAttachments_WF: async function (sReqno, sReqtype, sReqitem, oRowContext) {
+        try {
+          const oBackendModel = this.getView().getModel("attachment");
 
-        const aFilters = [
-          new sap.ui.model.Filter("Reqno", "EQ", sReqno),
-          new sap.ui.model.Filter("Reqtype", "EQ", sReqtype),
-          new sap.ui.model.Filter("Reqitem", "EQ", sReqitem)
-        ];
+          const sPath = `/DownloadFiles(Reqno='${sReqno}',Reqtype='${sReqtype}')`;
 
-        oSrvModel.read("/AttachmentsList", {
-          filters: aFilters,
-          success: (oData) => {
-            const aAttachments = oData.results.map(item => ({
-              Fileid: item.Fileid,
-              Filename: item.Filename,
-              MimeType: item.MimeType,
-              Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
-              Linked: true
-            }));
+          const oBinding = oBackendModel.bindContext(sPath);
+          const oContext = await oBinding.requestObject();
 
-            const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
-            oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-            oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
-              JSON.parse(JSON.stringify(aAttachments))
-            );
-          },
-          error: (oError) => {
-            console.error("Error while loading attachments:", oError);
-          }
-        });
-      },
+          const aAllAttachments = oContext?.value || [];
+          const aFiltered = aAllAttachments.filter(
+            item => item.Reqitem === sReqitem
+          );
 
+          const aAttachments = aFiltered.map(item => ({
+            fileID: item.fileID,
+            fileName: item.fileName,
+            mimeType: item.mimeType,
+            url: item.url,
+            Reqno: item.Reqno,
+            Reqitem: item.Reqitem,
+            Reqtype: item.Reqtype,
+            Linked: true
+          }));
 
-      onGenericDownloadItem: function (oEvent) {
-        const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        const aAttachments = oContext.getProperty("Attachments");
-        if (!aAttachments || aAttachments.length === 0) {
-         MessageBox.warning("No attachment found.");
-          return;
+          const oModel = oRowContext.getModel();
+          oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
+
+          oModel.refresh();
+
+        } catch (err) {
+          console.error(`❌ Error loading WF attachments for item ${sReqitem}`, err);
         }
-        const oAttachment = aAttachments[0]; // since you bound to Attachments/0
-        const sFileId = oAttachment.Fileid;
-        const sMimeType = oAttachment.MimeType || "application/octet-stream";
-        const sFileName = oAttachment.Filename;
+      },
 
-        const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-        const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
 
-        fetch(sUrl, { credentials: "include" })
-          .then(res => res.blob())
-          .then(blob => {
-            const newBlob = new Blob([blob], { type: sMimeType });
-            const url = window.URL.createObjectURL(newBlob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = sFileName;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-          })
-          .catch(err => {
-            console.error("Download failed", err);
-            MessageBox.error("Failed to download file.");
-          });
+
+
+      // _loadAllAttachments: function () {
+      //   const oModel = this.getView().getModel("listOfSelectedAssetsModel");
+      //   const aItems = oModel.getProperty("/value");   
+
+      //   const sReqno = aItems.length > 0 ? aItems[0].Btprn : null; 
+      //   const sReqtype = "ADApproval"; 
+
+      //   if (!aItems || aItems.length === 0) return;
+
+      //   aItems.forEach((oRow, index) => {
+      //     this._loadRowAttachments(
+      //       sReqno,
+      //       sReqtype,
+      //       String(index + 1).padStart(3, "0"),
+      //       new sap.ui.model.Context(oModel, "/value/" + index)
+      //     );
+      //   });
+      // },
+      // _loadRowAttachments: function (sReqno, sReqtype, sReqitem, oRowContext) {
+      //   const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+      //   const aFilters = [
+      //     new sap.ui.model.Filter("Reqno", "EQ", sReqno),
+      //     new sap.ui.model.Filter("Reqtype", "EQ", sReqtype),
+      //     new sap.ui.model.Filter("Reqitem", "EQ", sReqitem)
+      //   ];
+
+      //   oSrvModel.read("/AttachmentsList", {
+      //     filters: aFilters,
+      //     success: (oData) => {
+      //       const aAttachments = oData.results.map(item => ({
+      //         Fileid: item.Fileid,
+      //         Filename: item.Filename,
+      //         MimeType: item.MimeType,
+      //         Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
+      //         Linked: true
+      //       }));
+
+      //       const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
+      //       oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
+      //       oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
+      //         JSON.parse(JSON.stringify(aAttachments))
+      //       );
+      //     },
+      //     error: (oError) => {
+      //       console.error("Error while loading attachments:", oError);
+      //     }
+      //   });
+      // },
+
+
+      // onGenericDownloadItem: function (oEvent) {
+      //   const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+      //   const aAttachments = oContext.getProperty("Attachments");
+      //   if (!aAttachments || aAttachments.length === 0) {
+      //     MessageBox.warning("No attachment found.");
+      //     return;
+      //   }
+      //   const oAttachment = aAttachments[0]; // since you bound to Attachments/0
+      //   const sFileId = oAttachment.Fileid;
+      //   const sMimeType = oAttachment.MimeType || "application/octet-stream";
+      //   const sFileName = oAttachment.Filename;
+
+      //   const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+      //   const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
+
+      //   fetch(sUrl, { credentials: "include" })
+      //     .then(res => res.blob())
+      //     .then(blob => {
+      //       const newBlob = new Blob([blob], { type: sMimeType });
+      //       const url = window.URL.createObjectURL(newBlob);
+      //       const a = document.createElement("a");
+      //       a.href = url;
+      //       a.download = sFileName;
+      //       document.body.appendChild(a);
+      //       a.click();
+      //       a.remove();
+      //       window.URL.revokeObjectURL(url);
+      //     })
+      //     .catch(err => {
+      //       console.error("Download failed", err);
+      //       MessageBox.error("Failed to download file.");
+      //     });
+      // },
+
+      onGenericDownloadItem: async function (oEvent) {
+        const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+        if (!oCtx) return;
+
+        const oParent = oCtx.getObject();
+
+        const oAttachment = oParent.Attachments && oParent.Attachments[0];
+        if (!oAttachment) return;
+
+        const fileName = oAttachment.fileName;
+        const fileUrl = oAttachment.url;
+
+        try {
+          const response = await fetch(fileUrl);
+          const blob = await response.blob();
+
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = fileName;  // perfect name
+          link.click();
+
+          URL.revokeObjectURL(link.href);
+        } catch (err) {
+          console.error("File download failed", err);
+        }
       },
 
       getUserInfo: async function () {
@@ -173,11 +260,11 @@ sap.ui.define(
         if (oValue instanceof Date) {
           oDate = oValue;
         }
-      
+
         else if (typeof oValue === "string") {
           oDate = new Date(oValue);
         }
-        
+
         else {
           oDate = new Date(oValue);
         }

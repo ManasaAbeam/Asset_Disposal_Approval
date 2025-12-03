@@ -9,13 +9,20 @@
       "endpoint": "api",
       "csrfProtection": true,
       "authenticationType": "xsuaa"
-     },
-     {
+    },
+    {
       "source": "^/user-api/currentUser$",
       "target": "/currentUser",
       "service": "sap-approuter-userapi"
     },
-     {
+    {
+      "source": "^/odata/v4/attachment/(.*)$",
+      "target": "/odata/v4/attachment/$1",
+      "destination": "BTP_Sharepoint_Interface_Fin",
+      "authenticationType": "xsuaa",
+      "csrfProtection": false
+    },
+    {
       "source": "^/sap/(.*)$",
       "target": "/sap/$1",
       "destination": "DS4_110_BAS",

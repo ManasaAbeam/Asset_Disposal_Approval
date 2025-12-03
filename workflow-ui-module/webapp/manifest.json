@@ -51,6 +51,15 @@
           "localUri": "localService/ZUI_SMU_ATTACHMENTS_SRV/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "attachment": {
+        "uri": "/odata/v4/attachment/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/attachment/metadata.xml",
+          "odataVersion": "4.0"
+        }
       }
     }
   },
@@ -135,6 +144,16 @@
         "dataSource": "ZUI_SMU_ATTACHMENTS_SRV",
         "preload": true,
         "settings": {}
+      },
+      "attachment": {
+        "dataSource": "attachment",
+        "preload": true,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
       }
     },
     "resources": {

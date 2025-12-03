@@ -184,18 +184,14 @@
                                             </template>
                                         </Column> -->
 
-                                       <Column width="18rem">
-    <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
-    <template>
-        <m:VBox>
-            <m:Link
-                text="{listOfSelectedAssetsModel>Attachments/0/Filename}"
-                wrapping="true"
-                press=".onGenericDownloadItem" 
-                visible="{= ${listOfSelectedAssetsModel>Attachments}.length > 0 }"/>
-        </m:VBox>
-    </template>
-</Column>
+                                        <Column width="18rem">
+                                            <m:Label text="{i18n>lblProofOfDisposalAttachment}" />
+                                            <template>
+                                                <m:VBox>
+                                                    <m:Link text="{listOfSelectedAssetsModel>Attachments/0/fileName}" wrapping="true" press=".onGenericDownloadItem" visible="{= ${listOfSelectedAssetsModel>Attachments}.length > 0 }"/>
+                                                </m:VBox>
+                                            </template>
+                                        </Column>
 
 
                                     </columns>

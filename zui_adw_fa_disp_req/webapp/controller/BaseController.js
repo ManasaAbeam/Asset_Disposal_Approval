@@ -695,7 +695,7 @@ sap.ui.define([
                         Reqno: sBtprn,
                         Reqitem: att.Reqitem,
                         Reqtype: att.Reqtype,
-                        FileID:  att.fileID,
+                        FileID: att.fileID,
                         fileName: att.fileName,
                         mediaType: att.mediaType,
                         file: att.file
@@ -871,53 +871,53 @@ sap.ui.define([
 
         onGenericDownloadItem: async function (oEvent) {
 
-    const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-    if (!oCtx) return;
+            const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+            if (!oCtx) return;
 
-    const oAttachment = oCtx.getObject();
-    const fileName = oAttachment.fileName || "attachment";
-    const mediaType = oAttachment.mimeType || "application/octet-stream";
+            const oAttachment = oCtx.getObject();
+            const fileName = oAttachment.fileName || "attachment";
+            const mediaType = oAttachment.mimeType || "application/octet-stream";
 
-    // 1️⃣ SharePoint Hosted File Download
-    if (oAttachment.fileID && oAttachment.url) {
+            // 1️⃣ SharePoint Hosted File Download
+            if (oAttachment.fileID && oAttachment.url) {
 
-        try {
-            const response = await fetch(oAttachment.url);
-            const blob = await response.blob();
+                try {
+                    const response = await fetch(oAttachment.url);
+                    const blob = await response.blob();
+
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = fileName;          // <-- Perfect filename!
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+
+                } catch (err) {
+                    console.error("SharePoint file download failed:", err);
+                }
+
+                return;
+            }
+
+            // 2️⃣ Base64 Download
+            const base64 = oAttachment.file;
+            if (!base64) return;
+
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: mediaType });
 
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = fileName;          // <-- Perfect filename!
+            link.download = fileName;
             link.click();
             URL.revokeObjectURL(link.href);
-
-        } catch (err) {
-            console.error("SharePoint file download failed:", err);
-        }
-
-        return;
-    }
-
-    // 2️⃣ Base64 Download
-    const base64 = oAttachment.file;
-    if (!base64) return;
-
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: mediaType });
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    link.click();
-    URL.revokeObjectURL(link.href);
-},
+        },
 
 
 
