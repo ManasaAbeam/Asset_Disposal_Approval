@@ -66,57 +66,6 @@ sap.ui.define([
             }.bind(this));
         },
 
-        // onAttachmentPress: function (oEvent) {
-        //  this.onGenericAttachmentPress(oEvent,"idtDisposalRequest");          
-        // },
-
-        //  onDownloadItem: function (oEvent) {
-        //     this.onGenericDownloadItem(oEvent);
-        // },
-
-        //connected to cap without generic nature
-        // onAttachmentSelected: function (oEvent) {
-        //     const oFileUploader = oEvent.getSource();
-        //     const file = oEvent.getParameter("files")[0];
-        //     if (!file) return;
-
-        //     const oCtx = oFileUploader.getBindingContext("listOfSelectedAssetsModel");
-        //     const rowPath = oCtx.getPath();               // "/assets/2"
-        //     const rowIndex = parseInt(rowPath.split("/").pop()); // 2
-
-        //     // Convert rowIndex → Reqno ("001", "002", "003"...)
-        //     const reqNo = (rowIndex + 1).toString().padStart(3, "0");
-
-        //     const reader = new FileReader();
-
-        //     reader.onload = (e) => {
-        //         const base64 = e.target.result.split(",")[1];
-
-        //         const oAttachment = {
-        //             file: base64,
-        //             Reqno: reqNo,                 
-        //             Reqitem: reqNo,                 
-        //             FileID: "",
-        //             Reqtype: "FAD",
-        //             fileName: file.name,
-        //             mediaType: file.type
-        //         };
-
-        //         const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        //         const aAssets = oModel.getProperty("/assets");
-
-        //         aAssets[rowIndex].Attachments.push(oAttachment);
-
-        //         oModel.setProperty("/assets", aAssets);
-
-        //         sap.m.MessageToast.show("Attachment uploaded successfully");
-
-        //         oFileUploader.clear();
-        //     };
-
-        //     reader.readAsDataURL(file);
-        // },
-
         onAttachmentSelected: function (oEvent) {
             this.uploadAttachmentGeneric(
                 oEvent,
@@ -125,33 +74,6 @@ sap.ui.define([
                 false                          // new upload → no existing FileID
             );
         },
-
-        //working fine with sharepoint
-        // onDownloadItem: function (oEvent) {
-        //     const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        //     const oAttachment = oCtx.getObject();
-
-        //     const base64 = oAttachment.file;
-        //     const fileName = oAttachment.fileName;
-        //     const mediaType = oAttachment.mediaType;
-
-        //     const byteCharacters = atob(base64);
-        //     const byteNumbers = new Array(byteCharacters.length);
-        //     for (let i = 0; i < byteCharacters.length; i++) {
-        //         byteNumbers[i] = byteCharacters.charCodeAt(i);
-        //     }
-
-        //     const byteArray = new Uint8Array(byteNumbers);
-        //     const blob = new Blob([byteArray], { type: mediaType });
-
-        //     const link = document.createElement("a");
-        //     link.href = URL.createObjectURL(blob);
-        //     link.download = fileName;
-
-        //     link.click();
-
-        //     URL.revokeObjectURL(link.href);
-        // },
 
         onDownloadItem: function (oEvent) {
             this.onGenericDownloadItem(oEvent);
@@ -180,12 +102,16 @@ sap.ui.define([
             } else {
                 oPercentageInput.setEditable(true);
             }
-        }
+        },
 
+    //old code related to abap attachment Destination    
+        // onAttachmentPress: function (oEvent) {
+        //  this.onGenericAttachmentPress(oEvent,"idtDisposalRequest");          
+        // },
 
-
-
-
+        //  onDownloadItem: function (oEvent) {
+        //     this.onGenericDownloadItem(oEvent);
+        // },
 
 
     });

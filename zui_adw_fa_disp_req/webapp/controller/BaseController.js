@@ -683,15 +683,35 @@ sap.ui.define([
                         continue;
                     }
 
+                    const att = oAttachment.Attachments[0];
+
+                    // Skip old attachments coming from Edit (no base64)
+                    if (!att.file) {
+                        console.log("⏭️ Existing file — no upload needed for:", att.Filename || att.fileName);
+                        continue;
+                    }
+
                     const oPayload = {
                         Reqno: sBtprn,
-                        Reqitem: oAttachment.Attachments[0].Reqitem,
-                        Reqtype: oAttachment.Attachments[0].Reqtype,
-                        FileID: oAttachment.Attachments[0].FileID,
-                        fileName: oAttachment.Attachments[0].fileName,
-                        mediaType: oAttachment.Attachments[0].mediaType,
-                        file: oAttachment.Attachments[0].file    // base64 content
+                        Reqitem: att.Reqitem,
+                        Reqtype: att.Reqtype,
+                        FileID:  att.fileID,
+                        fileName: att.fileName,
+                        mediaType: att.mediaType,
+                        file: att.file
                     };
+
+
+                    // const oPayload = {
+                    //     Reqno: sBtprn,
+                    //     Reqitem: oAttachment.Attachments[0].Reqitem,
+                    //     Reqtype: oAttachment.Attachments[0].Reqtype,
+                    //     // FileID: oAttachment.Attachments[0].FileID,
+                    //     FileID: oAttachment.Attachments?.[0]?.FileID || "",
+                    //     fileName: oAttachment.Attachments[0].fileName || oAttachment.Attachments[0].Filename,
+                    //     mediaType: oAttachment.Attachments[0].mediaType || oAttachment.Attachments[0].MimeType,
+                    //     file: oAttachment.Attachments[0].file    // base64 content
+                    // };
 
                     console.log("Uploading file:", oPayload.fileName);
 
@@ -743,8 +763,8 @@ sap.ui.define([
 
         uploadAttachmentGeneric: function (oEvent, sModelName, sArrayPath, bKeepExistingFileID) {
             const oFileUploader = oEvent.getSource();
-            const file = oEvent.getParameter("files")[0];
-            if (!file) return;
+            const oSelectedFile = oEvent.getParameter("files")[0];
+            if (!oSelectedFile) return;
 
             const oCtx = oFileUploader.getBindingContext(sModelName);
             const rowPath = oCtx.getPath();               // e.g. "/assets/2" or "/Items/3"
@@ -753,19 +773,21 @@ sap.ui.define([
             // Convert index → Reqno ("001")
             const reqNo = (rowIndex + 1).toString().padStart(3, "0");
 
-            const reader = new FileReader();
+            const oFileReader = new FileReader();
 
-            reader.onload = (e) => {
-                const base64 = e.target.result.split(",")[1];
+            oFileReader.onload = (oLoadEvent) => {
+                const base64 = oLoadEvent.target.result.split(",")[1];
 
                 const oModel = this.getView().getModel(sModelName);
                 const aData = oModel.getProperty(sArrayPath); // e.g. "/assets" or "/Items"
 
                 // Pick existing FileID if required
                 let existingFileID = "";
-                if (bKeepExistingFileID &&
+                if (
+                    bKeepExistingFileID &&
                     aData[rowIndex].Attachments &&
-                    aData[rowIndex].Attachments.length > 0) {
+                    aData[rowIndex].Attachments.length > 0
+                ) {
                     existingFileID = aData[rowIndex].Attachments[0].FileID || "";
                 }
 
@@ -775,24 +797,128 @@ sap.ui.define([
                     Reqno: reqNo,
                     Reqitem: reqNo,
                     Reqtype: "FAD",
-                    FileID: existingFileID,
-                    fileName: file.name,
-                    Filename: file.name,
-                    mediaType: file.type
+                    fileID: existingFileID,
+                    fileName: oSelectedFile.name,
+                    mediaType: oSelectedFile.type
                 };
 
                 // Always replace existing array (only 1 attachment allowed)
                 aData[rowIndex].Attachments = [oAttachment];
-
                 oModel.setProperty(sArrayPath, aData);
-
-                sap.m.MessageToast.show("Attachment uploaded successfully");
-
+                MessageToast.show("Attachment uploaded successfully");
                 oFileUploader.clear();
             };
 
-            reader.readAsDataURL(file);
+            oFileReader.readAsDataURL(oSelectedFile);
         },
+
+
+        // onGenericDownloadItem: function (oEvent) {
+
+        //     const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+        //     if (!oCtx) {
+        //         console.error("❌ No binding context found for download.");
+        //         return;
+        //     }
+
+        //     const oAttachment = oCtx.getObject();
+
+        //     // Normalize field names
+        //     // const fileName =
+        //     //     oAttachment.fileName?.trim() ||
+        //     //     oAttachment.Filename?.trim() ||
+        //     //     oAttachment.filename?.trim() ||
+        //     //     "attachment";
+
+        //     // const mediaType =
+        //     //     oAttachment.mediaType ||
+        //     //     oAttachment.Mediatype ||
+        //     //     "application/octet-stream";
+
+        //     const fileName = oAttachment.fileName;
+        //     const mediaType = oAttachment.mediaType;
+
+        //     // 1️⃣ SharePoint Download
+        //     if (oAttachment.fileID && oAttachment.url) {
+        //         window.open(oAttachment.Url, "_blank");
+        //         return;
+        //     }
+
+        //     // 2️⃣ Base64 Download
+        //     const base64 = oAttachment.file;
+
+        //     if (!base64) {
+        //         console.warn("⚠️ No file content found for base64 download.");
+        //         return;
+        //     }
+
+        //     const byteCharacters = atob(base64);
+        //     const byteNumbers = new Array(byteCharacters.length);
+        //     for (let i = 0; i < byteCharacters.length; i++) {
+        //         byteNumbers[i] = byteCharacters.charCodeAt(i);
+        //     }
+
+        //     const byteArray = new Uint8Array(byteNumbers);
+        //     const blob = new Blob([byteArray], { type: mediaType });
+
+        //     const link = document.createElement("a");
+        //     link.href = URL.createObjectURL(blob);
+        //     link.download = fileName;  // always valid now
+        //     link.click();
+        //     URL.revokeObjectURL(link.href);
+        // },
+
+
+        onGenericDownloadItem: async function (oEvent) {
+
+    const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
+    if (!oCtx) return;
+
+    const oAttachment = oCtx.getObject();
+    const fileName = oAttachment.fileName || "attachment";
+    const mediaType = oAttachment.mimeType || "application/octet-stream";
+
+    // 1️⃣ SharePoint Hosted File Download
+    if (oAttachment.fileID && oAttachment.url) {
+
+        try {
+            const response = await fetch(oAttachment.url);
+            const blob = await response.blob();
+
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;          // <-- Perfect filename!
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+        } catch (err) {
+            console.error("SharePoint file download failed:", err);
+        }
+
+        return;
+    }
+
+    // 2️⃣ Base64 Download
+    const base64 = oAttachment.file;
+    if (!base64) return;
+
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mediaType });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+},
+
 
 
         onGenericDeleteAttachment: function (oEvent) {
@@ -805,19 +931,19 @@ sap.ui.define([
             const sRowPath = sPath.split("/Attachments")[0];
 
             // 🔹 Track backend attachments for deletion later (on Save/Submit)
-            if (oData.Fileid) {
+            if (oData.fileID) {
                 if (!this._aDeletedAttachments) this._aDeletedAttachments = [];
                 this._aDeletedAttachments.push({
                     Reqno: oData.Reqno,
                     Reqtype: oData.Reqtype,
                     Reqitem: oData.Reqitem,
-                    FileID: oData.Fileid
+                    FileID: oData.fileID
                 });
             }
 
             // 🔹 Remove from frontend model
             const aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
-            const aUpdated = aAttachments.filter(att => att.Filename !== oData.Filename);
+            const aUpdated = aAttachments.filter(att => att.fileName !== oData.fileName);
 
             oModel.setProperty(sRowPath + "/Attachments", aUpdated);
 
@@ -873,7 +999,7 @@ sap.ui.define([
 
 
 
-
+        //this code is for abap attachment part
         // _saveRowAttachments: function (aTableData, sBtprn) {
         //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
 
@@ -1291,195 +1417,195 @@ sap.ui.define([
             return this.getOwnerComponent().getModel("i18n").getResourceBundle();
         },
 
-        /**  
-         * Handles file upload action for the selected asset row using backend service.  
-         * @param {sap.ui.base.Event} oEvent - The press event triggered by the attachment action.  
-         * @param {sap.m.Table} oTable - The table containing the asset rows.  
-         * @public  
-         */
-        onGenericAttachmentPress: function (oEvent, oTable) {
-            var oButton = oEvent.getSource();
-            var oTable = this.byId(oTable);
+        // /**  
+        //  * Handles file upload action for the selected asset row using backend service.  
+        //  * @param {sap.ui.base.Event} oEvent - The press event triggered by the attachment action.  
+        //  * @param {sap.m.Table} oTable - The table containing the asset rows.  
+        //  * @public  
+        //  */
+        // onGenericAttachmentPress: function (oEvent, oTable) {
+        //     var oButton = oEvent.getSource();
+        //     var oTable = this.byId(oTable);
 
-            if (!oTable) {
-                MessageBox.error("Table not found");
-                return;
-            }
-            var aItems = [];
-            if (oTable.getItems) {
-                aItems = oTable.getItems();
-            } else if (oTable.getRows) {
-                aItems = oTable.getRows();
-            } else if (oTable.getAggregation && oTable.getAggregation("items")) {
-                aItems = oTable.getAggregation("items");
-            } else {
-                console.log("Table type:", oTable.getMetadata().getName());
-                MessageBox.error("Unsupported table type");
-                return;
-            }
-            console.log("Found table items:", aItems.length);
+        //     if (!oTable) {
+        //         MessageBox.error("Table not found");
+        //         return;
+        //     }
+        //     var aItems = [];
+        //     if (oTable.getItems) {
+        //         aItems = oTable.getItems();
+        //     } else if (oTable.getRows) {
+        //         aItems = oTable.getRows();
+        //     } else if (oTable.getAggregation && oTable.getAggregation("items")) {
+        //         aItems = oTable.getAggregation("items");
+        //     } else {
+        //         console.log("Table type:", oTable.getMetadata().getName());
+        //         MessageBox.error("Unsupported table type");
+        //         return;
+        //     }
+        //     console.log("Found table items:", aItems.length);
 
-            var iRowIndex = -1;
-            for (var i = 0; i < aItems.length; i++) {
-                var oItem = aItems[i];
-                if (this._isButtonInRow(oButton, oItem)) {
-                    iRowIndex = i;
-                    break;
-                }
-            }
+        //     var iRowIndex = -1;
+        //     for (var i = 0; i < aItems.length; i++) {
+        //         var oItem = aItems[i];
+        //         if (this._isButtonInRow(oButton, oItem)) {
+        //             iRowIndex = i;
+        //             break;
+        //         }
+        //     }
 
-            if (iRowIndex === -1) {
-                console.error("Button not found in any row. Button parent hierarchy:");
-                this._logParentHierarchy(oButton);
-                MessageBox.error("Could not determine which row was clicked");
-                return;
-            }
-            var sReqitem = (iRowIndex + 1).toString().padStart(3, '0');
-            this._iCurrentRowIndex = iRowIndex;
-            this._sCurrentReqitem = sReqitem;
+        //     if (iRowIndex === -1) {
+        //         console.error("Button not found in any row. Button parent hierarchy:");
+        //         this._logParentHierarchy(oButton);
+        //         MessageBox.error("Could not determine which row was clicked");
+        //         return;
+        //     }
+        //     var sReqitem = (iRowIndex + 1).toString().padStart(3, '0');
+        //     this._iCurrentRowIndex = iRowIndex;
+        //     this._sCurrentReqitem = sReqitem;
 
-            console.log("Row clicked:", iRowIndex, "Reqitem:", sReqitem);
+        //     console.log("Row clicked:", iRowIndex, "Reqitem:", sReqitem);
 
-            var oFileInput = document.createElement("input");
-            oFileInput.type = "file";
-            oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
+        //     var oFileInput = document.createElement("input");
+        //     oFileInput.type = "file";
+        //     oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
 
-            oFileInput.onchange = async function (e) {
-                var oFile = e.target.files[0];
-                if (oFile) {
-                    //MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
-                    await this.onGenericUploadFileToBackend(oFile, iRowIndex);
-                    oEvent.getSource().setVisible(false);
-                }
-            }.bind(this);
+        //     oFileInput.onchange = async function (e) {
+        //         var oFile = e.target.files[0];
+        //         if (oFile) {
+        //             //MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
+        //             await this.onGenericUploadFileToBackend(oFile, iRowIndex);
+        //             oEvent.getSource().setVisible(false);
+        //         }
+        //     }.bind(this);
 
-            oFileInput.click();
+        //     oFileInput.click();
 
 
-        },
+        // },
 
-        // Helper function to debug parent hierarchy
-        _logParentHierarchy: function (oControl) {
-            var aHierarchy = [];
-            var oParent = oControl;
+        // // Helper function to debug parent hierarchy
+        // _logParentHierarchy: function (oControl) {
+        //     var aHierarchy = [];
+        //     var oParent = oControl;
 
-            while (oParent && aHierarchy.length < 10) {
-                aHierarchy.push(oParent.getMetadata().getName() + " (ID: " + (oParent.getId() || "none") + ")");
-                oParent = oParent.getParent();
-            }
+        //     while (oParent && aHierarchy.length < 10) {
+        //         aHierarchy.push(oParent.getMetadata().getName() + " (ID: " + (oParent.getId() || "none") + ")");
+        //         oParent = oParent.getParent();
+        //     }
 
-            console.log("Control hierarchy:", aHierarchy);
-        },
+        //     console.log("Control hierarchy:", aHierarchy);
+        // },
 
-        // Helper function to check if a button is within a specific table row
-        _isButtonInRow: function (oButton, oTableItem) {
-            var oParent = oButton.getParent();
-            while (oParent) {
-                if (oParent === oTableItem) {
-                    return true;
-                }
-                oParent = oParent.getParent();
-            }
+        // // Helper function to check if a button is within a specific table row
+        // _isButtonInRow: function (oButton, oTableItem) {
+        //     var oParent = oButton.getParent();
+        //     while (oParent) {
+        //         if (oParent === oTableItem) {
+        //             return true;
+        //         }
+        //         oParent = oParent.getParent();
+        //     }
 
-            return false;
-        },
+        //     return false;
+        // },
 
-        /**  
-         * Uploads files to the backend for the specified collection path.  
-         * @param {File} oFile - The file object to be uploaded.  
-         * @param {any} vRowRef - Reference to the related row/asset.  
-         * @param {string} sCollectionPath - Backend collection path (e.g., FileSet).  
-         * @public  
-         */
-        onGenericUploadFileToBackend: function (oFile, vRowRef, sCollectionPath) {
-            var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-            var oFormData = new FormData();
-            oFormData.append("fileData", oFile);
-            var sToken = oSrvModel.getSecurityToken();
-            var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
-            BusyIndicator.show();
+        // /**  
+        //  * Uploads files to the backend for the specified collection path.  
+        //  * @param {File} oFile - The file object to be uploaded.  
+        //  * @param {any} vRowRef - Reference to the related row/asset.  
+        //  * @param {string} sCollectionPath - Backend collection path (e.g., FileSet).  
+        //  * @public  
+        //  */
+        // onGenericUploadFileToBackend: function (oFile, vRowRef, sCollectionPath) {
+        //     var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+        //     var oFormData = new FormData();
+        //     oFormData.append("fileData", oFile);
+        //     var sToken = oSrvModel.getSecurityToken();
+        //     var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
+        //     BusyIndicator.show();
 
-            var xhr = new XMLHttpRequest();
+        //     var xhr = new XMLHttpRequest();
 
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    BusyIndicator.hide();
-                    if (xhr.status === 201 || xhr.status === 200) {
-                        try {
-                            var sResponse = xhr.responseText;
-                            var xml = jQuery.parseXML(sResponse);
-                            var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
-                            if (typeof vRowRef === "number") {
-                                this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, vRowRef);
-                            } else if (vRowRef && vRowRef.getPath) {
-                                var sRowPath = vRowRef.getPath();
-                                var oModel = vRowRef.getModel();
-                                var aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
+        //     xhr.onreadystatechange = function () {
+        //         if (xhr.readyState === 4) {
+        //             BusyIndicator.hide();
+        //             if (xhr.status === 201 || xhr.status === 200) {
+        //                 try {
+        //                     var sResponse = xhr.responseText;
+        //                     var xml = jQuery.parseXML(sResponse);
+        //                     var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
+        //                     if (typeof vRowRef === "number") {
+        //                         this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, vRowRef);
+        //                     } else if (vRowRef && vRowRef.getPath) {
+        //                         var sRowPath = vRowRef.getPath();
+        //                         var oModel = vRowRef.getModel();
+        //                         var aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
 
-                                aAttachments.push({
-                                    Fileid: sFileid,
-                                    Filename: oFile.name,
-                                    MimeType: oFile.type,
-                                    Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
-                                });
+        //                         aAttachments.push({
+        //                             Fileid: sFileid,
+        //                             Filename: oFile.name,
+        //                             MimeType: oFile.type,
+        //                             Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
+        //                         });
 
-                                oModel.setProperty(sRowPath + "/Attachments", aAttachments);
-                                console.log("Updated attachments for path:", sRowPath);
-                            }
+        //                         oModel.setProperty(sRowPath + "/Attachments", aAttachments);
+        //                         console.log("Updated attachments for path:", sRowPath);
+        //                     }
 
-                            MessageToast.show("File uploaded successfully!");
-                        } catch (e) {
-                            console.error("Error parsing upload response:", e);
-                            MessageToast.show("Upload completed but failed to parse response");
-                        }
-                    } else {
-                        console.error("Upload failed:", xhr.status, xhr.statusText);
-                        MessageBox.error("Upload failed: " + xhr.statusText);
-                    }
-                }
-            }.bind(this);
+        //                     MessageToast.show("File uploaded successfully!");
+        //                 } catch (e) {
+        //                     console.error("Error parsing upload response:", e);
+        //                     MessageToast.show("Upload completed but failed to parse response");
+        //                 }
+        //             } else {
+        //                 console.error("Upload failed:", xhr.status, xhr.statusText);
+        //                 MessageBox.error("Upload failed: " + xhr.statusText);
+        //             }
+        //         }
+        //     }.bind(this);
 
-            xhr.onerror = function () {
-                BusyIndicator.hide();
-                MessageBox.error("Upload failed due to network error");
-            };
+        //     xhr.onerror = function () {
+        //         BusyIndicator.hide();
+        //         MessageBox.error("Upload failed due to network error");
+        //     };
 
-            xhr.open("POST", sUploadUrl, true);
-            xhr.setRequestHeader("X-CSRF-Token", sToken);
-            xhr.setRequestHeader("slug", oFile.name);
-            xhr.send(oFormData);
-        },
+        //     xhr.open("POST", sUploadUrl, true);
+        //     xhr.setRequestHeader("X-CSRF-Token", sToken);
+        //     xhr.setRequestHeader("slug", oFile.name);
+        //     xhr.send(oFormData);
+        // },
 
-        /**  
-         * Updates files related to the selected asset in the FileSet entity.  
-         * @param {string} sFileid - Unique identifier of the file.  
-         * @param {string} sFileName - Name of the uploaded file.  
-         * @param {string} sMimeType - MIME type of the uploaded file.  
-         * @param {number} iRowIndex - Row index of the asset in the table.  
-         * @public  
-         */
-        onGenericUpdateAttachmentModel: function (sFileid, sFileName, sMimeType, iRowIndex) {
-            const oModel = this.getModel("listOfSelectedAssetsModel");
-            let aAssets = oModel.getProperty("/assets") || sCollectionPath;
+        // /**  
+        //  * Updates files related to the selected asset in the FileSet entity.  
+        //  * @param {string} sFileid - Unique identifier of the file.  
+        //  * @param {string} sFileName - Name of the uploaded file.  
+        //  * @param {string} sMimeType - MIME type of the uploaded file.  
+        //  * @param {number} iRowIndex - Row index of the asset in the table.  
+        //  * @public  
+        //  */
+        // onGenericUpdateAttachmentModel: function (sFileid, sFileName, sMimeType, iRowIndex) {
+        //     const oModel = this.getModel("listOfSelectedAssetsModel");
+        //     let aAssets = oModel.getProperty("/assets") || sCollectionPath;
 
-            if (!aAssets[iRowIndex]) {
-                console.error("Invalid row index for attachment update");
-                return;
-            }
-            const oAttachmentData = {
-                Fileid: sFileid,
-                Filename: sFileName,
-                MimeType: sMimeType,
-                Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
-            };
+        //     if (!aAssets[iRowIndex]) {
+        //         console.error("Invalid row index for attachment update");
+        //         return;
+        //     }
+        //     const oAttachmentData = {
+        //         Fileid: sFileid,
+        //         Filename: sFileName,
+        //         MimeType: sMimeType,
+        //         Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
+        //     };
 
-            if (!aAssets[iRowIndex].Attachments) {
-                aAssets[iRowIndex].Attachments = [];
-            }
-            aAssets[iRowIndex].Attachments.push(oAttachmentData);
-            oModel.setProperty("/assets", aAssets);
-            console.log("Updated asset with attachments:", aAssets[iRowIndex]);
-        },
+        //     if (!aAssets[iRowIndex].Attachments) {
+        //         aAssets[iRowIndex].Attachments = [];
+        //     }
+        //     aAssets[iRowIndex].Attachments.push(oAttachmentData);
+        //     oModel.setProperty("/assets", aAssets);
+        //     console.log("Updated asset with attachments:", aAssets[iRowIndex]);
+        // },
 
 
         /**
@@ -1547,59 +1673,6 @@ sap.ui.define([
         //             MessageBox.error("Failed to download file.");
         //         });
         // }
-
-
-        onGenericDownloadItem: function (oEvent) {
-
-            const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-            if (!oCtx) {
-                console.error("❌ No binding context found for download.");
-                return;
-            }
-
-            const oAttachment = oCtx.getObject();
-
-            // Normalize field names
-            const fileName =
-                oAttachment.fileName?.trim() ||
-                oAttachment.Filename?.trim() ||
-                oAttachment.filename?.trim() ||
-                "attachment";
-
-            const mediaType =
-                oAttachment.mediaType ||
-                oAttachment.Mediatype ||
-                "application/octet-stream";
-
-            // 1️⃣ SharePoint Download
-            if (oAttachment.Fileid && oAttachment.Url) {
-                window.open(oAttachment.Url, "_blank");
-                return;
-            }
-
-            // 2️⃣ Base64 Download
-            const base64 = oAttachment.file || oAttachment.File || oAttachment.Base64;
-
-            if (!base64) {
-                console.warn("⚠️ No file content found for base64 download.");
-                return;
-            }
-
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: mediaType });
-
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;  // always valid now
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
 
     });
 });

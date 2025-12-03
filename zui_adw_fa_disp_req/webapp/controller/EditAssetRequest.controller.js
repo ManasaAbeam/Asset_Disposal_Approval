@@ -62,14 +62,23 @@ sap.ui.define([
 
                 // 🔹 Map to your model structure (matching your view bindings)
                 const aAttachments = aFilteredAttachments.map(item => ({
-                    Fileid: item.fileID,          // Capital F to match your view
-                    Filename: item.fileName,      // Capital F to match your view
-                    MimeType: item.mimeType,
-                    Url: item.url,                // Capital U to match your view
+                    // Fileid: item.fileID,          // Capital F to match your view
+                    // Filename: item.fileName,      // Capital F to match your view
+                    // MimeType: item.mimeType,
+                    // Url: item.url,                // Capital U to match your view
+                    // Reqno: item.Reqno,
+                    // Reqitem: item.Reqitem,
+                    // Reqtype: item.Reqtype,
+                    // Linked: true                  // Flag to indicate it's from backend
+                
+                        fileID: item.fileID,          // Capital F to match your view
+                    fileName: item.fileName,      // Capital F to match your view
+                    mimeType: item.mimeType,
+                    url: item.url,                // Capital U to match your view
                     Reqno: item.Reqno,
                     Reqitem: item.Reqitem,
                     Reqtype: item.Reqtype,
-                    Linked: true                  // Flag to indicate it's from backend
+                    Linked: true    
                 }));
 
                 console.log(`✔ Loaded ${aAttachments.length} attachment(s) for item ${sReqitem}:`, aAttachments);
@@ -78,7 +87,10 @@ sap.ui.define([
                 const oModel = oRowContext.getModel();
                 oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
 
-               
+                // 🔹 Keep original copy for comparison (like your old code)
+                // oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
+                //     JSON.parse(JSON.stringify(aAttachments))
+                // );
 
                 // 🔹 Refresh the model to update the UI
                 oModel.refresh();
@@ -88,52 +100,6 @@ sap.ui.define([
             }
         },
         
-        // _loadAllAttachments: function () {
-        //     const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        //     const aItems = oModel.getProperty("/Items");
-        //     const sReqno = oModel.getProperty("/Header/RequestId"); // adapt to your RequestId
-        //     const sReqtype = "ADApproval"; // same as you save
-
-        //     aItems.forEach((oRow, index) => {
-        //         this._loadRowAttachments(sReqno, sReqtype, String(index + 1).padStart(3, "0"),
-        //             new sap.ui.model.Context(oModel, "/Items/" + index));
-        //     });
-        // },
-
-        // _loadRowAttachments: function (sReqno, sReqtype, sReqitem, oRowContext) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     const aFilters = [
-        //         new sap.ui.model.Filter("Reqno", "EQ", sReqno),
-        //         new sap.ui.model.Filter("Reqtype", "EQ", sReqtype),
-        //         new sap.ui.model.Filter("Reqitem", "EQ", sReqitem)
-        //     ];
-
-        //     oSrvModel.read("/AttachmentsList", {
-        //         filters: aFilters,
-        //         success: (oData) => {
-        //             const aAttachments = oData.results.map(item => ({
-        //                 Fileid: item.Fileid,
-        //                 Filename: item.Filename,
-        //                 MimeType: item.MimeType,
-        //                 Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
-        //                 Linked: true
-        //             }));
-
-        //             const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
-        //             oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-        //             oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
-        //                 JSON.parse(JSON.stringify(aAttachments))
-        //             );
-        //         },
-        //         error: (oError) => {
-        //             console.error("Error while loading attachments:", oError);
-        //         }
-        //     });
-        // },
-
-
-
         onEditSaveDraftPress: function () {
             try {
                 let oModel = this.getModel("listOfSelectedAssetsModel");
@@ -184,20 +150,6 @@ sap.ui.define([
             }.bind(this));
         },
 
-        // onAttachmentPress: function (oEvent) {
-        //     var oButton = oEvent.getSource();
-        //     var oFileInput = document.createElement("input");
-        //     oFileInput.type = "file";
-        //     oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
-
-        //     oFileInput.onchange = async function (e) {
-        //         var oFile = e.target.files[0];
-        //         if (oFile) {
-        //             await this.onGenericUploadFileToBackend(oFile, oButton.getBindingContext("listOfSelectedAssetsModel"), "/Items");
-        //         }
-        //     }.bind(this);
-        //     oFileInput.click();
-        // },
 
         onAttachmentSelected: function (oEvent) {
             this.uploadAttachmentGeneric(
@@ -213,18 +165,6 @@ sap.ui.define([
         onDownloadItem: function (oEvent) {
             this.onGenericDownloadItem(oEvent);
         },
-
-        // onDownloadItem: function (oEvent) {
-        //     const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        //     const sUrl = oContext.getProperty("Url");
-        //     const sFilename = oContext.getProperty("Filename");
-
-        //     console.log("📥 Downloading file:", sFilename);
-        //     console.log("🔗 Download URL:", sUrl);
-
-        //     // Open the SharePoint download URL - file will auto-download
-        //     window.open(sUrl, '_blank');
-        // },
 
         onDeleteAttachment: function (oEvent) {
             this.onGenericDeleteAttachment(oEvent)
@@ -252,7 +192,69 @@ sap.ui.define([
             } else {
                 oPercentageInput.setEditable(true);
             }
-        }
+        },
+
+//old code which is working fine with abap file upload
+          // _loadAllAttachments: function () {
+        //     const oModel = this.getView().getModel("listOfSelectedAssetsModel");
+        //     const aItems = oModel.getProperty("/Items");
+        //     const sReqno = oModel.getProperty("/Header/RequestId"); // adapt to your RequestId
+        //     const sReqtype = "ADApproval"; // same as you save
+
+        //     aItems.forEach((oRow, index) => {
+        //         this._loadRowAttachments(sReqno, sReqtype, String(index + 1).padStart(3, "0"),
+        //             new sap.ui.model.Context(oModel, "/Items/" + index));
+        //     });
+        // },
+
+        // _loadRowAttachments: function (sReqno, sReqtype, sReqitem, oRowContext) {
+        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
+
+        //     const aFilters = [
+        //         new sap.ui.model.Filter("Reqno", "EQ", sReqno),
+        //         new sap.ui.model.Filter("Reqtype", "EQ", sReqtype),
+        //         new sap.ui.model.Filter("Reqitem", "EQ", sReqitem)
+        //     ];
+
+        //     oSrvModel.read("/AttachmentsList", {
+        //         filters: aFilters,
+        //         success: (oData) => {
+        //             const aAttachments = oData.results.map(item => ({
+        //                 Fileid: item.Fileid,
+        //                 Filename: item.Filename,
+        //                 MimeType: item.MimeType,
+        //                 Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
+        //                 Linked: true
+        //             }));
+
+        //             const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
+        //             oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
+        //             oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
+        //                 JSON.parse(JSON.stringify(aAttachments))
+        //             );
+        //         },
+        //         error: (oError) => {
+        //             console.error("Error while loading attachments:", oError);
+        //         }
+        //     });
+        // },
+
+
+          // onAttachmentPress: function (oEvent) {
+        //     var oButton = oEvent.getSource();
+        //     var oFileInput = document.createElement("input");
+        //     oFileInput.type = "file";
+        //     oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
+
+        //     oFileInput.onchange = async function (e) {
+        //         var oFile = e.target.files[0];
+        //         if (oFile) {
+        //             await this.onGenericUploadFileToBackend(oFile, oButton.getBindingContext("listOfSelectedAssetsModel"), "/Items");
+        //         }
+        //     }.bind(this);
+        //     oFileInput.click();
+        // },
+
 
     });
 });
