@@ -14,7 +14,6 @@ sap.ui.define([
 
         _onRouteFixedAssetsDisposalMatched: function () {
             BusyIndicator.hide();
-
         },
 
         onSaveDraftPress: function () {
@@ -38,6 +37,7 @@ sap.ui.define([
                 MessageBox.error(this.getResourceBundle().getText("errorSavingDraft"));
             }
         },
+
         onSubmitPress: function () {
             try {
                 let oModel = this.getModel("listOfSelectedAssetsModel");
@@ -66,8 +66,8 @@ sap.ui.define([
             }.bind(this));
         },
 
-        onAttachmentSelected: function (oEvent) {
-            this.uploadAttachmentGeneric(
+        onAttachmentSelected: async function (oEvent) {
+           await this.uploadAttachmentGeneric(
                 oEvent,
                 "listOfSelectedAssetsModel",   // model name
                 "/assets",                     // array path
@@ -75,12 +75,12 @@ sap.ui.define([
             );
         },
 
-        onDownloadItem: function (oEvent) {
-            this.onGenericDownloadItem(oEvent);
+        onDownloadItem: async function (oEvent) {
+           await this.onGenericDownloadItem(oEvent);
         },
 
-        onDeleteAttachment: function (oEvent) {
-            this.onGenericDeleteAttachment(oEvent)
+        onDeleteAttachment: async function (oEvent) {
+            await this.onGenericDeleteAttachment(oEvent)
         },
 
         onDisposalPercentageChange: function (oEvent) {
@@ -93,6 +93,7 @@ sap.ui.define([
                 oPercentageInput.setEditable(true);
             }
         },
+
         onDisposaValueChange: function (oEvent) {
             let oInputValue = oEvent.getSource();
             let sValue = oInputValue.getValue();
@@ -102,17 +103,7 @@ sap.ui.define([
             } else {
                 oPercentageInput.setEditable(true);
             }
-        },
-
-    //old code related to abap attachment Destination    
-        // onAttachmentPress: function (oEvent) {
-        //  this.onGenericAttachmentPress(oEvent,"idtDisposalRequest");          
-        // },
-
-        //  onDownloadItem: function (oEvent) {
-        //     this.onGenericDownloadItem(oEvent);
-        // },
-
+        }
 
     });
 });

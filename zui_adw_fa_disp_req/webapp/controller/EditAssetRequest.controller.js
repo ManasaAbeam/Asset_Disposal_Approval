@@ -12,16 +12,16 @@ sap.ui.define([
             this.getRouter().getRoute("RouteEditAssetRequest").attachPatternMatched(this._onRouteRouteEditAssetRequestMatched, this);
         },
 
-        _onRouteRouteEditAssetRequestMatched: function () {
+        _onRouteRouteEditAssetRequestMatched: async function () {
             BusyIndicator.hide();
-            this._loadAllAttachments();
+            await this._loadAllAttachments();
         },
 
-        _loadAllAttachments: function () {
+        _loadAllAttachments:  function () {
             const oModel = this.getView().getModel("listOfSelectedAssetsModel");
             const aItems = oModel.getProperty("/Items") || [];
-            const sReqno = oModel.getProperty("/Header/RequestId"); // Your RequestId
-            const sReqtype = "FAD"; // Change to your actual Reqtype
+            const sReqno = oModel.getProperty("/Header/RequestId");
+            const sReqtype = "FAD";
 
             if (!sReqno || !sReqtype) {
                 console.warn("⚠️ Missing Reqno or Reqtype");
@@ -30,76 +30,49 @@ sap.ui.define([
 
             console.log(`📥 Loading attachments for Request: ${sReqno}, Type: ${sReqtype}`);
 
-            // Load attachments for each item row
-            aItems.forEach((oRow, index) => {
+          aItems.forEach( async (oRow, index) => {
                 const sReqitem = String(index + 1).padStart(3, "0"); // "001", "002", "003"
                 const oRowContext = new sap.ui.model.Context(oModel, "/Items/" + index);
 
-                this._loadRowAttachments(sReqno, sReqtype, sReqitem, oRowContext);
+                 await this._loadRowAttachments(sReqno, sReqtype, sReqitem, oRowContext);
             });
         },
 
         _loadRowAttachments: async function (sReqno, sReqtype, sReqitem, oRowContext) {
             try {
-                const oBackendModel = this.getModel("attachment"); // Your attachment model
-
-                // 🔹 Construct the path for DownloadFiles function
+                const oBackendModel = this.getModel("attachment");
                 const sPath = `/DownloadFiles(Reqno='${sReqno}',Reqtype='${sReqtype}')`;
 
-                console.log(`📥 Loading attachments for Reqitem: ${sReqitem}, Path: ${sPath}`);
+                console.log(`Loading attachments for Reqitem: ${sReqitem}, Path: ${sPath}`);
 
-                // 🔹 Call the backend using bindContext and requestObject
                 const oBinding = oBackendModel.bindContext(sPath);
                 const oContext = await oBinding.requestObject();
 
-                console.log("✔ Backend Response:", oContext);
+                console.log("Backend Response:", oContext);
 
-                // 🔹 Extract all attachments from response
                 const aAllAttachments = oContext?.value || [];
-
-                // 🔹 Filter attachments for this specific Reqitem
                 const aFilteredAttachments = aAllAttachments.filter(item => item.Reqitem === sReqitem);
-
-                // 🔹 Map to your model structure (matching your view bindings)
                 const aAttachments = aFilteredAttachments.map(item => ({
-                    // Fileid: item.fileID,          // Capital F to match your view
-                    // Filename: item.fileName,      // Capital F to match your view
-                    // MimeType: item.mimeType,
-                    // Url: item.url,                // Capital U to match your view
-                    // Reqno: item.Reqno,
-                    // Reqitem: item.Reqitem,
-                    // Reqtype: item.Reqtype,
-                    // Linked: true                  // Flag to indicate it's from backend
-                
-                        fileID: item.fileID,          // Capital F to match your view
-                    fileName: item.fileName,      // Capital F to match your view
+                    fileID: item.fileID,
+                    fileName: item.fileName,
                     mimeType: item.mimeType,
-                    url: item.url,                // Capital U to match your view
+                    url: item.url,
                     Reqno: item.Reqno,
                     Reqitem: item.Reqitem,
                     Reqtype: item.Reqtype,
-                    Linked: true    
+                    Linked: true
                 }));
 
-                console.log(`✔ Loaded ${aAttachments.length} attachment(s) for item ${sReqitem}:`, aAttachments);
-
-                // 🔹 Set attachments in the model (same as your old code)
+                console.log(`Loaded ${aAttachments.length} attachment(s) for item ${sReqitem}:`, aAttachments);
                 const oModel = oRowContext.getModel();
                 oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-
-                // 🔹 Keep original copy for comparison (like your old code)
-                // oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
-                //     JSON.parse(JSON.stringify(aAttachments))
-                // );
-
-                // 🔹 Refresh the model to update the UI
                 oModel.refresh();
 
             } catch (oError) {
-                console.error(`❌ Error loading attachments for Reqitem ${sReqitem}:`, oError);
+                console.error(`Error loading attachments for Reqitem ${sReqitem}:`, oError);
             }
         },
-        
+
         onEditSaveDraftPress: function () {
             try {
                 let oModel = this.getModel("listOfSelectedAssetsModel");
@@ -151,8 +124,8 @@ sap.ui.define([
         },
 
 
-        onAttachmentSelected: function (oEvent) {
-            this.uploadAttachmentGeneric(
+        onAttachmentSelected: async function (oEvent) {
+           await this.uploadAttachmentGeneric(
                 oEvent,
                 "listOfSelectedAssetsModel",   // model
                 "/Items",                      // array path
@@ -162,8 +135,8 @@ sap.ui.define([
 
 
 
-        onDownloadItem: function (oEvent) {
-            this.onGenericDownloadItem(oEvent);
+        onDownloadItem: async function (oEvent) {
+           await this.onGenericDownloadItem(oEvent);
         },
 
         onDeleteAttachment: function (oEvent) {
@@ -192,69 +165,7 @@ sap.ui.define([
             } else {
                 oPercentageInput.setEditable(true);
             }
-        },
-
-//old code which is working fine with abap file upload
-          // _loadAllAttachments: function () {
-        //     const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        //     const aItems = oModel.getProperty("/Items");
-        //     const sReqno = oModel.getProperty("/Header/RequestId"); // adapt to your RequestId
-        //     const sReqtype = "ADApproval"; // same as you save
-
-        //     aItems.forEach((oRow, index) => {
-        //         this._loadRowAttachments(sReqno, sReqtype, String(index + 1).padStart(3, "0"),
-        //             new sap.ui.model.Context(oModel, "/Items/" + index));
-        //     });
-        // },
-
-        // _loadRowAttachments: function (sReqno, sReqtype, sReqitem, oRowContext) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     const aFilters = [
-        //         new sap.ui.model.Filter("Reqno", "EQ", sReqno),
-        //         new sap.ui.model.Filter("Reqtype", "EQ", sReqtype),
-        //         new sap.ui.model.Filter("Reqitem", "EQ", sReqitem)
-        //     ];
-
-        //     oSrvModel.read("/AttachmentsList", {
-        //         filters: aFilters,
-        //         success: (oData) => {
-        //             const aAttachments = oData.results.map(item => ({
-        //                 Fileid: item.Fileid,
-        //                 Filename: item.Filename,
-        //                 MimeType: item.MimeType,
-        //                 Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${item.Fileid}')/$value`,
-        //                 Linked: true
-        //             }));
-
-        //             const oModel = oRowContext.getModel("listOfSelectedAssetsModel");
-        //             oModel.setProperty(oRowContext.getPath() + "/Attachments", aAttachments);
-        //             oModel.setProperty(oRowContext.getPath() + "/_OriginalAttachments",
-        //                 JSON.parse(JSON.stringify(aAttachments))
-        //             );
-        //         },
-        //         error: (oError) => {
-        //             console.error("Error while loading attachments:", oError);
-        //         }
-        //     });
-        // },
-
-
-          // onAttachmentPress: function (oEvent) {
-        //     var oButton = oEvent.getSource();
-        //     var oFileInput = document.createElement("input");
-        //     oFileInput.type = "file";
-        //     oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
-
-        //     oFileInput.onchange = async function (e) {
-        //         var oFile = e.target.files[0];
-        //         if (oFile) {
-        //             await this.onGenericUploadFileToBackend(oFile, oButton.getBindingContext("listOfSelectedAssetsModel"), "/Items");
-        //         }
-        //     }.bind(this);
-        //     oFileInput.click();
-        // },
-
+        }
 
     });
 });

@@ -176,30 +176,10 @@
 						</template>
 					</Column>
 
-
-
-					<!-- <Column width="18rem">
-						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
-						<template>
-							<m:HBox justifyContent="SpaceBetween" alignItems="Center">
-								<m:List items="{listOfSelectedAssetsModel>Attachments}">
-									<m:CustomListItem>
-										<m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
-											<m:Link text="{= ${listOfSelectedAssetsModel>Filename}.length > 20 ? ${listOfSelectedAssetsModel>Filename}.substring(0, 20) + '...' : ${listOfSelectedAssetsModel>Filename}}" wrapping="true" press=".onDownloadItem" />
-											<m:Button class="sapUiMediumMarginBegin" icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" tooltip="{i18n>tooltipDeleteAttachment}" />
-										</m:HBox>
-									</m:CustomListItem>
-								</m:List>
-								<m:Button icon="sap-icon://upload" type="Transparent" press=".onAttachmentPress" tooltip="{i18n>tooltipUploadAttachment}" visible="{= ${listOfSelectedAssetsModel>Attachments}.length === 0}" />
-							</m:HBox>
-						</template>
-					</Column> -->
-
-
 					<Column width="18rem">
 						<m:Label text="{i18n>lblProofOfDisposalAttachment}" />
 						<template>
-							<m:HBox justifyContent="SpaceBetween" alignItems="Center">								<!-- Existing attachments list -->
+							<m:HBox justifyContent="SpaceBetween" alignItems="Center">
 								<m:List items="{listOfSelectedAssetsModel>Attachments}">
 									<m:CustomListItem>
 										<m:HBox justifyContent="SpaceBetween" alignItems="Center" width="17rem">
@@ -207,15 +187,11 @@
 											<m:Button icon="sap-icon://delete" type="Reject" press=".onDeleteAttachment" />
 										</m:HBox>
 									</m:CustomListItem>
-								</m:List>								<!-- DIRECT FILE UPLOADER -->
+								</m:List>
 								<unified:FileUploader id="fileUploader" uploadOnChange="false" sameFilenameAllowed="true" multiple="false" change=".onAttachmentSelected" buttonOnly="true" icon="sap-icon://upload" tooltip="{i18n>tooltipUploadAttachment}" />
 							</m:HBox>
 						</template>
 					</Column>
-
-
-
-
 				</columns>
 			</Table>
 		</m:content>
@@ -226,7 +202,6 @@
 					<m:Button text="{i18n>btnSubmit}" type="Accept" press=".onSubmitPress" />
 					<m:Button text="{i18n>btnCancel}" type="Reject" press=".onCancelPress" />
 				</m:contentRight>
-
 			</m:Bar>
 		</m:footer>
 	</m:Page>

@@ -633,7 +633,6 @@ sap.ui.define([
                             await that._saveRowAttachments(aTableData, oData.Btprn);
                         }
 
-
                     } catch (error) {
                         console.error("Error in success handler:", error);
                         BusyIndicator.hide();
@@ -654,14 +653,13 @@ sap.ui.define([
 
             try {
                 await this.deleteRowAttachments(this._aDeletedAttachments);
-                console.log("✔ Deleted from backend:", this._aDeletedAttachments);
+                console.log(" Deleted from backend:", this._aDeletedAttachments);
 
-                // Clear after successful delete
                 this._aDeletedAttachments = [];
 
             } catch (e) {
-                console.error("❌ Backend delete failed:", e);
-                MessageToast.show("Failed to delete removed attachments");
+                console.error("Backend delete failed:", e);
+                // MessageToast.show("Failed to delete removed attachments");
             }
         },
 
@@ -669,7 +667,7 @@ sap.ui.define([
             const oBackendModel = this.getModel("attachment");
 
             if (!aTableData || aTableData.length === 0) {
-                console.log("🚫 No attachments found.");
+                console.log("No attachments found.");
                 return;
             }
 
@@ -679,15 +677,14 @@ sap.ui.define([
                 for (let oAttachment of aTableData) {
 
                     if (!oAttachment.Attachments || oAttachment.Attachments.length === 0) {
-                        console.log("⏭️ Skipped row — No attachments for Reqitem:", oAttachment.Reqitem);
+                        console.log("Skipped row — No attachments for Reqitem:", oAttachment.Reqitem);
                         continue;
                     }
 
                     const att = oAttachment.Attachments[0];
 
-                    // Skip old attachments coming from Edit (no base64)
                     if (!att.file) {
-                        console.log("⏭️ Existing file — no upload needed for:", att.Filename || att.fileName);
+                        console.log("Existing file — no upload needed for:", att.Filename || att.fileName);
                         continue;
                     }
 
@@ -701,24 +698,10 @@ sap.ui.define([
                         file: att.file
                     };
 
-
-                    // const oPayload = {
-                    //     Reqno: sBtprn,
-                    //     Reqitem: oAttachment.Attachments[0].Reqitem,
-                    //     Reqtype: oAttachment.Attachments[0].Reqtype,
-                    //     // FileID: oAttachment.Attachments[0].FileID,
-                    //     FileID: oAttachment.Attachments?.[0]?.FileID || "",
-                    //     fileName: oAttachment.Attachments[0].fileName || oAttachment.Attachments[0].Filename,
-                    //     mediaType: oAttachment.Attachments[0].mediaType || oAttachment.Attachments[0].MimeType,
-                    //     file: oAttachment.Attachments[0].file    // base64 content
-                    // };
-
                     console.log("Uploading file:", oPayload.fileName);
 
-                    // 🔹 Create binding for the action/function
                     const oBinding = oBackendModel.bindContext("/uploadFileToSharePoint(...)");
 
-                    // 🔹 Set parameters
                     oBinding.setParameter("Reqno", oPayload.Reqno);
                     oBinding.setParameter("Reqitem", oPayload.Reqitem);
                     oBinding.setParameter("Reqtype", oPayload.Reqtype);
@@ -727,16 +710,13 @@ sap.ui.define([
                     oBinding.setParameter("mediaType", oPayload.mediaType);
                     oBinding.setParameter("file", oPayload.file);
 
-                    // 🔹 Execute and get response
                     await oBinding.execute();
                     const oContext = await oBinding.getBoundContext().requestObject();
 
-                    console.log("✔ Backend Response:", oContext);
+                    console.log("Backend Response:", oContext);
 
-                    // 🔹 Extract the response data
                     const aResponseData = oContext?.value || [];
 
-                    // Process each response
                     aResponseData.forEach(oResponse => {
                         console.log("✔ File uploaded successfully:", {
                             FileID: oResponse.FileID,
@@ -749,14 +729,13 @@ sap.ui.define([
                     });
                 }
 
-                console.log("✔ All uploads completed:", aResults);
-                MessageToast.show(`${aResults.length} attachment(s) uploaded successfully!`);
-
+                console.log("All uploads completed:", aResults);
+                // MessageToast.show(`${aResults.length} attachment(s) uploaded successfully!`);
                 return aResults;
 
             } catch (err) {
-                console.error("❌ Upload failed:", err);
-                MessageToast.show("Attachment upload failed!");
+                console.error("Upload failed:", err);
+                // MessageToast.show("Attachment upload failed!");
                 throw err;
             }
         },
@@ -767,7 +746,7 @@ sap.ui.define([
             if (!oSelectedFile) return;
 
             const oCtx = oFileUploader.getBindingContext(sModelName);
-            const rowPath = oCtx.getPath();               // e.g. "/assets/2" or "/Items/3"
+            const rowPath = oCtx.getPath();
             const rowIndex = parseInt(rowPath.split("/").pop());
 
             // Convert index → Reqno ("001")
@@ -779,9 +758,8 @@ sap.ui.define([
                 const base64 = oLoadEvent.target.result.split(",")[1];
 
                 const oModel = this.getView().getModel(sModelName);
-                const aData = oModel.getProperty(sArrayPath); // e.g. "/assets" or "/Items"
+                const aData = oModel.getProperty(sArrayPath);
 
-                // Pick existing FileID if required
                 let existingFileID = "";
                 if (
                     bKeepExistingFileID &&
@@ -791,7 +769,6 @@ sap.ui.define([
                     existingFileID = aData[rowIndex].Attachments[0].FileID || "";
                 }
 
-                // Generic attachment structure
                 const oAttachment = {
                     file: base64,
                     Reqno: reqNo,
@@ -802,72 +779,14 @@ sap.ui.define([
                     mediaType: oSelectedFile.type
                 };
 
-                // Always replace existing array (only 1 attachment allowed)
                 aData[rowIndex].Attachments = [oAttachment];
                 oModel.setProperty(sArrayPath, aData);
-                MessageToast.show("Attachment uploaded successfully");
+                //MessageToast.show("Attachment uploaded successfully");
                 oFileUploader.clear();
             };
 
             oFileReader.readAsDataURL(oSelectedFile);
         },
-
-
-        // onGenericDownloadItem: function (oEvent) {
-
-        //     const oCtx = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        //     if (!oCtx) {
-        //         console.error("❌ No binding context found for download.");
-        //         return;
-        //     }
-
-        //     const oAttachment = oCtx.getObject();
-
-        //     // Normalize field names
-        //     // const fileName =
-        //     //     oAttachment.fileName?.trim() ||
-        //     //     oAttachment.Filename?.trim() ||
-        //     //     oAttachment.filename?.trim() ||
-        //     //     "attachment";
-
-        //     // const mediaType =
-        //     //     oAttachment.mediaType ||
-        //     //     oAttachment.Mediatype ||
-        //     //     "application/octet-stream";
-
-        //     const fileName = oAttachment.fileName;
-        //     const mediaType = oAttachment.mediaType;
-
-        //     // 1️⃣ SharePoint Download
-        //     if (oAttachment.fileID && oAttachment.url) {
-        //         window.open(oAttachment.Url, "_blank");
-        //         return;
-        //     }
-
-        //     // 2️⃣ Base64 Download
-        //     const base64 = oAttachment.file;
-
-        //     if (!base64) {
-        //         console.warn("⚠️ No file content found for base64 download.");
-        //         return;
-        //     }
-
-        //     const byteCharacters = atob(base64);
-        //     const byteNumbers = new Array(byteCharacters.length);
-        //     for (let i = 0; i < byteCharacters.length; i++) {
-        //         byteNumbers[i] = byteCharacters.charCodeAt(i);
-        //     }
-
-        //     const byteArray = new Uint8Array(byteNumbers);
-        //     const blob = new Blob([byteArray], { type: mediaType });
-
-        //     const link = document.createElement("a");
-        //     link.href = URL.createObjectURL(blob);
-        //     link.download = fileName;  // always valid now
-        //     link.click();
-        //     URL.revokeObjectURL(link.href);
-        // },
-
 
         onGenericDownloadItem: async function (oEvent) {
 
@@ -878,7 +797,6 @@ sap.ui.define([
             const fileName = oAttachment.fileName || "attachment";
             const mediaType = oAttachment.mimeType || "application/octet-stream";
 
-            // 1️⃣ SharePoint Hosted File Download
             if (oAttachment.fileID && oAttachment.url) {
 
                 try {
@@ -887,7 +805,7 @@ sap.ui.define([
 
                     const link = document.createElement("a");
                     link.href = URL.createObjectURL(blob);
-                    link.download = fileName;          // <-- Perfect filename!
+                    link.download = fileName;
                     link.click();
                     URL.revokeObjectURL(link.href);
 
@@ -898,7 +816,6 @@ sap.ui.define([
                 return;
             }
 
-            // 2️⃣ Base64 Download
             const base64 = oAttachment.file;
             if (!base64) return;
 
@@ -930,7 +847,6 @@ sap.ui.define([
             const sPath = oCtx.getPath();
             const sRowPath = sPath.split("/Attachments")[0];
 
-            // 🔹 Track backend attachments for deletion later (on Save/Submit)
             if (oData.fileID) {
                 if (!this._aDeletedAttachments) this._aDeletedAttachments = [];
                 this._aDeletedAttachments.push({
@@ -941,13 +857,12 @@ sap.ui.define([
                 });
             }
 
-            // 🔹 Remove from frontend model
             const aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
             const aUpdated = aAttachments.filter(att => att.fileName !== oData.fileName);
 
             oModel.setProperty(sRowPath + "/Attachments", aUpdated);
 
-            MessageToast.show("Attachment removed");
+            //  MessageToast.show("Attachment removed");
         },
 
 
@@ -955,14 +870,13 @@ sap.ui.define([
 
             const oBackendModel = this.getModel("attachment");
 
-            // Nothing to delete
             if (!aDeletedAttachments || aDeletedAttachments.length === 0) {
-                console.log("🚫 No deleted items received.");
+                console.log("No deleted items received.");
                 return;
             }
 
             try {
-                // FORM FINAL PAYLOAD EXACTLY LIKE BACKEND EXPECTS
+
                 const aPayloadList = aDeletedAttachments.map(oAtt => ({
                     Reqno: oAtt.Reqno,
                     Reqtype: oAtt.Reqtype,
@@ -972,113 +886,27 @@ sap.ui.define([
 
                 const oFinalPayload = { data: aPayloadList };
 
-                console.log("📤 FINAL DELETE PAYLOAD:", oFinalPayload);
+                console.log("FINAL DELETE PAYLOAD:", oFinalPayload);
 
-                // Bind action
                 const oDeleteBinding = oBackendModel.bindContext("/deleteAttachmentsFromSharePoint(...)");
 
-                // Set parameter "data"
                 oDeleteBinding.setParameter("data", oFinalPayload.data);
 
-                // Fire action
                 await oDeleteBinding.execute();
 
                 const oResponse = await oDeleteBinding.getBoundContext().requestObject();
-                console.log("✔ DELETE RESPONSE:", oResponse);
-
-                MessageToast.show("Attachment deleted from SharePoint");
+                console.log(" DELETE RESPONSE:", oResponse);
+                //     MessageToast.show("Attachment deleted from SharePoint");
 
                 return oResponse;
 
             } catch (err) {
-                console.error("❌ Delete failed:", err);
-                MessageToast.show("Failed to delete attachment");
+                console.error("Delete failed:", err);
+                // MessageToast.show("Failed to delete attachment");
                 throw err;
             }
         },
 
-
-
-        //this code is for abap attachment part
-        // _saveRowAttachments: function (aTableData, sBtprn) {
-        //     const oSrvModel = this.getView().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-
-        //     let aAllAttachmentsPayload = [];
-        //     let aFilesToDelete = [];
-
-        //     aTableData.forEach((oRow, iIndex) => {
-        //         const aCurrent = oRow.Attachments || [];
-        //         const aOriginal = oRow._OriginalAttachments || [];
-
-        //         const aDeletedFiles = aOriginal.filter(orig =>
-        //             !aCurrent.find(att => att.Fileid === orig.Fileid)
-        //         );
-        //         aFilesToDelete = aFilesToDelete.concat(aDeletedFiles);
-
-        //         const aNewFiles = aCurrent.filter(att => !att.Linked);
-        //         if (aNewFiles.length) {
-        //             const aRowAttachments = aNewFiles.map(att => ({
-        //                 Fileid: att.Fileid,
-        //                 Reqno: sBtprn,
-        //                 Reqtype: "ADApproval",
-        //                 Reqitem: String(iIndex + 1).padStart(3, "0")
-        //             }));
-        //             aAllAttachmentsPayload = aAllAttachmentsPayload.concat(aRowAttachments);
-        //         }
-        //     });
-
-        //     const deleteFilesSequentially = async () => {
-        //         for (let i = 0; i < aFilesToDelete.length; i++) {
-        //             const file = aFilesToDelete[i];
-        //             console.log(` Deleting file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-
-        //             try {
-        //                 await new Promise((resolve, reject) => {
-        //                     oSrvModel.remove(`/AttachmentsList('${file.Fileid}')`, {
-        //                         success: () => {
-        //                             console.log(`Deleted file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`);
-        //                             resolve();
-        //                         },
-        //                         error: (err) => {
-        //                             console.error(` Delete failed for file ${i + 1}/${aFilesToDelete.length}: ${file.Fileid}`, err);
-        //                             resolve();
-        //                         }
-        //                     });
-        //                 });
-        //                 await new Promise(resolve => setTimeout(resolve, 100));
-        //             } catch (error) {
-        //                 console.error(` Unexpected error deleting file: ${file.Fileid}`, error);
-        //             }
-        //         }
-
-        //         this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-        //     };
-
-        //     if (aFilesToDelete.length > 0) {
-        //         console.log(`🔄 Starting sequential deletion of ${aFilesToDelete.length} files`);
-        //         deleteFilesSequentially();
-        //     } else {
-        //         this._linkNewAttachments(aAllAttachmentsPayload, oSrvModel);
-        //     }
-        // },
-
-        // // Helper function to link new attachments
-        // _linkNewAttachments: function (aAllAttachmentsPayload, oSrvModel) {
-        //     if (aAllAttachmentsPayload.length) {
-        //         console.log(`🔗 Linking ${aAllAttachmentsPayload.length} new files`);
-        //         const oPayload = { Comments: "", Attachments: aAllAttachmentsPayload };
-        //         oSrvModel.create("/LinkFiles", oPayload, {
-        //             success: () => {
-        //                 console.log("✅ Successfully linked all new files");
-        //             },
-        //             error: (err) => {
-        //                 console.error("❌ Linking failed", err);
-        //             }
-        //         });
-        //     } else {
-        //         console.log("ℹ️ No new files to link");
-        //     }
-        // },
         triggerWorkflowAfterSave: async function (oSaveData, sAction, oBundle, aTableData) {
             let that = this;
 
@@ -1167,36 +995,6 @@ sap.ui.define([
             }
         },
 
-        //retriving approvers from G-table insted DOA Working fine 
-        // getApproverDetails: async function () {
-        //     try {
-        //         const oModel = this.getModel();
-        //         const oBindList = oModel.bindList("/AssetApprovers")
-        //         const aContexts = await oBindList.requestContexts();
-        //         console.log("AssetApprovers contexts fetched:", aContexts);
-        //         const approverData = aContexts.map(oContext => oContext.getObject());
-        //         console.log("AssetApprovers data:", approverData);
-        //         const approverGroups = {};
-        //         approverData.forEach(approver => {
-        //             if (!approverGroups[approver.Aprgrp]) {
-        //                 approverGroups[approver.Aprgrp] = [];
-        //             }
-        //             approverGroups[approver.Aprgrp].push(approver.Btpuser);
-        //         });
-        //         const processedApproverData = {};
-        //         Object.keys(approverGroups).forEach(group => {
-        //             processedApproverData[group] = approverGroups[group].join(",");
-        //         });
-
-        //         console.log("Processed approver data:", processedApproverData);
-        //         return processedApproverData;
-
-        //     } catch (error) {
-        //         console.error("Error fetching or processing approver details:", error);
-        //         throw error;
-        //     }
-        // },
-
         getApproverDetails: async function (oSaveData, sPhysicalDisposalFlag, sGrantIdFlag) {
             try {
                 const oModel = this.getOwnerComponent().getModel("doa"); // DOA model
@@ -1204,12 +1002,12 @@ sap.ui.define([
                 const sCostCenter = oSaveData.Items?.results?.[0]?.Kostl || "";
                 const sEmail = oSaveData.CrBtpuser || "";
 
-                // 🔹 Determine subObject (Disposal / Non-Disposal)
+                // Determine subObject (Disposal / Non-Disposal)
                 const sProcess = sPhysicalDisposalFlag === "yes" ? "Disposal" : "Non-Disposal";
                 console.log("sProcess ", sProcess)
 
 
-                // 🔹 Determine process (Grant / Non-Grant)
+                // Determine process (Grant / Non-Grant)
                 const sSubObject = sGrantIdFlag === "yes" ? "Grant" : "Non-Grant";
                 console.log("subobject ", sSubObject)
 
@@ -1217,23 +1015,19 @@ sap.ui.define([
                     throw new Error("Missing required data: cost center or email");
                 }
 
-                // 🔹 Construct the correct path (with service name prefix)
-                const sPath = `/getApproverDetails(applicationID='${sApplicationID}',costCenter='${sCostCenter}',subObject='${sSubObject}',process='${sProcess}',email='${sEmail}')`;
-                //  const sPath = `/getApproverDetails(applicationID='FAD',costCenter='C1021-00',subObject='Grant',process='Non-Disposal',email='')`;
+                // Construct the correct path (with service name prefix)
+                //const sPath = `/getApproverDetails(applicationID='${sApplicationID}',costCenter='${sCostCenter}',subObject='${sSubObject}',process='${sProcess}',email='${sEmail}')`;
+                const sPath = `/getApproverDetails(applicationID='FAD',costCenter='C1021-00',subObject='Grant',process='Non-Disposal',email='')`;
 
                 console.log("Calling DOA API:", sPath);
 
-                // 🔹 Call the backend
+                // Call the backend
                 const oBinding = oModel.bindContext(sPath);
                 const oContext = await oBinding.requestObject();
 
                 console.log("Fetched approver details from DOA:", oContext);
 
-                // Safety check for returned data
                 const aApprovers = oContext?.value || [];
-
-
-                // Prepare approver groups based on LEVEL
                 const approverData = {
                     HOD: "",
                     FUMAN: "",
@@ -1254,16 +1048,14 @@ sap.ui.define([
                     levelGroups[level].push(email);
                 });
 
-                // ⭐ Final dynamic mapping based on "sProcess"
                 // Non-Disposal → 3 levels
                 // Disposal → 4 levels
                 if (sProcess === "Non-Disposal") {
                     approverData.HOD = (levelGroups["1"] || []).join(",");
-                    approverData.OFIN = (levelGroups["2"] || []).join(",");  // Grant/Non-Grant
+                    approverData.OFIN = (levelGroups["2"] || []).join(",");
                     approverData.GFIN = (levelGroups["2"] || []).join(",");
                     approverData.CFO = (levelGroups["3"] || []).join(",");
                 } else {
-                    // Disposal
                     approverData.HOD = (levelGroups["1"] || []).join(",");
                     approverData.FUMAN = (levelGroups["2"] || []).join(",");
                     approverData.OFIN = (levelGroups["3"] || []).join(",");
@@ -1415,264 +1207,7 @@ sap.ui.define([
          */
         getResourceBundle: function () {
             return this.getOwnerComponent().getModel("i18n").getResourceBundle();
-        },
-
-        // /**  
-        //  * Handles file upload action for the selected asset row using backend service.  
-        //  * @param {sap.ui.base.Event} oEvent - The press event triggered by the attachment action.  
-        //  * @param {sap.m.Table} oTable - The table containing the asset rows.  
-        //  * @public  
-        //  */
-        // onGenericAttachmentPress: function (oEvent, oTable) {
-        //     var oButton = oEvent.getSource();
-        //     var oTable = this.byId(oTable);
-
-        //     if (!oTable) {
-        //         MessageBox.error("Table not found");
-        //         return;
-        //     }
-        //     var aItems = [];
-        //     if (oTable.getItems) {
-        //         aItems = oTable.getItems();
-        //     } else if (oTable.getRows) {
-        //         aItems = oTable.getRows();
-        //     } else if (oTable.getAggregation && oTable.getAggregation("items")) {
-        //         aItems = oTable.getAggregation("items");
-        //     } else {
-        //         console.log("Table type:", oTable.getMetadata().getName());
-        //         MessageBox.error("Unsupported table type");
-        //         return;
-        //     }
-        //     console.log("Found table items:", aItems.length);
-
-        //     var iRowIndex = -1;
-        //     for (var i = 0; i < aItems.length; i++) {
-        //         var oItem = aItems[i];
-        //         if (this._isButtonInRow(oButton, oItem)) {
-        //             iRowIndex = i;
-        //             break;
-        //         }
-        //     }
-
-        //     if (iRowIndex === -1) {
-        //         console.error("Button not found in any row. Button parent hierarchy:");
-        //         this._logParentHierarchy(oButton);
-        //         MessageBox.error("Could not determine which row was clicked");
-        //         return;
-        //     }
-        //     var sReqitem = (iRowIndex + 1).toString().padStart(3, '0');
-        //     this._iCurrentRowIndex = iRowIndex;
-        //     this._sCurrentReqitem = sReqitem;
-
-        //     console.log("Row clicked:", iRowIndex, "Reqitem:", sReqitem);
-
-        //     var oFileInput = document.createElement("input");
-        //     oFileInput.type = "file";
-        //     oFileInput.accept = ".pdf,.doc,.docx,.jpg,.png,.gif";
-
-        //     oFileInput.onchange = async function (e) {
-        //         var oFile = e.target.files[0];
-        //         if (oFile) {
-        //             //MessageToast.show("Selected: " + oFile.name + " for row " + (iRowIndex + 1) + " - Starting upload...");
-        //             await this.onGenericUploadFileToBackend(oFile, iRowIndex);
-        //             oEvent.getSource().setVisible(false);
-        //         }
-        //     }.bind(this);
-
-        //     oFileInput.click();
-
-
-        // },
-
-        // // Helper function to debug parent hierarchy
-        // _logParentHierarchy: function (oControl) {
-        //     var aHierarchy = [];
-        //     var oParent = oControl;
-
-        //     while (oParent && aHierarchy.length < 10) {
-        //         aHierarchy.push(oParent.getMetadata().getName() + " (ID: " + (oParent.getId() || "none") + ")");
-        //         oParent = oParent.getParent();
-        //     }
-
-        //     console.log("Control hierarchy:", aHierarchy);
-        // },
-
-        // // Helper function to check if a button is within a specific table row
-        // _isButtonInRow: function (oButton, oTableItem) {
-        //     var oParent = oButton.getParent();
-        //     while (oParent) {
-        //         if (oParent === oTableItem) {
-        //             return true;
-        //         }
-        //         oParent = oParent.getParent();
-        //     }
-
-        //     return false;
-        // },
-
-        // /**  
-        //  * Uploads files to the backend for the specified collection path.  
-        //  * @param {File} oFile - The file object to be uploaded.  
-        //  * @param {any} vRowRef - Reference to the related row/asset.  
-        //  * @param {string} sCollectionPath - Backend collection path (e.g., FileSet).  
-        //  * @public  
-        //  */
-        // onGenericUploadFileToBackend: function (oFile, vRowRef, sCollectionPath) {
-        //     var oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-        //     var oFormData = new FormData();
-        //     oFormData.append("fileData", oFile);
-        //     var sToken = oSrvModel.getSecurityToken();
-        //     var sUploadUrl = oSrvModel.sServiceUrl + "/FileSet";
-        //     BusyIndicator.show();
-
-        //     var xhr = new XMLHttpRequest();
-
-        //     xhr.onreadystatechange = function () {
-        //         if (xhr.readyState === 4) {
-        //             BusyIndicator.hide();
-        //             if (xhr.status === 201 || xhr.status === 200) {
-        //                 try {
-        //                     var sResponse = xhr.responseText;
-        //                     var xml = jQuery.parseXML(sResponse);
-        //                     var sFileid = xml.getElementsByTagName("d:Fileid")[0].textContent;
-        //                     if (typeof vRowRef === "number") {
-        //                         this.onGenericUpdateAttachmentModel(sFileid, oFile.name, oFile.type, vRowRef);
-        //                     } else if (vRowRef && vRowRef.getPath) {
-        //                         var sRowPath = vRowRef.getPath();
-        //                         var oModel = vRowRef.getModel();
-        //                         var aAttachments = oModel.getProperty(sRowPath + "/Attachments") || [];
-
-        //                         aAttachments.push({
-        //                             Fileid: sFileid,
-        //                             Filename: oFile.name,
-        //                             MimeType: oFile.type,
-        //                             Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
-        //                         });
-
-        //                         oModel.setProperty(sRowPath + "/Attachments", aAttachments);
-        //                         console.log("Updated attachments for path:", sRowPath);
-        //                     }
-
-        //                     MessageToast.show("File uploaded successfully!");
-        //                 } catch (e) {
-        //                     console.error("Error parsing upload response:", e);
-        //                     MessageToast.show("Upload completed but failed to parse response");
-        //                 }
-        //             } else {
-        //                 console.error("Upload failed:", xhr.status, xhr.statusText);
-        //                 MessageBox.error("Upload failed: " + xhr.statusText);
-        //             }
-        //         }
-        //     }.bind(this);
-
-        //     xhr.onerror = function () {
-        //         BusyIndicator.hide();
-        //         MessageBox.error("Upload failed due to network error");
-        //     };
-
-        //     xhr.open("POST", sUploadUrl, true);
-        //     xhr.setRequestHeader("X-CSRF-Token", sToken);
-        //     xhr.setRequestHeader("slug", oFile.name);
-        //     xhr.send(oFormData);
-        // },
-
-        // /**  
-        //  * Updates files related to the selected asset in the FileSet entity.  
-        //  * @param {string} sFileid - Unique identifier of the file.  
-        //  * @param {string} sFileName - Name of the uploaded file.  
-        //  * @param {string} sMimeType - MIME type of the uploaded file.  
-        //  * @param {number} iRowIndex - Row index of the asset in the table.  
-        //  * @public  
-        //  */
-        // onGenericUpdateAttachmentModel: function (sFileid, sFileName, sMimeType, iRowIndex) {
-        //     const oModel = this.getModel("listOfSelectedAssetsModel");
-        //     let aAssets = oModel.getProperty("/assets") || sCollectionPath;
-
-        //     if (!aAssets[iRowIndex]) {
-        //         console.error("Invalid row index for attachment update");
-        //         return;
-        //     }
-        //     const oAttachmentData = {
-        //         Fileid: sFileid,
-        //         Filename: sFileName,
-        //         MimeType: sMimeType,
-        //         Url: `/sap/opu/odata/sap/ZUI_SMU_ATTACHMENTS_SRV/FileSet('${sFileid}')/$value`
-        //     };
-
-        //     if (!aAssets[iRowIndex].Attachments) {
-        //         aAssets[iRowIndex].Attachments = [];
-        //     }
-        //     aAssets[iRowIndex].Attachments.push(oAttachmentData);
-        //     oModel.setProperty("/assets", aAssets);
-        //     console.log("Updated asset with attachments:", aAssets[iRowIndex]);
-        // },
-
-
-        /**
-         * Handles Deleting the uploaded file linked to the selected asset From Local Model.
-         * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
-         * @public
-         */
-        // onGenericDeleteAttachment: function (oEvent) {
-        //     let uploadButton = oEvent.getSource().getParent().getParent().getParent().getParent().getItems()[1];
-        //     console.log("Delete button pressed");
-
-        //     const oAttachmentContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        //     console.log("Attachment context:", oAttachmentContext);
-
-        //     if (!oAttachmentContext) {
-        //         console.warn("No attachment context found.");
-        //         return;
-        //     }
-
-        //     const sFileName = oAttachmentContext.getProperty("Filename");
-        //     console.log("File to delete:", sFileName);
-        //     const oAttachmentPath = oAttachmentContext.getPath();
-        //     console.log("Attachment path:", oAttachmentPath);
-        //     const oRowPath = oAttachmentPath.split("/Attachments")[0];
-        //     console.log("Row path:", oRowPath);
-        //     const oModel = this.getView().getModel("listOfSelectedAssetsModel");
-        //     console.log("Model object:", oModel);
-        //     const aAttachments = oModel.getProperty(oRowPath + "/Attachments") || [];
-        //     console.log("Current attachments array:", aAttachments);
-        //     const aUpdated = aAttachments.filter(att => att.Filename !== sFileName);
-        //     console.log("Updated attachments array:", aUpdated);
-        //     oModel.setProperty(oRowPath + "/Attachments", aUpdated);
-        //     MessageToast.show("Attachment deleted successfully.");
-        //     uploadButton.setVisible(true)
-        // },
-
-        /**
-         * Handles downloading the uploaded file linked to the selected asset.
-         * @param {sap.ui.base.Event} oEvent - The event triggered by the download action.
-         * @public
-         */
-        // onGenericDownloadItem: function (oEvent) {
-        //     const oContext = oEvent.getSource().getBindingContext("listOfSelectedAssetsModel");
-        //     const sFileId = oContext.getProperty("Fileid");
-        //     const sMimeType = oContext.getProperty("MimeType");
-        //     const sFileName = oContext.getProperty("Filename");
-        //     const oSrvModel = this.getOwnerComponent().getModel("ZUI_SMU_ATTACHMENTS_SRV");
-        //     const sUrl = `${oSrvModel.sServiceUrl}/FileSet('${sFileId}')/$value`;
-        //     fetch(sUrl, { credentials: "include" })
-        //         .then(res => res.blob())
-        //         .then(blob => {
-        //             const newBlob = new Blob([blob], { type: sMimeType });
-        //             const url = window.URL.createObjectURL(newBlob);
-        //             const a = document.createElement("a");
-        //             a.href = url;
-        //             a.download = sFileName;
-        //             document.body.appendChild(a);
-        //             a.click();
-        //             a.remove();
-
-        //             window.URL.revokeObjectURL(url);
-        //         })
-        //         .catch(err => {
-        //             console.error("Download failed", err);
-        //             MessageBox.error("Failed to download file.");
-        //         });
-        // }
+        }
 
     });
 });
