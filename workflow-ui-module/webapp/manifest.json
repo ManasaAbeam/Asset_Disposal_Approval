@@ -115,11 +115,6 @@
         "settings": {},
         "preload": false
       },
-      "LocalModel": {
-        "type": "sap.ui.model.json.JSONModel",
-        "settings": {},
-        "preload": false
-      },
       "listOfSelectedAssetsModel": {
         "type": "sap.ui.model.json.JSONModel",
         "settings": {},
@@ -227,6 +222,11 @@
           "type": "string",
           "title": "Btprn",
           "description": "Btprn"
+        },
+        "ApprovalStage": {
+          "type": "string",
+          "title": "Approval Stage",
+          "description": "Approval stage for workflow routing"
         }
       }
     },

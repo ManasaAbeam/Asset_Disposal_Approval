@@ -124,6 +124,51 @@ sap.ui.define(
                 // },
 
 
+                _triggerAction: function (outcome) {
+                    var that = this;
+                    var oModel = this.getModel("ZUI_ADW_ASSET_REQUEST_SRV");
+
+                    const sStage = this.getModel("context").getProperty("/ApprovalStage");
+                    const role = this._getRoleFromStage(sStage);  // HOD / Functional / Grant / OFIN / CFO
+
+                    const Reqstatus =
+                        outcome === "approve"
+                            ? `Approved By ${role}`
+                            : `Rejected By ${role}`;
+
+                    var oPayload = {
+                        Reqno: this.getModel("context").getData().Btprn,
+                      //  ActionCode: outcome === "approve" ? "APPROVE" : "REJECT",
+                        ActionCode: Reqstatus,
+                        Comments: this.getRootControl().byId("idApproverComments").getValue(),
+                        CrBtpuser: this.getModel("currentUser").getProperty("/email"),
+                        Reqstatus: Reqstatus,
+                        Aprgrp: role                     // NEW FIELD
+                    };
+
+                    console.log("TriggerAction payload:", oPayload);
+
+                    return new Promise(function (resolve, reject) {
+                        oModel.create("/ActionSet", oPayload, {
+                            success: function (oData) {
+                                console.log("Created ActionSet:", oData);
+                                resolve(oData);
+                            },
+                            error: function (oError) {
+                                console.error("Error in _triggerAction:", oError);
+                                reject(new Error("Failed to trigger workflow action"));
+                            }
+                        });
+                    });
+                },
+
+                _getRoleFromStage: function (sStage) {
+                    if (!sStage) return "";
+
+                    // Extract last word (HOD, Functional, Grant, OFIN, CFO)
+                    const parts = sStage.split(" ");
+                    return parts[parts.length - 1];
+                },
 
                 completeTask: function (approvalStatus, outcomeId) {
                     if (outcomeId === "reject") {
@@ -136,7 +181,7 @@ sap.ui.define(
                     }
 
                     this.getModel("context").setProperty("/approved", approvalStatus);
-                    //this._triggerAction(outcomeId);
+                    this._triggerAction(outcomeId);
                     this._patchTaskInstance(outcomeId);
                 },
 

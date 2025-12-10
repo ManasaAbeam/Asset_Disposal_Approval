@@ -1074,6 +1074,36 @@ sap.ui.define([
             }
         },
 
+        //retriving approvers from G-table insted DOA Working fine 
+        // getApproverDetails: async function () {
+        //     try {
+        //         const oModel = this.getModel();
+        //         const oBindList = oModel.bindList("/AssetApprovers")
+        //         const aContexts = await oBindList.requestContexts();
+        //         console.log("AssetApprovers contexts fetched:", aContexts);
+        //         const approverData = aContexts.map(oContext => oContext.getObject());
+        //         console.log("AssetApprovers data:", approverData);
+        //         const approverGroups = {};
+        //         approverData.forEach(approver => {
+        //             if (!approverGroups[approver.Aprgrp]) {
+        //                 approverGroups[approver.Aprgrp] = [];
+        //             }
+        //             approverGroups[approver.Aprgrp].push(approver.Btpuser);
+        //         });
+        //         const processedApproverData = {};
+        //         Object.keys(approverGroups).forEach(group => {
+        //             processedApproverData[group] = approverGroups[group].join(",");
+        //         });
+
+        //         console.log("Processed approver data:", processedApproverData);
+        //         return processedApproverData;
+
+        //     } catch (error) {
+        //         console.error("Error fetching or processing approver details:", error);
+        //         throw error;
+        //     }
+        // },
+
 
 
         _handleSaveSuccess: function (oData, sAction, oBundle) {
